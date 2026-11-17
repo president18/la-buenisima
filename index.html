@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Buenísima · Fantasy Football</title>
+<meta name="theme-color" content="#0B0F17">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div id="brandLogo" class="logo">LB</div>
+    <div class="brand"><h1>La Buenísima</h1><small id="brandSub">Fantasy Football</small></div>
+    <div class="live"><span id="liveDot" class="dot off"></span><span id="liveTxt">Cargando…</span>
+      <button class="btn" id="refreshBtn" style="padding:5px 9px" title="Actualizar">↻</button></div>
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+</header>
+
+<div id="loading" class="loading"><div><div class="spin"></div><div id="loadTxt">Conectando con Sleeper…</div></div></div>
+
+<main id="main" class="wrap" style="display:none">
+  <section class="sec" id="s-inicio"></section>
+  <section class="sec" id="s-power"></section>
+  <section class="sec" id="s-semana"></section>
+  <section class="sec" id="s-calendarios"></section>
+  <section class="sec" id="s-movimientos"></section>
+  <section class="sec" id="s-draft"></section>
+  <section class="sec" id="s-historia"></section>
+</main>
+
+<div class="modal" id="imgModal" onclick="if(event.target===this)this.classList.remove('on')"><div class="modal-in"><div class="modal-body"></div></div></div>
+<div class="toast" id="toast"></div>
+<div id="canvasHost"></div>
+
+<script src="config.js"></script>
+<script src="js/core.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/league.js"></script>
+</body>
+</html>
