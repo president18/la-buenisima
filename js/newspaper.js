@@ -10,6 +10,7 @@
   const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
   const hoy = () => { const d = new Date(); return `${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`; };
   const T = (D, r) => esc(UI.tName(D, r));
+  const TN = (D, r) => { const n = UI.tName(D, r); return `<div class="np-tn" style="${n.length > 20 ? "font-size:21px" : n.length > 16 ? "font-size:23px" : ""}">${esc(n)}</div>`; };
 
   function masthead(D, section, w, small) {
     return `<div class="np-top"><span>Año ${Number(D.season) - 2025} · Edición No. ${w}</span><span>${hoy()}</span><span>Precio: una cerveza</span></div>
@@ -27,9 +28,9 @@
       const wa = M.winA == null ? 0.5 : M.winA;
       const kA = M.topA[0], kB = M.topB[0];
       return `<div class="np-mu">
-        <div class="np-mu-t"><div class="np-tn">${T(D, M.g.a)}</div><div class="np-rec">${M.sa.W != null ? rec(M.sa) : ""} · ${esc(UI.oName(D, M.g.a))}</div></div>
+        <div class="np-mu-t">${TN(D, M.g.a)}<div class="np-rec">${M.sa.W != null ? rec(M.sa) : ""} · ${esc(UI.oName(D, M.g.a))}</div></div>
         <div class="np-mu-s"><b>${f1(sa)}</b><i>vs</i><b>${f1(sb)}</b></div>
-        <div class="np-mu-t r"><div class="np-tn">${T(D, M.g.b)}</div><div class="np-rec">${M.sb.W != null ? rec(M.sb) : ""} · ${esc(UI.oName(D, M.g.b))}</div></div>
+        <div class="np-mu-t r">${TN(D, M.g.b)}<div class="np-rec">${M.sb.W != null ? rec(M.sb) : ""} · ${esc(UI.oName(D, M.g.b))}</div></div>
         <div class="np-bar"><i style="width:${wa * 100}%"></i></div>
         <div class="np-mu-x"><span>${pct(wa)}</span><span>${kA && kB ? `Clave: ${esc(UI.plName(D, kA.pid))} vs ${esc(UI.plName(D, kB.pid))}` : ""}</span><span>${pct(1 - wa)}</span></div></div>`;
     }).join("");
