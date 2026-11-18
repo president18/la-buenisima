@@ -6,11 +6,11 @@
   const { esc, f1, pct, sign, rec } = UI;
   const $ = (s) => document.querySelector(s);
   const TABS = [
-    ["inicio", "Inicio"], ["power", "Power Rankings"], ["semana", "Semana"], ["calendarios", "Calendarios"],
-    ["movimientos", "Trades y Waivers"], ["draft", "Draft"], ["historia", "Historia"],
+    ["inicio", "Inicio"], ["power", "Power Rankings"], ["semana", "Semana"], ["manianera", "La Mañanera 6"], ["calendarios", "Calendarios"],
+    ["movimientos", "Trades y Waivers"], ["draft", "Draft"], ["oscars", "Óscars"], ["historia", "Historia"],
   ];
   let D = null;
-  const sel = { power: null, semana: null };
+  const sel = { power: null, semana: null, np: null, npMode: null, bnAll: false };
 
   function header() {
     $("#brandLogo").outerHTML = UI.logoHTML(D);
@@ -44,12 +44,12 @@
       const o = sim[s.rid];
       return `<tr class="${UI.isMine(D, s.rid) ? "me" : ""}">
         <td class="num">${s.rank}</td><td class="sticky-col">${UI.teamCell(D, s.rid, { sm: true })}</td>
-        <td class="num">${rec(s)}</td><td class="r num">${f1(s.pf)}</td><td class="r num">${f1(s.pa)}</td>
-        <td class="r num">${f1(s.max)}</td><td class="r num">${pct(s.eff, 1)}</td>
-        <td class="num">${s.apW}-${s.apL}</td><td class="r num ${s.luck > 0.5 ? "good" : s.luck < -0.5 ? "bad" : ""}">${sign(s.luck)}</td>
+        <td class="num">${rec(s)}</td><td class="r num">${f1(s.pf)}</td><td class="r num hide-m">${f1(s.pa)}</td>
+        <td class="r num hide-m">${f1(s.max)}</td><td class="r num">${pct(s.eff, 1)}</td>
+        <td class="num hide-m">${s.apW}-${s.apL}</td><td class="r num ${s.luck > 0.5 ? "good" : s.luck < -0.5 ? "bad" : ""}">${sign(s.luck)}</td>
         <td class="c">${s.streak}</td><td class="r num">${D.sim.remaining.length ? pct(o.playoff) : s.rank <= D.playoffTeams ? "✔" : "✘"}</td></tr>`;
     }).join("");
-    $("#s-inicio").innerHTML = `
+    $("#s-inicio").innerHTML = breakingHTML() + `
       <div class="row"><div><div class="h2">Tabla general</div><p class="sub">Después de la semana ${w} · Top ${D.playoffTeams} a playoffs (semana ${D.regEnd + 1})</p></div><span class="sp"></span>
       <button class="btn" id="imgStand">🖼️ Imagen</button></div>
       <div class="kpis" style="margin-bottom:14px">
@@ -59,9 +59,12 @@
         ${kpi("Más suertudo", sign(lucky.luck), esc(D.teams[lucky.rid].name) + " · victorias vs esperado")}
         ${kpi("Más salado", sign(unlucky.luck), esc(D.teams[unlucky.rid].name))}
       </div>
-      <div class="tbl-wrap"><table><thead><tr><th>#</th><th class="sticky-col">Equipo</th><th>Récord</th><th class="r">PF</th><th class="r">PC</th><th class="r">Máx</th><th class="r">Efic.</th><th>All-play</th><th class="r">Suerte</th><th class="c">Racha</th><th class="r">Playoffs</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <div class="tbl-wrap"><table><thead><tr><th>#</th><th class="sticky-col">Equipo</th><th>Récord</th><th class="r">PF</th><th class="r hide-m">PC</th><th class="r hide-m">Máx</th><th class="r">Efic.</th><th class="hide-m">All-play</th><th class="r">Suerte</th><th class="c">Racha</th><th class="r">Playoffs</th></tr></thead><tbody>${rows}</tbody></table></div>
       <p class="small faint">PF: puntos a favor · PC: en contra · Máx: lo que hubiera sumado con el lineup perfecto · All-play: récord si jugara contra todos cada semana · Suerte: victorias reales menos las esperadas por puntos.</p>
-      ${D.sim.remaining.length ? renderOdds() : ""}`;
+      ${D.sim.remaining.length ? renderOdds() : ""}
+      ${topScorersHTML()}`;
+    bindBreaking();
+    const ts = $("#imgTop"); if (ts) ts.onclick = () => UI.makeImage(cardTop(), `mas-puntos-por-semana`);
     $("#imgStand").onclick = () => UI.makeImage(cardStandings(), `tabla-semana-${w}`);
     const ib = $("#imgOdds"); if (ib) ib.onclick = () => UI.makeImage(cardOdds(), `playoffs-semana-${w}`);
   }
@@ -70,11 +73,11 @@
     const ord = D.rids.slice().sort((a, b) => sim[b].playoff - sim[a].playoff || sim[b].wins - sim[a].wins);
     const rows = ord.map((r) => {
       const o = sim[r];
-      return `<tr class="${UI.isMine(D, r) ? "me" : ""}"><td class="sticky-col">${UI.teamCell(D, r, { sm: true })}</td><td class="r num">${f1(o.wins)}</td>
-      <td class="r num"><b>${pct(o.playoff)}</b></td><td class="r num">${pct(o.bye)}</td><td class="r num">${pct(o.first)}</td><td class="r num ${o.last > 0.25 ? "bad" : ""}">${pct(o.last)}</td></tr>`;
+      return `<tr class="${UI.isMine(D, r) ? "me" : ""}"><td class="sticky-col">${UI.teamCell(D, r, { sm: true })}</td><td class="r num hide-m">${f1(o.wins)}</td>
+      <td class="r num"><b>${pct(o.playoff)}</b></td><td class="r num">${pct(o.bye)}</td><td class="r num hide-m">${pct(o.first)}</td><td class="r num ${o.last > 0.25 ? "bad" : ""}">${pct(o.last)}</td></tr>`;
     }).join("");
     return `<div class="row" style="margin-top:20px"><div><div class="h3" style="margin:0">Probabilidades de playoffs</div><p class="sub" style="margin:4px 0 10px">${D.sim.N.toLocaleString()} simulaciones de las semanas ${D.lastScored + 1}–${D.regEnd} con el calendario real</p></div><span class="sp"></span><button class="btn" id="imgOdds">🖼️ Imagen</button></div>
-      <div class="tbl-wrap"><table><thead><tr><th class="sticky-col">Equipo</th><th class="r">Victorias proy.</th><th class="r">Playoffs</th><th class="r">Bye (top 2)</th><th class="r">#1</th><th class="r">Último</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      <div class="tbl-wrap"><table><thead><tr><th class="sticky-col">Equipo</th><th class="r hide-m">Victorias proy.</th><th class="r">Playoffs</th><th class="r">Bye</th><th class="r hide-m">#1</th><th class="r">Último</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
   function cardStandings() {
     const w = Math.min(D.lastScored, D.regEnd);
@@ -90,6 +93,60 @@
       <div><div class="ic-name">${esc(D.teams[r].name)}</div><div class="ic-meta">Bye ${pct(sim[r].bye)} · #1 ${pct(sim[r].first)} · Último ${pct(sim[r].last)}</div></div>
       <div class="ic-score" style="color:${sim[r].playoff > 0.5 ? "#3DDC97" : "#FF5C7A"}">${pct(sim[r].playoff)}</div></div>`).join("");
     return UI.icFrame(D, "Probabilidades", "¿Quién entra a playoffs?", body);
+  }
+
+
+  /* ---- Breaking News ---- */
+  function breakingHTML() {
+    const all = LB.stories.breaking(D);
+    const list = sel.bnAll ? all : all.slice(0, 5);
+    if (!list.length) return "";
+    return `<div class="row"><div><div class="h2" style="color:var(--bad)">🚨 Breaking News</div><p class="sub">Lo más fuerte que ha pasado en la liga. Toca 🗞️ para la portada.</p></div></div>
+      <div class="grid" style="gap:8px">${list.map((e, i) => `<div class="bn"><div class="bn-w">S${e.week}</div><div style="min-width:0"><div class="bn-k">${esc(e.kicker)}</div><div class="bn-h">${esc(e.headline)}</div><div class="bn-s">${esc(e.sub)}</div></div><button class="btn" data-bn="${i}" style="padding:7px 10px">🗞️</button></div>`).join("")}</div>
+      ${all.length > 5 ? `<div style="text-align:center;margin-top:8px"><button class="btn" id="bnMore">${sel.bnAll ? "Ver menos" : `Ver todas (${all.length})`}</button></div>` : ""}<div style="height:10px"></div>`;
+  }
+  function bindBreaking() {
+    const all = LB.stories.breaking(D);
+    const list = sel.bnAll ? all : all.slice(0, 5);
+    document.querySelectorAll("[data-bn]").forEach((b) => (b.onclick = () => { const e = list[Number(b.dataset.bn)]; UI.makeImage(LB.np.breaking(D, e), `breaking-${slug(e.headline)}`); }));
+    const m = $("#bnMore"); if (m) m.onclick = () => { sel.bnAll = !sel.bnAll; renderInicio(); };
+  }
+  /* ---- Equipo con más puntos por semana ---- */
+  function topScorersHTML() {
+    const R = D.records;
+    const rows = R.weeklyTop.slice().reverse().map((x) => {
+      const second = D.rids.filter((r) => r !== x.rid && D.tw[r][x.w]).map((r) => D.tw[r][x.w].pf).sort((a, b) => b - a)[0];
+      return `<tr><td class="num">S${x.w}</td><td>${UI.teamCell(D, x.rid, { sm: true })}</td><td class="r num"><b>${f1(x.pts)}</b></td><td class="r num faint">+${f1(x.pts - (second || 0))}</td><td class="c">${D.tw[x.rid][x.w].res === "W" ? '<span class="good">G</span>' : '<span class="bad">P</span>'}</td></tr>`;
+    }).join("");
+    const counts = D.rids.filter((r) => R.weeklyTopCount[r]).sort((a, b) => R.weeklyTopCount[b] - R.weeklyTopCount[a]).map((r) => `<span class="chip">${esc(D.teams[r].name)} <b>×${R.weeklyTopCount[r]}</b></span>`).join("");
+    return `<div class="row" style="margin-top:20px"><div><div class="h3" style="margin:0">👑 El que más metió cada semana</div><p class="sub" style="margin:4px 0 10px">Equipo con más puntos de cada jornada y su ventaja sobre el segundo.</p></div><span class="sp"></span><button class="btn" id="imgTop">🖼️ Imagen</button></div>
+      <div class="chips" style="margin-bottom:10px">${counts}</div>
+      <div class="tbl-wrap"><table><thead><tr><th>Sem</th><th>Equipo</th><th class="r">Pts</th><th class="r">Ventaja</th><th class="c">Res</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }
+  function cardTop() {
+    const R = D.records;
+    const body = R.weeklyTop.map((x) => `<div class="ic-row" style="padding:8px 22px;grid-template-columns:90px 1fr auto"><div class="ic-rk" style="font-size:40px">S${x.w}</div><div><div class="ic-name" style="font-size:27px">${esc(D.teams[x.rid].name)}</div></div><div class="ic-score" style="font-size:40px">${f1(x.pts)}</div></div>`).join("");
+    return UI.icFrame(D, "Temporada " + D.season, "El que más metió", body);
+  }
+
+  /* ============ LA MAÑANERA 6 ============ */
+  function renderManianera() {
+    const played = D.playedWeeks.slice();
+    const future = Object.keys(D.games).map(Number).filter((w) => w > D.lastScored && D.games[w].length);
+    const mode = sel.npMode || (future.includes(D.projWeek) ? "preview" : "results");
+    const weeks = mode === "preview" ? future : played;
+    let w = sel.np && weeks.includes(sel.np) ? sel.np : mode === "preview" ? (future.includes(D.projWeek) ? D.projWeek : future[0]) : played[played.length - 1];
+    $("#s-manianera").innerHTML = `<div class="row"><div><div class="h2">La Mañanera 6</div><p class="sub">El periódico oficial de La Buenísima, listo para mandarlo al chat.</p></div></div>
+      <div class="row" style="margin-bottom:12px"><button class="btn ${mode === "preview" ? "pri" : ""}" id="npPrev" ${future.length ? "" : "disabled"}>📰 Preview</button><button class="btn ${mode === "results" ? "pri" : ""}" id="npRes" ${played.length ? "" : "disabled"}>🏁 Resultados</button>
+      <select id="npWeek">${weeks.map((x) => `<option value="${x}" ${x === w ? "selected" : ""}>Semana ${x}</option>`).join("")}</select><span class="sp"></span><button class="btn pri" id="npImg">🖼️ Generar imagen</button></div>
+      ${mode === "preview" && w !== D.projWeek ? '<p class="note">Para semanas futuras no hay proyecciones todavía: se usan promedios de temporada.</p>' : ""}
+      <div id="npBox"></div>`;
+    const html = w ? (mode === "preview" ? LB.np.preview(D, w) : LB.np.results(D, w)) : "";
+    if (html) LB.np.mount($("#npBox"), html);
+    $("#npPrev").onclick = () => { sel.npMode = "preview"; sel.np = null; renderManianera(); };
+    $("#npRes").onclick = () => { sel.npMode = "results"; sel.np = null; renderManianera(); };
+    $("#npWeek").onchange = (e) => { sel.np = Number(e.target.value); renderManianera(); };
+    $("#npImg").onclick = () => UI.makeImage(html, `la-mananera-6-${mode === "preview" ? "preview" : "resultados"}-semana-${w}`);
   }
 
   /* ============ POWER RANKINGS ============ */
@@ -354,69 +411,20 @@
       <div class="h3">Puntos que le ha dado su draft a cada equipo</div><div class="card">${teamRows}</div>`;
   }
 
+  /* ============ ÓSCARS ============ */
+  function renderOscars() { LB.awards.render(D, $("#s-oscars")); }
+
   /* ============ HISTORIA ============ */
   function renderHistoria() {
-    const R = D.records;
-    const tw = (x) => `${esc(UI.tName(D, x.rid))} <span class="faint small">sem ${x.w}</span>`;
-    const gm = (x) => { const aw = x.pa > x.pb; return `${esc(UI.tName(D, aw ? x.a : x.b))} ${f1(Math.max(x.pa, x.pb))}–${f1(Math.min(x.pa, x.pb))} ${esc(UI.tName(D, aw ? x.b : x.a))} <span class="faint small">sem ${x.w}</span>`; };
-    const box = (t, arr, f, v) => `<div class="card"><div class="h3" style="margin-top:0;font-size:21px">${t}</div>${arr.map((x, i) => `<div class="list-row small"><span class="faint num" style="width:16px">${i + 1}</span><span>${f(x)}</span><span class="sp"></span><b class="num">${v(x)}</b></div>`).join("")}</div>`;
-    const weeks = D.playedWeeks;
-    const allPts = []; D.rids.forEach((r) => weeks.forEach((w) => D.tw[r][w] && allPts.push(D.tw[r][w].pf)));
-    const mn = Math.min(...allPts), mx = Math.max(...allPts);
-    const heat = D.standings.map((s) => s.rid).map((r) => `<tr class="${UI.isMine(D, r) ? "me" : ""}"><td class="sticky-col">${UI.teamCell(D, r, { sm: true, noOwner: true })}</td>${weeks.map((w) => {
-      const x = D.tw[r][w]; if (!x) return "<td></td>";
-      const t = (x.pf - mn) / (mx - mn || 1);
-      const bg = `hsla(${Math.round(t * 140)},70%,45%,${0.18 + 0.5 * Math.abs(t - 0.5)})`;
-      return `<td style="background:${bg}" title="${x.res || ""} vs ${x.opp ? esc(UI.tName(D, x.opp)) : ""}">${f1(x.pf)}<div style="font-size:10px" class="${x.res === "W" ? "good" : "bad"}">${x.res === "W" ? "G" : x.res === "L" ? "P" : x.res || ""}</div></td>`;
-    }).join("")}<td class="r num"><b>${R.weeklyTopCount[r]}</b></td></tr>`).join("");
-    const champs = (CFG.pastChampions || []).map((c) => `<div class="list-row"><span class="pill y">${esc(c.season)}</span><b>🏆 ${esc(c.champion)}</b>${c.runnerUp ? `<span class="faint small">subcampeón: ${esc(c.runnerUp)}</span>` : ""}<span class="sp"></span><span class="small muted">${esc(c.note || "")}</span></div>`).join("");
-    const bracket = D.bracket.length ? D.bracket.filter((m) => m.r === Math.max(...D.bracket.map((x) => x.r)) && m.p === 1)[0] : null;
-    const champNow = bracket && bracket.w ? `<div class="list-row"><span class="pill y">${D.season}</span><b>🏆 ${esc(UI.tName(D, bracket.w))}</b><span class="faint small">subcampeón: ${esc(UI.tName(D, bracket.l))}</span></div>` : "";
-    $("#s-historia").innerHTML = `<div class="h2">Historia de La Buenísima</div><p class="sub">Récords, campeones y la tabla de puntos semana por semana.</p>
-      <div class="grid g2">
-        <div class="card"><div class="h3" style="margin-top:0">🏆 Campeones</div>${champNow || champs ? champNow + champs : `<p class="muted small">El primer campeón en Sleeper se corona en la semana ${D.totalWeeks}. ${D.season === "2026" ? "Las temporadas anteriores se pueden agregar después." : ""}</p>`}
-          ${CFG.trophy ? `<p class="small"><b>Trofeo:</b> ${esc(CFG.trophy)}</p>` : ""}${CFG.punishment ? `<p class="small"><b>Castigo del último:</b> ${esc(CFG.punishment)}</p>` : ""}</div>
-        <div class="card"><div class="h3" style="margin-top:0">🔥 Rachas</div>
-          <div class="list-row small"><span>Racha ganadora más larga</span><span class="sp"></span><b>${R.winStreak.n} · ${R.winStreak.rid ? esc(UI.tName(D, R.winStreak.rid)) : "—"}</b></div>
-          <div class="list-row small"><span>Racha perdedora más larga</span><span class="sp"></span><b>${R.loseStreak.n} · ${R.loseStreak.rid ? esc(UI.tName(D, R.loseStreak.rid)) : "—"}</b></div>
-          <div class="list-row small"><span>Más veces equipo de la semana</span><span class="sp"></span><b>${(() => { const r = D.rids.slice().sort((a, b) => R.weeklyTopCount[b] - R.weeklyTopCount[a])[0]; return esc(UI.tName(D, r)) + " (" + R.weeklyTopCount[r] + ")"; })()}</b></div></div>
-      </div>
-      <div class="row"><div class="h3">Récords de la temporada</div><span class="sp"></span><button class="btn" id="imgRec">🖼️ Imagen</button></div>
-      <div class="grid g3">
-        ${box("Más puntos en una semana", R.highScore, tw, (x) => f1(x.pf))}
-        ${box("Menos puntos en una semana", R.lowScore, tw, (x) => f1(x.pf))}
-        ${box("Palizas", R.blowouts, gm, (x) => "+" + f1(Math.abs(x.pa - x.pb)))}
-        ${box("Partidos de infarto", R.closest, gm, (x) => f1(Math.abs(x.pa - x.pb)))}
-        ${box("Más puntos en una derrota", R.mostInLoss, tw, (x) => f1(x.pf))}
-        ${box("Menos puntos en una victoria", R.fewestInWin, tw, (x) => f1(x.pf))}
-        ${box("Derrotas con la victoria en la banca", R.benchFails, tw, (x) => f1(x.max - x.pf) + " banca")}
-        ${box("Mejores actuaciones individuales", R.bestPerf, (x) => `${UI.pl(D, x.pid)} <span class="faint small">${esc(UI.tName(D, x.rid))} · sem ${x.w}</span>`, (x) => f1(x.pts))}
-      </div>
-      <div class="h3">Puntos semana por semana</div>
-      <div class="tbl-wrap"><table class="heat"><thead><tr><th class="sticky-col">Equipo</th>${weeks.map((w) => `<th class="c">S${w}</th>`).join("")}<th class="r">👑</th></tr></thead><tbody>${heat}</tbody></table></div>
-      <p class="small faint">👑 = veces que fue el equipo con más puntos de la semana.</p>`;
-    $("#imgRec").onclick = () => UI.makeImage(cardRecords(), "records-temporada");
-  }
-  function cardRecords() {
-    const R = D.records;
-    const row = (t, who, v) => `<div class="ic-row" style="grid-template-columns:1fr auto"><div><div class="ic-meta" style="text-transform:uppercase;letter-spacing:2px;color:#F5C542;font-weight:700;font-size:18px">${t}</div><div class="ic-name" style="font-size:28px">${esc(who)}</div></div><div class="ic-score" style="font-size:42px">${esc(v)}</div></div>`;
-    const g = (x) => { const aw = x.pa > x.pb; return `${UI.tName(D, aw ? x.a : x.b)} vs ${UI.tName(D, aw ? x.b : x.a)} · sem ${x.w}`; };
-    const body = [
-      row("Más puntos en una semana", `${UI.tName(D, R.highScore[0].rid)} · sem ${R.highScore[0].w}`, f1(R.highScore[0].pf)),
-      row("Menos puntos en una semana", `${UI.tName(D, R.lowScore[0].rid)} · sem ${R.lowScore[0].w}`, f1(R.lowScore[0].pf)),
-      row("La paliza más grande", g(R.blowouts[0]), "+" + f1(Math.abs(R.blowouts[0].pa - R.blowouts[0].pb))),
-      row("El partido más cerrado", g(R.closest[0]), f1(Math.abs(R.closest[0].pa - R.closest[0].pb))),
-      R.mostInLoss[0] ? row("Más puntos y aun así perdió", `${UI.tName(D, R.mostInLoss[0].rid)} · sem ${R.mostInLoss[0].w}`, f1(R.mostInLoss[0].pf)) : "",
-      R.bestPerf[0] ? row("Mejor actuación individual", `${UI.plName(D, R.bestPerf[0].pid)} (${UI.tName(D, R.bestPerf[0].rid)}) · sem ${R.bestPerf[0].w}`, f1(R.bestPerf[0].pts)) : "",
-      R.winStreak.rid ? row("Racha ganadora más larga", UI.tName(D, R.winStreak.rid), R.winStreak.n + " V") : "",
-    ].join("");
-    return UI.icFrame(D, "Temporada " + D.season, "Récords", body);
+    const el = $("#s-historia");
+    el.innerHTML = '<div class="loading" style="min-height:30vh"><div><div class="spin"></div>Cargando la historia…</div></div>';
+    LB.history.load(D).then((list) => LB.history.render(D, el, list)).catch((e) => { el.innerHTML = '<p class="bad">No se pudo cargar la historia: ' + esc(e.message) + '</p>'; });
   }
 
   /* ============ arranque ============ */
   function renderAll() {
     header();
-    [renderInicio, renderPower, renderSemana, renderCalendarios, renderMovimientos, renderDraft, renderHistoria].forEach((f) => {
+    [renderInicio, renderPower, renderSemana, renderManianera, renderCalendarios, renderMovimientos, renderDraft, renderOscars, renderHistoria].forEach((f) => {
       try { f(); } catch (e) { console.error(e); }
     });
   }

@@ -153,64 +153,135 @@
         <div class="card"><div class="h3" style="margin-top:0;font-size:20px">🛡️ Streaming de DEF · semana ${D.projWeek}</div>${st(stream("DEF"), myD)}<p class="small faint">Tu DEF: ${myD ? UI.pl(D, myD) + " · " + f1(D.projPts[myD] || 0) : "—"}</p></div></div>`;
   }
 
+  /* ---------- valor de mercado ---------- */
+  let MKT = {}, MKT_SRC = "modelo";
+  async function loadMarket() {
+    try {
+      const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 8000);
+      const r = await fetch("https://api.fantasycalc.com/values/current?isDynasty=false&numQbs=1&numTeams=10&ppr=0.5", { signal: ctl.signal });
+      clearTimeout(to);
+      const arr = await r.json();
+      const m = {};
+      (arr || []).forEach((x) => { const id = x.player && (x.player.sleeperId || x.player.sleeper_id); const v = x.redraftValue || x.value; if (id && v) m[String(id)] = v; });
+      if (Object.keys(m).length > 100) { MKT = m; MKT_SRC = "FantasyCalc"; return; }
+    } catch (e) { /* se usa el modelo propio */ }
+    MKT = modelMarket(); MKT_SRC = "modelo";
+  }
+  // Modelo propio: valor sobre reemplazo, con premio a estrellas (los cracks valen más que la suma de dos medianos)
+  function modelMarket() {
+    const repl = { QB: 11, RB: 25, WR: 26, TE: 11 };
+    const mult = { QB: 0.75, RB: 1.12, WR: 1.0, TE: 0.95 };
+    const byPos = {};
+    Object.keys(D.players).forEach((p) => { const pos = D.posOf(p); if (repl[pos]) (byPos[pos] = byPos[pos] || []).push({ p, v: tradeValue(p) }); });
+    const m = {};
+    for (const pos in byPos) {
+      const arr = byPos[pos].sort((a, b) => b.v - a.v);
+      const rv = (arr[repl[pos] - 1] || arr[arr.length - 1] || { v: 0 }).v;
+      arr.forEach((x) => (m[x.p] = Math.round(Math.pow(Math.max(0, x.v - rv) + 0.5, 1.45) * 120 * mult[pos])));
+    }
+    return m;
+  }
+  const mv = (p) => MKT[p] || 0;
+
+  function posRanks() {
+    // rank por posición de titulares y profundidad
+    const res = {};
+    D.rids.forEach((r) => (res[r] = {}));
+    ["QB", "RB", "WR", "TE"].forEach((k) => {
+      const ord = D.rids.slice().sort((a, b) => STATE.tv[b][k] - STATE.tv[a][k]);
+      ord.forEach((r, i) => (res[r][k] = i + 1));
+    });
+    D.rids.forEach((r) => {
+      const ros = rosterOf(r);
+      const used = new Set(LU(ros, tradeValue).lineup.map((x) => x.pid));
+      ["QB", "RB", "WR", "TE"].forEach((k) => {
+        const bench = ros.filter((p) => !used.has(p) && D.posOf(p) === k).map(tradeValue).sort((a, b) => b - a);
+        res[r][k + "_bench"] = bench[0] || 0;
+      });
+    });
+    return res;
+  }
+
   function trades() {
+    const PR = posRanks();
     const mine = rosterOf(ME);
     const myBase = LU(mine, tradeValue).total;
+    const myStarters = new Set(LU(mine, tradeValue).lineup.map((x) => x.pid));
+    const ok = (p) => !["K", "DEF"].includes(D.posOf(p)) && !(D.players[p] && D.players[p].inj === "IR") && mv(p) > 0;
     const ideas = [];
+    const fairOk = (give, get) => {
+      const g = give.reduce((s, p) => s + mv(p), 0), r = get.reduce((s, p) => s + mv(p), 0);
+      const big = Math.max(g, r) || 1;
+      // Ellos (reciben "give") no pueden perder más de 8% de valor; tú no pagas más de 25% de sobreprecio
+      return { ok: g >= r * 0.92 && g <= r * 1.25, g, r, diff: (g - r) / big };
+    };
     for (const r of D.rids) {
       if (r === ME) continue;
       const theirs = rosterOf(r);
       const thBase = LU(theirs, tradeValue).total;
-      const mineT = mine.filter((p) => !["K", "DEF"].includes(D.posOf(p)));
-      const theirT = theirs.filter((p) => !["K", "DEF"].includes(D.posOf(p)));
-      // 1 por 1
-      for (const a of mineT) for (const b of theirT) {
-        const my = LU([...mine.filter((p) => p !== a), b], tradeValue).total - myBase;
-        if (my < 0.8) continue;
-        const th = LU([...theirs.filter((p) => p !== b), a], tradeValue).total - thBase;
-        if (th < -0.3) continue;
-        ideas.push({ r, give: [a], get: [b], my, th, fair: tradeValue(a) - tradeValue(b) });
-      }
-      // 2 por 1 (das dos, recibes uno mejor)
-      for (let i = 0; i < mineT.length; i++) for (let j = i + 1; j < mineT.length; j++) {
-        const a1 = mineT[i], a2 = mineT[j];
-        for (const b of theirT) {
-          if (tradeValue(b) < Math.max(tradeValue(a1), tradeValue(a2))) continue;
-          const my = LU([...mine.filter((p) => p !== a1 && p !== a2), b], tradeValue).total - myBase;
-          if (my < 1.2) continue;
-          const thRoster = [...theirs.filter((p) => p !== b), a1, a2];
-          const th = LU(thRoster, tradeValue).total - thBase;
-          if (th < 0) continue;
-          ideas.push({ r, give: [a1, a2], get: [b], my, th, fair: tradeValue(a1) + tradeValue(a2) - tradeValue(b) });
-        }
-      }
+      const mineT = mine.filter(ok), theirT = theirs.filter(ok);
+      const evalT = (give, get) => {
+        const f = fairOk(give, get);
+        if (!f.ok) return;
+        const my = LU([...mine.filter((p) => !give.includes(p)), ...get], tradeValue).total - myBase;
+        if (my < 0.6) return;
+        const th = LU([...theirs.filter((p) => !get.includes(p)), ...give], tradeValue).total - thBase;
+        // Nivel A: a los dos les mejora el lineup. Nivel B: a ellos no les empeora y ganan en valor de mercado.
+        if (th >= 0.3) ideas.push({ r, give, get, my, th, f, tier: "A" });
+        else if (th >= -0.5 && f.g >= f.r) ideas.push({ r, give, get, my, th, f, tier: "B" });
+      };
+      for (const a of mineT) for (const b of theirT) evalT([a], [b]);
+      for (let i = 0; i < mineT.length; i++) for (let j = i + 1; j < mineT.length; j++) for (const b of theirT) evalT([mineT[i], mineT[j]], [b]);
+      for (const a of mineT) for (let i = 0; i < theirT.length; i++) for (let j = i + 1; j < theirT.length; j++) evalT([a], [theirT[i], theirT[j]]);
     }
-    // Más probables de aceptarse: ganas tú y gana (o casi no pierde) el otro
-    ideas.forEach((x) => (x.score = x.my + 0.8 * Math.min(x.th, 4) - (x.give.length > 1 ? 0.6 : 0)));
+    ideas.forEach((x) => {
+      x.score = x.my * 2 + Math.min(x.th, 5) - Math.abs(x.f.diff) * 6 - (x.give.length + x.get.length - 2) * 0.8 + (x.tier === "A" ? 3 : 0);
+    });
     ideas.sort((a, b) => b.score - a.score);
-    const picked = [], perTeam = {}, usedGet = new Set();
+    const picked = [], perTeam = {}, usedP = new Set();
     for (const x of ideas) {
-      if ((perTeam[x.r] || 0) >= 2 || usedGet.has(x.get[0])) continue;
-      picked.push(x); perTeam[x.r] = (perTeam[x.r] || 0) + 1; usedGet.add(x.get[0]);
+      if ((perTeam[x.r] || 0) >= 2) continue;
+      if ([...x.get, ...x.give].some((p) => usedP.has(p))) continue;
+      picked.push(x); perTeam[x.r] = (perTeam[x.r] || 0) + 1; [...x.get].forEach((p) => usedP.add(p));
       if (picked.length >= 8) break;
     }
-    const need = (r) => {
-      const ord = ["QB", "RB", "WR", "TE"].map((k) => ({ k, rank: D.rids.slice().sort((a, b) => STATE.tv[b][k] - STATE.tv[a][k]).indexOf(r) + 1 }));
-      ord.sort((a, b) => b.rank - a.rank);
-      return ord[0];
-    };
-    const cards = picked.map((x) => {
+    const need = (r) => ["QB", "RB", "WR", "TE"].map((k) => ({ k, rank: PR[r][k] })).sort((a, b) => b.rank - a.rank)[0];
+    const myNeed = need(ME);
+    const names = (arr) => arr.map((p) => UI.plName(D, p)).join(" y ");
+    const cards = picked.map((x, i) => {
       const nd = need(x.r);
-      const gives = x.give.map((p) => `<div class="list-row small"><span>${UI.pl(D, p)}</span><span class="sp"></span><span class="num">${f1(tradeValue(p))}</span></div>`).join("");
-      const gets = x.get.map((p) => `<div class="list-row small"><span>${UI.pl(D, p)}</span><span class="sp"></span><span class="num">${f1(tradeValue(p))}</span></div>`).join("");
-      return `<div class="card"><div class="row">${UI.teamCell(D, x.r, { sm: true })}<span class="sp"></span><span class="pill ${x.th > 0.3 ? "g" : "y"}">${x.th > 0.3 ? "Ganan los dos" : "Justo para ellos"}</span></div>
-        <div class="grid" style="grid-template-columns:1fr 1fr;gap:12px;margin-top:10px"><div><div class="small faint">Das</div>${gives}</div><div><div class="small faint">Recibes</div>${gets}</div></div>
-        <div class="stats"><span>Tu lineup <b class="good">+${f1(x.my)}</b> pts/sem</span><span>El suyo <b class="${x.th >= 0 ? "good" : "bad"}">${sign(x.th)}</b></span><span>Su necesidad: <b>${nd.k}</b> (#${nd.rank})</span></div></div>`;
+      const giveMain = x.give.slice().sort((a, b) => mv(b) - mv(a))[0];
+      const getMain = x.get.slice().sort((a, b) => mv(b) - mv(a))[0];
+      const whyThem = [];
+      const gpos = [...new Set(x.give.map(D.posOf))];
+      if (gpos.includes(nd.k)) whyThem.push(`Su punto más débil es ${nd.k} (#${nd.rank} de la liga) y ${UI.plName(D, giveMain)} le entra de titular.`);
+      else if (x.th > 0.2) whyThem.push(`Su lineup sube ${f1(x.th)} pts por semana.`);
+      else whyThem.push(`Recibe más valor de mercado del que entrega (${Math.round(x.f.g).toLocaleString()} vs ${Math.round(x.f.r).toLocaleString()}), y su lineup casi no cambia.`);
+      const gp = D.posOf(getMain);
+      if (PR[x.r][gp + "_bench"] > 6) whyThem.push(`Tiene profundidad en ${gp}, así que puede soltar a ${UI.plName(D, getMain)}.`);
+      const whyMe = D.posOf(getMain) === myNeed.k ? `Refuerza tu ${myNeed.k}, tu posición más floja (#${myNeed.rank}).` : `Tu lineup sube ${f1(x.my)} pts por semana.`;
+      const owner = UI.oName(D, x.r);
+      const msg = `¿Qué onda ${owner}? Te propongo un trade: te doy a ${names(x.give)} por ${names(x.get)}. Te ayuda en ${nd.k}, que es donde más lo necesitas, y en valor de mercado está parejo. ¿Cómo lo ves?`;
+      const pl = (p) => `<div class="list-row small" style="display:block"><div>${UI.pl(D, p)}</div><div class="faint num" style="font-size:11.5px">${f1(tradeValue(p))} ppg · valor <b style="color:var(--tx)">${mv(p).toLocaleString()}</b></div></div>`;
+      return `<div class="card"><div class="row">${UI.teamCell(D, x.r, { sm: true })}<span class="sp"></span><span class="pill ${x.tier === "A" ? "g" : "y"}">${x.tier === "A" ? "Ganan los dos" : "Ganan en valor"}</span></div>
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:12px;margin-top:10px"><div><div class="small faint">Das</div>${x.give.map(pl).join("")}</div><div><div class="small faint">Recibes</div>${x.get.map(pl).join("")}</div></div>
+        <div class="stats"><span>Tu lineup <b class="good">+${f1(x.my)}</b> pts/sem</span><span>El suyo <b class="${x.th >= 0 ? "good" : "bad"}">${sign(x.th)}</b></span><span>Mercado <b>${Math.round(x.f.g).toLocaleString()}</b> vs <b>${Math.round(x.f.r).toLocaleString()}</b></span></div>
+        <p class="small" style="margin:8px 0 0"><b>Por qué tú:</b> ${esc(whyMe)}<br><b>Por qué ellos dirían que sí:</b> ${esc(whyThem.join(" "))}</p>
+        <div class="row" style="margin-top:8px"><button class="btn" data-copy="${i}" style="padding:6px 10px;font-size:12.5px">📋 Copiar mensaje</button></div>
+        <textarea id="msg${i}" style="display:none">${esc(msg)}</textarea></div>`;
     }).join("");
+    STATE.afterRender = () => document.querySelectorAll("[data-copy]").forEach((b) => (b.onclick = async () => {
+      const t = document.getElementById("msg" + b.dataset.copy).value;
+      try { await navigator.clipboard.writeText(t); UI.toast("Mensaje copiado ✔"); } catch (e) { UI.toast("No se pudo copiar"); }
+    }));
+    // necesidades de la liga
+    const needRows = D.rids.filter((r) => r !== ME).map((r) => { const n = need(r); const strong = ["QB", "RB", "WR", "TE"].map((k) => ({ k, rank: PR[r][k] })).sort((a, b) => a.rank - b.rank)[0]; return `<tr><td>${UI.teamCell(D, r, { sm: true, noOwner: true })}</td><td><span class="pill b">${n.k} #${n.rank}</span></td><td><span class="pill g">${strong.k} #${strong.rank}</span></td></tr>`; }).join("");
     return `<div class="h3">Trades recomendados</div>
-      <p class="sub">Buscados entre todas las combinaciones 1×1 y 2×1 con cada equipo. Prioridad: que tu lineup mejore y que al otro también le convenga, para que lo acepte. Los números son puntos por semana esperados.</p>
-      ${cards ? `<div class="grid g2">${cards}</div>` : '<p class="muted">No encontré trades que convengan a los dos lados. Tu roster está bien balanceado o hay que pagar de más.</p>'}
-      <p class="small faint">Tip: abre la negociación con la versión que más te conviene y deja margen para ceder. Antes de mandar, revisa lesiones y semanas de descanso.</p>`;
+      <p class="sub">Primero los trades que <b>les mejoran el lineup a los dos</b>; luego los que a ellos les dan <b>más valor de mercado</b> sin empeorar su lineup. Siempre con valor parejo (${MKT_SRC === "FantasyCalc" ? "valores de FantasyCalc, sacados de miles de trades reales en ligas redraft half-PPR de 10 equipos" : "modelo propio de valor sobre reemplazo, con premio a las estrellas"}). Así hay chance real de que acepten.</p>
+      ${cards ? `<div class="grid g2">${cards}</div>` : '<p class="muted">No encontré trades justos que les mejoren el lineup a los dos. Tu roster está bien armado; revisa otra vez la próxima semana.</p>'}
+      <div class="h3" style="font-size:20px">Mapa de necesidades de la liga</div>
+      <div class="tbl-wrap"><table><thead><tr><th>Equipo</th><th>Necesita</th><th>Su fuerte</th></tr></thead><tbody>${needRows}</tbody></table></div>
+      <p class="small faint">Tu necesidad principal: <b>${myNeed.k}</b> (#${myNeed.rank} de la liga). Ofrécele a quien le sobre ${myNeed.k} lo que a él le falta.</p>`;
   }
 
   function myHistory() {
@@ -227,6 +298,7 @@
 
   function render() {
     $("#main").innerHTML = [resumen(), lineup(), posStrength(), freeAgents(), trades(), myHistory()].map((h) => `<section style="padding-top:8px">${h}</section>`).join("");
+    if (STATE.afterRender) STATE.afterRender();
   }
 
   async function boot() {
@@ -235,6 +307,8 @@
     try {
       D = await LB.load((t) => ($("#loadTxt").textContent = t));
       ME = UI.myRid(D);
+      $("#loadTxt").textContent = "Bajando valores de mercado…";
+      await loadMarket();
       if (!ME) throw new Error("No encontré el equipo de " + CFG.myUsername);
       $("#loading").style.display = "none";
       $("#main").style.display = "block";

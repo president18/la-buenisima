@@ -83,9 +83,9 @@
   LB.ELIG = ELIG;
 
   /* ---------------- carga principal ---------------- */
-  LB.load = async function (onProgress) {
+  LB.load = async function (onProgress, leagueIdOverride) {
     const step = (t) => onProgress && onProgress(t);
-    const id = CFG.leagueId;
+    const id = leagueIdOverride || CFG.leagueId;
     step("Conectando con Sleeper…");
     const [state, league, users, rosters] = await Promise.all([
       getJSON(`${API}/v1/state/nfl`),
@@ -137,7 +137,7 @@
     }
     for (const p of D.referenced) if (!D.players[p]) D.players[p] = { id: p, name: "Jugador " + p, short: "#" + p, pos: "?", team: "", inj: null };
     finalize(D);
-    LB.data = D;
+    if (!leagueIdOverride) LB.data = D;
     return D;
   };
 
@@ -178,7 +178,7 @@
       const co = (r.co_owners || []).map((c) => userById[c]).filter(Boolean);
       const tn = (u && u.metadata && u.metadata.team_name && u.metadata.team_name.trim()) || (u ? "Team " + u.display_name : "Equipo " + r.roster_id);
       teams[r.roster_id] = {
-        rid: r.roster_id, name: tn, owner: u ? u.display_name : "—", ownerNick: nick(u),
+        rid: r.roster_id, name: tn, owner: u ? u.display_name : "—", ownerNick: nick(u), ownerId: r.owner_id,
         owners: [u, ...co].filter(Boolean).map((x) => x.display_name),
         ownersNick: [u, ...co].filter(Boolean).map(nick).join(" & "),
         avatar: u && u.avatar ? `https://sleepercdn.com/avatars/thumbs/${u.avatar}` : null,
