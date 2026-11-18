@@ -135,8 +135,8 @@
       const w = worstAt(D.posOf(p));
       const vs = w ? tradeValue(p) - tradeValue(w) : tradeValue(p);
       const trend = D.trendMap[p] || 0;
-      return { p, gain, vs, worst: w, val: tradeValue(p), proj: D.projPts[p] || 0, ppg: D.ppg(p), trend, score: gain * 3 + Math.max(0, vs) + Math.log10(1 + trend) * 0.6 };
-    }).filter((x) => x.val > 2).sort((a, b) => b.score - a.score);
+      return { p, gain, vs, worst: w, val: tradeValue(p), proj: D.projPts[p] || 0, ppg: D.ppg(p), trend, score: gain * 3 + vs + Math.log10(1 + trend) * 0.3 };
+    }).filter((x) => x.val > 4).sort((a, b) => b.score - a.score);
     const top = scored.filter((x) => !["K", "DEF"].includes(D.posOf(x.p))).slice(0, 12);
     const stream = (pos) => scored.filter((x) => D.posOf(x.p) === pos).sort((a, b) => b.proj - a.proj).slice(0, 3);
     const myK = mine.find((p) => D.posOf(p) === "K"), myD = mine.find((p) => D.posOf(p) === "DEF");
