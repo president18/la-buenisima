@@ -123,7 +123,8 @@
   function cardPower(rows, w) {
     const body = rows.map((r) => {
       const d = r.delta;
-      const short = UI.powerBlurb(D, r, w, rows.length).split(". ")[0].replace(/\.$/, "") + ".";
+      const sents = UI.powerBlurb(D, r, w, rows.length).split(/(?<=\.)\s+/).filter((x) => !/^Playoffs/.test(x));
+      const short = sents[1] || sents[0] || "";
       return `<div class="ic-row" style="grid-template-columns:70px 1fr auto;padding:10px 22px">
         <div style="text-align:center"><div class="ic-rk" style="font-size:50px">${r.prank}</div><div style="font-size:18px;font-weight:800;color:${d > 0 ? "#3DDC97" : d < 0 ? "#FF5C7A" : "#6E7A93"}">${d > 0 ? "▲" + d : d < 0 ? "▼" + -d : "—"}</div></div>
         <div><div class="ic-name">${esc(D.teams[r.rid].name)} <span style="font-size:22px;color:#A9B4C8;font-weight:600">${rec(r)}</span></div><div class="ic-meta">${esc(short)}</div></div>
