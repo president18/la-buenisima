@@ -151,7 +151,7 @@
           const pts = e.sp[i] || 0;
           if (pts >= 36 || (w >= 3 && pts > maxPerf && pts >= 30)) {
             add({ week: w, type: "explosion", imp: 44 + (pts - 30) * 1.8 + (pts > maxPerf && w >= 3 ? 10 : 0), rids: [r], pids: [p], kicker: pts > maxPerf && w >= 3 ? "ACTUACIÓN RÉCORD" : "EXPLOSIÓN",
-              headline: `${P(D, p)} explota con ${f1(pts)} puntos`, sub: `Le dio la semana a ${T(D, r)}.`,
+              headline: `${P(D, p)} explota con ${f1(pts)} puntos`, sub: D.tw[r][w] && D.tw[r][w].res === "W" ? `Le dio la victoria a ${T(D, r)}.` : `Jugó para ${T(D, r)}, que aun así perdió.`,
               body: `${P(D, p)} tuvo una semana de otro planeta y ${O(D, r)} lo tenía de titular. ${D.tw[r][w].res === "W" ? "Y sí, le alcanzó para ganar." : "Ni así le alcanzó para ganar."}`, stat: { v: f1(pts), l: "pts de un solo jugador" } });
           }
           maxPerf = Math.max(maxPerf, pts);
