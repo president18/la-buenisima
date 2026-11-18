@@ -1,12 +1,12 @@
 /* =================================================================
-   LA MAÑANERA 6 · el periódico oficial de La Buenísima
+   LA MAÑANERA · el periódico oficial de La Buenísima
    Portadas de 1080x1920 (formato estado de WhatsApp)
    ================================================================= */
 (function () {
   const LB = window.LB, UI = LB.ui, CFG = window.LB_CONFIG;
   const { esc, f1, pct, rec } = UI;
   const NP = (LB.np = {});
-  const NAME = "La Mañanera 6";
+  const NAME = "La Mañanera";
   const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
   const hoy = () => { const d = new Date(); return `${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`; };
   const T = (D, r) => esc(UI.tName(D, r));

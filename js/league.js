@@ -6,7 +6,7 @@
   const { esc, f1, pct, sign, rec } = UI;
   const $ = (s) => document.querySelector(s);
   const TABS = [
-    ["inicio", "Inicio"], ["power", "Power Rankings"], ["semana", "Semana"], ["manianera", "La Mañanera 6"], ["calendarios", "Calendarios"],
+    ["inicio", "Inicio"], ["power", "Power Rankings"], ["semana", "Semana"], ["manianera", "La Mañanera"], ["calendarios", "Calendarios"],
     ["movimientos", "Trades y Waivers"], ["draft", "Draft"], ["oscars", "Óscars"], ["historia", "Historia"],
   ];
   let D = null;
@@ -129,14 +129,14 @@
     return UI.icFrame(D, "Temporada " + D.season, "El que más metió", body);
   }
 
-  /* ============ LA MAÑANERA 6 ============ */
+  /* ============ LA MAÑANERA ============ */
   function renderManianera() {
     const played = D.playedWeeks.slice();
     const future = Object.keys(D.games).map(Number).filter((w) => w > D.lastScored && D.games[w].length);
     const mode = sel.npMode || (future.includes(D.projWeek) ? "preview" : "results");
     const weeks = mode === "preview" ? future : played;
     let w = sel.np && weeks.includes(sel.np) ? sel.np : mode === "preview" ? (future.includes(D.projWeek) ? D.projWeek : future[0]) : played[played.length - 1];
-    $("#s-manianera").innerHTML = `<div class="row"><div><div class="h2">La Mañanera 6</div><p class="sub">El periódico oficial de La Buenísima, listo para mandarlo al chat.</p></div></div>
+    $("#s-manianera").innerHTML = `<div class="row"><div><div class="h2">La Mañanera</div><p class="sub">El periódico oficial de La Buenísima, listo para mandarlo al chat.</p></div></div>
       <div class="row" style="margin-bottom:12px"><button class="btn ${mode === "preview" ? "pri" : ""}" id="npPrev" ${future.length ? "" : "disabled"}>📰 Preview</button><button class="btn ${mode === "results" ? "pri" : ""}" id="npRes" ${played.length ? "" : "disabled"}>🏁 Resultados</button>
       <select id="npWeek">${weeks.map((x) => `<option value="${x}" ${x === w ? "selected" : ""}>Semana ${x}</option>`).join("")}</select><span class="sp"></span><button class="btn pri" id="npImg">🖼️ Generar imagen</button></div>
       ${mode === "preview" && w !== D.projWeek ? '<p class="note">Para semanas futuras no hay proyecciones todavía: se usan promedios de temporada.</p>' : ""}
@@ -146,7 +146,7 @@
     $("#npPrev").onclick = () => { sel.npMode = "preview"; sel.np = null; renderManianera(); };
     $("#npRes").onclick = () => { sel.npMode = "results"; sel.np = null; renderManianera(); };
     $("#npWeek").onchange = (e) => { sel.np = Number(e.target.value); renderManianera(); };
-    $("#npImg").onclick = () => UI.makeImage(html, `la-mananera-6-${mode === "preview" ? "preview" : "resultados"}-semana-${w}`);
+    $("#npImg").onclick = () => UI.makeImage(html, `la-mananera-${mode === "preview" ? "preview" : "resultados"}-semana-${w}`);
   }
 
   /* ============ POWER RANKINGS ============ */
