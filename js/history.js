@@ -79,17 +79,18 @@
       S.records.bestPerf.forEach((p) => perf.push({ S, ...p }));
     });
     const top = (arr, f, n = 5) => arr.slice().sort((a, b) => f(b) - f(a)).slice(0, n);
-    const lbl = (x) => `${esc(x.S.teams[x.r].name)} <span class="faint small">${x.S.season} · sem ${x.w}</span>`;
-    const glbl = (g) => { const aw = g.pa > g.pb; return `${esc(g.S.teams[aw ? g.a : g.b].name)} ${f1(Math.max(g.pa, g.pb))}–${f1(Math.min(g.pa, g.pb))} ${esc(g.S.teams[aw ? g.b : g.a].name)} <span class="faint small">${g.S.season} · sem ${g.w}</span>`; };
-    const box = (t, arr, f, v) => `<div class="card"><div class="h3" style="margin-top:0;font-size:21px">${t}</div>${arr.map((x, i) => `<div class="list-row small"><span class="faint num" style="width:16px">${i + 1}</span><span>${f(x)}</span><span class="sp"></span><b class="num">${v(x)}</b></div>`).join("")}</div>`;
-    const recs = `<div class="grid g3">
+    // Cada etiqueta devuelve [línea principal, detalle]
+    const lbl = (x) => [esc(x.S.teams[x.r].name), `${x.S.season} · semana ${x.w}`];
+    const glbl = (g) => { const aw = g.pa > g.pb; return [`${esc(g.S.teams[aw ? g.a : g.b].name)} <span class="rec-vs">vs</span> ${esc(g.S.teams[aw ? g.b : g.a].name)}`, `${f1(Math.max(g.pa, g.pb))}–${f1(Math.min(g.pa, g.pb))} · ${g.S.season} · semana ${g.w}`]; };
+    const box = (t, arr, f, v) => `<section class="rec-box"><h4 class="rec-h">${t}</h4><ol class="rec-list">${arr.map((x, i) => { const [m, d] = f(x); return `<li class="rec-row${i === 0 ? " first" : ""}"><span class="rec-n">${i + 1}</span><div class="rec-t"><div class="rec-m">${m}</div><div class="rec-d">${d}</div></div><b class="rec-v">${v(x)}</b></li>`; }).join("")}</ol></section>`;
+    const recs = `<div class="rec-grid">
       ${box("Más puntos en una semana", top(tw, (x) => x.pf), lbl, (x) => f1(x.pf))}
       ${box("Menos puntos en una semana", top(tw, (x) => -x.pf), lbl, (x) => f1(x.pf))}
       ${box("Partidos con más puntos", top(games, (g) => g.pa + g.pb), glbl, (g) => f1(g.pa + g.pb))}
       ${box("Palizas", top(games, (g) => Math.abs(g.pa - g.pb)), glbl, (g) => "+" + f1(Math.abs(g.pa - g.pb)))}
       ${box("Partidos de infarto", top(games, (g) => -Math.abs(g.pa - g.pb)), glbl, (g) => f1(Math.abs(g.pa - g.pb)))}
       ${box("Más puntos y perdió", top(tw.filter((x) => x.res === "L"), (x) => x.pf), lbl, (x) => f1(x.pf))}
-      ${box("Mejores actuaciones individuales", top(perf, (p) => p.pts, 6), (p) => `${UI.pl(p.S, p.pid)} <span class="faint small">${esc(p.S.teams[p.rid].name)} · ${p.S.season} sem ${p.w}</span>`, (p) => f1(p.pts))}
+      ${box("Mejores actuaciones individuales", top(perf, (p) => p.pts, 6), (p) => [esc(p.S.players[p.pid] ? p.S.players[p.pid].name : p.pid), `${esc(p.S.teams[p.rid].name)} · ${p.S.season} · semana ${p.w}`], (p) => f1(p.pts))}
     </div>`;
 
     // Drafts

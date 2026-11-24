@@ -246,6 +246,25 @@ tr.me td.sticky-col{background:var(--tint)}
 .ml-v span{font-size:12px;color:var(--tx3)}
 .mt-list .ml-row:first-child{border-top:2px solid var(--tx)}
 
+/* bloques con título: sin caja, como sección de periódico */
+.card:has(> .h3:first-child){background:none;border:0;border-radius:0;padding:0}
+.card > .h3:first-child{font-size:20px !important;letter-spacing:.02em;margin:0 0 4px !important;padding:10px 0 8px;border-bottom:1px solid var(--tx)}
+
+/* récords de todos los tiempos */
+.rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px 36px}
+.rec-box{min-width:0}
+.rec-h{font-family:var(--fh);font-weight:700;font-size:20px;letter-spacing:.02em;text-transform:uppercase;line-height:1.1;margin:0;padding:10px 0 8px;border-top:3px solid var(--tx);border-bottom:1px solid var(--tx)}
+.rec-list{list-style:none;margin:0 0 18px;padding:0}
+.rec-row{display:grid;grid-template-columns:22px 1fr auto;gap:12px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line)}
+.rec-n{font-family:var(--fh);font-weight:700;font-size:17px;color:var(--tx3);text-align:right}
+.rec-t{min-width:0}
+.rec-m{font-weight:600;font-size:15px;line-height:1.25;overflow-wrap:anywhere}
+.rec-vs{font-weight:400;color:var(--tx3);font-size:13px}
+.rec-d{font-size:12.5px;color:var(--tx3);margin-top:2px}
+.rec-v{font-family:var(--fh);font-weight:700;font-size:22px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rec-row.first .rec-n{color:var(--forest)}
+.rec-row.first .rec-v{color:var(--forest);font-size:26px}
+
 /* página por equipo */
 .tp-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0;border-top:2px solid var(--tx)}
 .tp-chip{display:flex;align-items:center;gap:10px;border:0;border-bottom:1px solid var(--line);background:transparent;padding:12px 4px;text-align:left;font-weight:600;font-size:15px;cursor:pointer}
@@ -327,3 +346,7 @@ tr.me td.sticky-col{background:var(--tint)}
   .mt.full .mt-full{display:block}
   .subtabs{padding-top:12px}
 }
+
+.row:has(> .h3){border-top:3px solid var(--tx);padding-top:8px;margin-top:30px}
+.row > .h3{border-top:0 !important;padding-top:0 !important;margin:0 !important}
+.row > div > .h3{border-top:0;padding-top:0}
