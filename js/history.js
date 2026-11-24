@@ -37,8 +37,8 @@
     const cur = D;
     // Salón de la fama
     const champs = list.map((S) => ({ S, c: champ(S) })).filter((x) => x.c);
-    const manual = (CFG.pastChampions || []).map((c) => `<div class="list-row"><span class="pill y">${esc(c.season)}</span><b>🏆 ${esc(c.champion)}</b>${c.runnerUp ? `<span class="faint small">vs ${esc(c.runnerUp)}</span>` : ""}</div>`).join("");
-    const hall = champs.map(({ S, c }) => `<div class="list-row"><span class="pill y">${S.season}</span><b>🏆 ${tl(S, c.w)}</b><span class="sp"></span><span class="small faint">subcampeón: ${esc(S.teams[c.l].name)}</span></div>`).join("") + manual;
+    const manual = (CFG.pastChampions || []).map((c) => `<div class="list-row"><span class="pill y">${esc(c.season)}</span><b>${IC("trophy", 15)} ${esc(c.champion)}</b>${c.runnerUp ? `<span class="faint small">vs ${esc(c.runnerUp)}</span>` : ""}</div>`).join("");
+    const hall = champs.map(({ S, c }) => `<div class="list-row"><span class="pill y">${S.season}</span><b>${IC("trophy", 15)} ${tl(S, c.w)}</b><span class="sp"></span><span class="small faint">subcampeón: ${esc(S.teams[c.l].name)}</span></div>`).join("") + manual;
 
     // Temporadas
     const seasonCards = list.map((S) => {
@@ -48,11 +48,11 @@
       const mvp = (LB.awards && LB.awards.metrics.includes("mvp")) ? mvpOf(S) : null;
       const live = !c && S.league.status !== "complete";
       return `<div class="card"><div class="row"><div class="h3" style="margin:0">${S.season}</div><span class="sp"></span>${live ? '<span class="pill g">En curso</span>' : ""}</div>
-        <div class="list-row small"><span>🏆 Campeón</span><span class="sp"></span><b>${c ? esc(S.teams[c.w].name) : "Por definirse"}</b></div>
-        <div class="list-row small"><span>🥇 Mejor récord${live ? " (hasta hoy)" : ""}</span><span class="sp"></span><b>${esc(S.teams[st[0].rid].name)} ${rec(st[0])}</b></div>
-        <div class="list-row small"><span>💥 Más puntos</span><span class="sp"></span><b>${esc(S.teams[most.rid].name)} ${f1(most.pf)}</b></div>
-        ${mvp ? `<div class="list-row small"><span>⭐ MVP</span><span class="sp"></span><b>${esc(mvp)}</b></div>` : ""}
-        <div class="list-row small"><span>🔁 Trades</span><span class="sp"></span><b>${S.trades.length}</b></div></div>`;
+        <div class="list-row small"><span>${IC("trophy", 15)} Campeón</span><span class="sp"></span><b>${c ? esc(S.teams[c.w].name) : "Por definirse"}</b></div>
+        <div class="list-row small"><span>${IC("medal", 15)} Mejor récord${live ? " (hasta hoy)" : ""}</span><span class="sp"></span><b>${esc(S.teams[st[0].rid].name)} ${rec(st[0])}</b></div>
+        <div class="list-row small"><span>${IC("zap", 15)} Más puntos</span><span class="sp"></span><b>${esc(S.teams[most.rid].name)} ${f1(most.pf)}</b></div>
+        ${mvp ? `<div class="list-row small"><span>${IC("star", 15)} MVP</span><span class="sp"></span><b>${esc(mvp)}</b></div>` : ""}
+        <div class="list-row small"><span>${IC("swap", 15)} Trades</span><span class="sp"></span><b>${S.trades.length}</b></div></div>`;
     }).join("");
 
     // Tabla histórica por manager
@@ -69,7 +69,7 @@
         m.last = t.name; m.name = t.ownersNick;
       });
     });
-    const mgrRows = Object.values(mgr).sort((a, b) => b.titles - a.titles || (b.W / Math.max(1, b.W + b.L)) - (a.W / Math.max(1, a.W + a.L)) || b.pf - a.pf).map((m, i) => `<tr><td class="num faint">${i + 1}</td><td><b>${esc(m.name)}</b><div class="to">${esc(m.last)}</div></td><td class="c">${m.titles ? "🏆".repeat(m.titles) : "—"}</td><td class="num">${m.W}-${m.L}${m.T ? "-" + m.T : ""}</td><td class="r num">${((m.W + m.T / 2) / Math.max(1, m.W + m.L + m.T) * 100).toFixed(0)}%</td><td class="r num hide-m">${f1(m.pf)}</td><td class="c hide-m">${m.seasons}</td><td class="c hide-m">${m.po}</td></tr>`).join("");
+    const mgrRows = Object.values(mgr).sort((a, b) => b.titles - a.titles || (b.W / Math.max(1, b.W + b.L)) - (a.W / Math.max(1, a.W + a.L)) || b.pf - a.pf).map((m, i) => `<tr><td class="num faint">${i + 1}</td><td><b>${esc(m.name)}</b><div class="to">${esc(m.last)}</div></td><td class="c">${m.titles ? IC("trophy", 15).repeat(m.titles) : "—"}</td><td class="num">${m.W}-${m.L}${m.T ? "-" + m.T : ""}</td><td class="r num">${((m.W + m.T / 2) / Math.max(1, m.W + m.L + m.T) * 100).toFixed(0)}%</td><td class="r num hide-m">${f1(m.pf)}</td><td class="c hide-m">${m.seasons}</td><td class="c hide-m">${m.po}</td></tr>`).join("");
 
     // Récords de todos los tiempos
     const tw = [], games = [], perf = [];
@@ -96,7 +96,7 @@
     const draftOpts = list.filter((S) => S.draft.length).map((S, i) => `<option value="${i}">${S.season}</option>`).join("");
 
     el.innerHTML = `<div class="h2">Historia de La Buenísima</div><p class="sub">Campeones, récords de todos los tiempos, managers y drafts. Cada temporada nueva en Sleeper se agrega sola.</p>
-      <div class="grid g2"><div class="card"><div class="h3" style="margin-top:0">🏆 Salón de la fama</div>${hall || `<p class="small muted">El primer campeón se corona en la semana ${cur.totalWeeks} de ${cur.season}.</p>`}
+      <div class="grid g2"><div class="card"><div class="h3" style="margin-top:0">${IC("trophy")} Salón de la fama</div>${hall || `<p class="small muted">El primer campeón se corona en la semana ${cur.totalWeeks} de ${cur.season}.</p>`}
         ${CFG.trophy ? `<p class="small"><b>Trofeo:</b> ${esc(CFG.trophy)}</p>` : ""}${CFG.punishment ? `<p class="small"><b>Castigo del último:</b> ${esc(CFG.punishment)}</p>` : ""}</div>
       <div class="grid">${seasonCards}</div></div>
       <div class="h3">Tabla histórica de managers</div>
@@ -117,7 +117,7 @@
     return b ? `${S.players[b[0]] ? S.players[b[0]].name : b[0]} (${f1(b[1])})` : null;
   }
 
-  const POSC = { QB: "#E85A4F", RB: "#5E8C61", WR: "#5AA9FF", TE: "#E85A4F", K: "#C084FC", DEF: "#6E6C68" };
+  const POSC = { QB: "#E85A4F", RB: "#2F5D50", WR: "#5AA9FF", TE: "#E85A4F", K: "#C084FC", DEF: "#6E6C68" };
   function draftBoard(S) {
     const rounds = Math.max(...S.draft.map((p) => p.round));
     const n = S.numTeams;
@@ -140,7 +140,7 @@
     const rows = D.standings.map((s) => s.rid).map((r) => `<tr class="${UI.isMine(D, r) ? "me" : ""}"><td class="sticky-col">${UI.teamCell(D, r, { sm: true, noOwner: true })}</td>${weeks.map((w) => {
       const x = D.tw[r][w]; if (!x) return "<td></td>";
       const t = (x.pf - mn) / (mx - mn || 1);
-      return `<td style="background:${t >= 0.5 ? `rgba(232,90,79,${((t - 0.5) * 1.1).toFixed(2)})` : `rgba(142,141,138,${((0.5 - t) * 0.7).toFixed(2)})`}">${f1(x.pf)}<div style="font-size:10px" class="${x.res === "W" ? "good" : "bad"}">${x.res === "W" ? "G" : x.res === "L" ? "P" : ""}</div></td>`;
+      return `<td style="background:${t >= 0.5 ? `rgba(47,93,80,${((t - 0.5) * 1.1).toFixed(2)})` : `rgba(122,82,54,${((0.5 - t) * 0.6).toFixed(2)})`}">${f1(x.pf)}<div style="font-size:10px" class="${x.res === "W" ? "good" : "bad"}">${x.res === "W" ? "G" : x.res === "L" ? "P" : ""}</div></td>`;
     }).join("")}</tr>`).join("");
     return `<div class="tbl-wrap"><table class="heat"><thead><tr><th class="sticky-col">Equipo</th>${weeks.map((w) => `<th class="c">S${w}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>`;
   }

@@ -77,11 +77,11 @@
         return `<div class="card ${UI.isMine(D, r) ? "me" : ""}"><div class="row">${UI.teamCell(D, r)}<span class="sp"></span>${status}</div>
           <div class="small muted" style="margin:8px 0 6px">${rec(D.standings.find((x) => x.rid === r))} · Le faltan ${s.left} partido${s.left === 1 ? "" : "s"}</div>
           <div class="scn">${rows}</div>
-          ${help && o.playoff > 0.005 && o.playoff < 0.995 ? `<p class="small" style="margin:8px 0 0">📣 Esta semana le conviene que ganen: <b>${help}</b>.</p>` : ""}</div>`;
+          ${help && o.playoff > 0.005 && o.playoff < 0.995 ? `<p class="small" style="margin:8px 0 0">${IC("megaphone", 15)} Esta semana le conviene que ganen: <b>${help}</b>.</p>` : ""}</div>`;
       }).join("");
     }
     el.innerHTML = `<div class="h2">Playoffs</div><p class="sub">Top ${D.playoffTeams} entran, los 2 primeros descansan la primera ronda. Semanas ${D.regEnd + 1} a ${D.totalWeeks}.</p>
-      <div class="row"><div class="h3" style="margin-top:0">Bracket</div><span class="sp"></span><button class="btn" id="imgBracket">🖼️ Imagen</button></div>${bracketHTML}
+      <div class="row"><div class="h3" style="margin-top:0">Bracket</div><span class="sp"></span><button class="btn" id="imgBracket">${IC("image", 16)} Imagen</button></div>${bracketHTML}
       ${S ? `<div class="h3">¿Qué necesita cada equipo?</div><p class="sub">Probabilidad de entrar según cuántos partidos gane de los que le faltan (${D.sim.N.toLocaleString()} simulaciones con el calendario real).</p><div class="grid g2">${scn}</div>` : ""}`;
     const b = document.getElementById("imgBracket");
     if (b) b.onclick = () => UI.makeImage(UI.icFrame(D, "Playoffs " + D.season, "El bracket", `<div style="zoom:1">${bracketCard(D)}</div>`), "bracket-playoffs");
@@ -151,9 +151,9 @@
         out.innerHTML = `<div class="kpis"><div class="kpi"><div class="l">${esc(na)}</div><div class="v">${wa}</div><div class="d">victorias</div></div><div class="kpi"><div class="l">${esc(nb)}</div><div class="v">${wb}</div><div class="d">victorias</div></div>
           <div class="kpi"><div class="l">Puntos</div><div class="v" style="font-size:22px">${f1(pa)} – ${f1(pb)}</div><div class="d">${games.length} partidos</div></div>
           <div class="kpi"><div class="l">Paliza más grande</div><div class="v" style="font-size:22px">${big ? "+" + f1(Math.abs(big.pa - big.pb)) : "—"}</div><div class="d">${big ? esc(big.pa > big.pb ? na : nb) + " · " + big.S.season + " sem " + big.w : ""}</div></div></div>
-          ${next ? `<p class="note" style="margin-top:12px">🔥 Se vuelven a ver en la semana ${next.w}.</p>` : ""}
+          ${next ? `<p class="note" style="margin-top:12px">${IC("flame", 15)} Se vuelven a ver en la semana ${next.w}.</p>` : ""}
           <div class="h3">Todos sus partidos</div>
-          ${games.length ? `<div class="tbl-wrap"><table><thead><tr><th>Temp.</th><th>Sem</th><th class="r">${esc(na)}</th><th class="r">${esc(nb)}</th><th>Ganó</th></tr></thead><tbody>${games.map((g) => `<tr><td>${g.S.season}</td><td>${g.w}${g.po ? " 🏆" : ""}</td><td class="r num ${g.pa > g.pb ? "good" : ""}">${f1(g.pa)}</td><td class="r num ${g.pb > g.pa ? "good" : ""}">${f1(g.pb)}</td><td>${esc(g.pa > g.pb ? na : nb)}</td></tr>`).join("")}</tbody></table></div>` : '<p class="muted">Todavía no se han enfrentado.</p>'}`;
+          ${games.length ? `<div class="tbl-wrap"><table><thead><tr><th>Temp.</th><th>Sem</th><th class="r">${esc(na)}</th><th class="r">${esc(nb)}</th><th>Ganó</th></tr></thead><tbody>${games.map((g) => `<tr><td>${g.S.season}</td><td>${g.w}${g.po ? " " + IC("trophy", 13) : ""}</td><td class="r num ${g.pa > g.pb ? "good" : ""}">${f1(g.pa)}</td><td class="r num ${g.pb > g.pa ? "good" : ""}">${f1(g.pb)}</td><td>${esc(g.pa > g.pb ? na : nb)}</td></tr>`).join("")}</tbody></table></div>` : '<p class="muted">Todavía no se han enfrentado.</p>'}`;
       };
       document.getElementById("h2a").onchange = run; document.getElementById("h2b").onchange = run; run();
     });
@@ -196,12 +196,12 @@
     const list = X.roasts(D, w);
     el.innerHTML = `<div class="row"><div><div class="h2">Roast semanal</div><p class="sub">Una tarjeta de carrilla para cada equipo, lista para el chat.</p></div><span class="sp"></span><select id="roW">${weeks.map((x) => `<option value="${x}" ${x === w ? "selected" : ""}>Semana ${x}</option>`).join("")}</select></div>
       <div class="grid g2">${list.map((x, i) => `<div class="card tstripe" style="--tc:${UI.color(x.r)}"><div class="row">${UI.teamCell(D, x.r)}<span class="sp"></span><span class="pill ${x.t.res === "W" ? "g" : "b"}">${x.t.res === "W" ? "Ganó" : "Perdió"} · ${f1(x.t.pf)}</span></div>
-        ${x.lines.map((l) => `<p style="margin:10px 0 0">🔥 ${esc(l)}</p>`).join("")}<div style="margin-top:10px"><button class="btn" data-ro="${i}" style="padding:6px 12px;font-size:13px">🖼️ Imagen</button></div></div>`).join("")}</div>`;
+        ${x.lines.map((l) => `<p style="margin:10px 0 0;display:flex;gap:8px"><span style="color:var(--coral);flex:none">${IC("flame", 17)}</span><span>${esc(l)}</span></p>`).join("")}<div style="margin-top:10px"><button class="btn" data-ro="${i}" style="padding:6px 12px;font-size:13px">${IC("image", 16)} Imagen</button></div></div>`).join("")}</div>`;
     document.getElementById("roW").onchange = (e) => X.renderRoast(D, el, Number(e.target.value));
     el.querySelectorAll("[data-ro]").forEach((b) => (b.onclick = () => {
       const x = list[Number(b.dataset.ro)];
       const body = `<div style="display:flex;align-items:center;gap:26px;margin:10px 0 30px"><div style="width:150px;height:150px;border-radius:50%;background:${UI.color(x.r)};display:grid;place-items:center;font-size:56px;font-weight:700;color:#fff">${esc(UI.tName(D, x.r).slice(0, 2).toUpperCase())}</div><div><div class="ic-name" style="font-size:46px">${T(D, x.r)}</div><div class="ic-meta" style="font-size:26px">${esc(UI.oName(D, x.r))} · ${x.t.res === "W" ? "Ganó" : "Perdió"} ${f1(x.t.pf)}–${f1(x.t.pa)}</div></div></div>
-        ${x.lines.map((l) => `<div class="ic-row" style="grid-template-columns:60px 1fr;font-size:32px;line-height:1.35"><div style="font-size:44px">🔥</div><div>${esc(l)}</div></div>`).join("")}`;
+        ${x.lines.map((l) => `<div class="ic-row" style="grid-template-columns:60px 1fr;font-size:32px;line-height:1.35"><div>${LB.icoImg("flame", 44, "#E85A4F", 1.8)}</div><div>${esc(l)}</div></div>`).join("")}`;
       UI.makeImage(UI.icFrame(D, `Semana ${w}`, "Roast", body), `roast-semana-${w}-${UI.tName(D, x.r).toLowerCase().replace(/[^a-z0-9]+/g, "-")}`);
     }));
   };

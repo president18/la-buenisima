@@ -402,7 +402,7 @@
     out.forEach((o) => (o.t = o.t.replace(/\.\.(?!\.)/g, ".")));
     return out.sort(() => R() - 0.5).slice(0, 3);
   };
-  const SIGNOS = ["♈ Aries", "♉ Tauro", "♊ Géminis", "♋ Cáncer", "♌ Leo", "♍ Virgo", "♎ Libra", "♏ Escorpio", "♐ Sagitario", "♑ Capricornio", "♒ Acuario", "♓ Piscis"];
+  const SIGNOS = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"];
   ST.horoscopo = function (D, w) {
     const R = rng("hs" + w);
     const mus = (D.games[w] || []).map((g) => LB.matchupInfo(D, w, g));
@@ -430,9 +430,9 @@
     const sun = mus.slice().sort((a, b) => Math.abs((b.winA || 0.5) - 0.5) - Math.abs((a.winA || 0.5) - 0.5))[0];
     const fav = (M) => ((M.winA || 0.5) >= 0.5 ? M.g.a : M.g.b);
     return [
-      { i: "☀️", t: `Soleado para ${T(D, fav(sun))}: ${Math.round(Math.max(sun.winA || 0.5, 1 - (sun.winA || 0.5)) * 100)}% de probabilidad de victoria.` },
-      { i: "🌩️", t: `Tormenta de puntos en ${T(D, hot.g.a)} vs ${T(D, hot.g.b)}: se esperan ${f1(comb(hot))} combinados.` },
-      { i: "🌫️", t: `Neblina total en ${T(D, fog.g.a)} vs ${T(D, fog.g.b)}. No se ve quién gana.` },
+      { i: "sun", t: `Soleado para ${T(D, fav(sun))}: ${Math.round(Math.max(sun.winA || 0.5, 1 - (sun.winA || 0.5)) * 100)}% de probabilidad de victoria.` },
+      { i: "storm", t: `Tormenta de puntos en ${T(D, hot.g.a)} vs ${T(D, hot.g.b)}: se esperan ${f1(comb(hot))} combinados.` },
+      { i: "fog", t: `Neblina total en ${T(D, fog.g.a)} vs ${T(D, fog.g.b)}. No se ve quién gana.` },
     ];
   };
   ST.erratas = function (D, w) {

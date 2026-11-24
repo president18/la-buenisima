@@ -71,7 +71,7 @@
         <div class="np-bar"><i style="width:${wa * 100}%"></i></div>
         <div class="np-mu-x"><span>${pct(wa)}</span><span>${kA && kB ? `A vigilar: ${esc(UI.plName(D, kA.pid))} vs ${esc(UI.plName(D, kB.pid))}` : ""}</span><span>${pct(1 - wa)}</span></div></div>`;
     }).join("");
-    const clima = LB.stories.clima(D, w).map((c) => `<div class="np-li"><span class="np-ico">${c.i}</span>${esc(c.t)}</div>`).join("");
+    const clima = LB.stories.clima(D, w).map((c) => `<div class="np-li"><span class="np-ico">${LB.icoImg(c.i, 20, "#22201C", 1.8)}</span>${esc(c.t)}</div>`).join("");
     const horo = LB.stories.horoscopo(D, w).slice(0, 2).map((h) => `<div class="np-li"><b>${esc(h.sign)} · ${T(D, h.r)}:</b> ${esc(h.t)}</div>`).join("");
     const clas = LB.stories.clasificados(D, w).slice(0, 2).map((c) => `<div class="np-ad"><b>${esc(c.h)}</b> ${esc(c.t)}</div>`).join("");
     const body = `${masthead(D, w, "Edición matutina")}
@@ -92,7 +92,7 @@
     const S = LB.stories.results(D, w);
     const tws = D.rids.map((r) => ({ r, ...D.tw[r][w] })).filter((x) => x.pf != null).sort((a, b) => b.pf - a.pf);
     const avg = tws.reduce((s, x) => s + x.pf, 0) / (tws.length || 1);
-    const chart = ART.toImg(ART.hbars(tws.map((x) => ({ label: UI.tName(D, x.r), value: x.pf, color: x.res === "W" ? ART.colors.red : ART.colors.sand, strong: x.res === "W" })), { w: 380, rowH: 27, labelW: 150, avg }), 380, tws.length * 27 + 12);
+    const chart = ART.toImg(ART.hbars(tws.map((x) => ({ label: UI.tName(D, x.r), value: x.pf, color: x.res === "W" ? ART.colors.blue : ART.colors.sand, strong: x.res === "W" })), { w: 380, rowH: 27, labelW: 150, avg }), 380, tws.length * 27 + 12);
     const rows = S.lines.map((l) => {
       const nw = UI.tName(D, l.W), nl = UI.tName(D, l.L);
       return `<div class="np-res"><div class="np-final">FINAL</div>
@@ -105,10 +105,10 @@
       const d = p ? p - s.rank : 0;
       return `<div class="np-li tb ${s.rank === D.playoffTeams ? "cut" : ""}"><b>${s.rank}.</b> ${T(D, s.rid)} <span class="np-mv ${d > 0 ? "up" : d < 0 ? "dn" : ""}">${d > 0 ? "▲" + d : d < 0 ? "▼" + -d : ""}</span><span class="rr">${rec(s)}</span></div>`;
     }).join("");
-    const premios = `<div class="np-li">👑 <b>Equipo:</b> ${T(D, A.top.rid)} (${f1(A.top.pf)})</div>
-      <div class="np-li">⭐ <b>MVP:</b> ${esc(UI.plName(D, A.mvp.pid))} (${f1(A.mvp.pts)})</div>
-      <div class="np-li">🪑 <b>Banca de oro:</b> ${T(D, A.bench.rid)} (${f1(A.bench.max - A.bench.pf)})</div>
-      <div class="np-li">🧱 <b>Ladrillo:</b> ${T(D, A.low.rid)} (${f1(A.low.pf)})</div>`;
+    const premios = `<div class="np-li">${LB.icoImg("crown", 19, "#22201C", 1.8)} <b>Equipo:</b> ${T(D, A.top.rid)} (${f1(A.top.pf)})</div>
+      <div class="np-li">${LB.icoImg("star", 19, "#22201C", 1.8)} <b>MVP:</b> ${esc(UI.plName(D, A.mvp.pid))} (${f1(A.mvp.pts)})</div>
+      <div class="np-li">${LB.icoImg("couch", 19, "#22201C", 1.8)} <b>Banca de oro:</b> ${T(D, A.bench.rid)} (${f1(A.bench.max - A.bench.pf)})</div>
+      <div class="np-li">${LB.icoImg("brick", 19, "#22201C", 1.8)} <b>Ladrillo:</b> ${T(D, A.low.rid)} (${f1(A.low.pf)})</div>`;
     const ad = LB.stories.clasificados(D, w)[0];
     const body = `${masthead(D, w, "Edición de la noche")}
       ${band(`Resultados · Semana ${w}`, "Así quedó")}
@@ -116,7 +116,7 @@
       <div class="np-h1">${esc(S.headline)}</div>
       <div class="np-sub">${esc(S.sub)}</div>
       ${byline(w)}
-      <div class="np-lead"><div class="np-body drop">${esc(S.body)}</div>${figure(chart, `Puntos de la semana ${w}. En rojo, los que ganaron; la línea punteada es el promedio.`)}</div>
+      <div class="np-lead"><div class="np-body drop">${esc(S.body)}</div>${figure(chart, `Puntos de la semana ${w}. En azul, los que ganaron; la línea punteada es el promedio.`)}</div>
       <div class="np-rule"><span>Los marcadores</span></div>
       <div class="np-res-list">${rows}</div>
       <div class="np-cols3 rs">${box("Premios de la semana", premios + S.extra.slice(0, 1).map((e) => `<div class="np-li it">• ${esc(e.headline)}</div>`).join(""))}${box("Así va la tabla", tabla)}${box("Fe de erratas", `<div class="np-li it">${esc(LB.stories.erratas(D, w))}</div>${ad ? `<div class="np-ad" style="margin-top:10px"><b>${esc(ad.h)}</b> ${esc(ad.t)}</div>` : ""}`)}</div>`;
@@ -147,7 +147,7 @@
       </div>
       <div class="tv-head" style="font-size:${head.length > 60 ? 70 : head.length > 42 ? 82 : 94}px">${esc(head)}</div>
       <div class="tv-sub">${esc(e.sub)}</div>
-      <div class="tv-report"><div class="tv-report-h">● REPORTE DESDE EL LUGAR DE LOS HECHOS</div><p>${esc(e.body)}</p><p class="ctx">${esc(LB.stories.context(D, e))}</p><p class="quip">🎙️ ${esc(Q.quip)}</p></div>
+      <div class="tv-report"><div class="tv-report-h">● REPORTE DESDE EL LUGAR DE LOS HECHOS</div><p>${esc(e.body)}</p><p class="ctx">${esc(LB.stories.context(D, e))}</p><p class="quip">${LB.icoImg("mic", 24, "#E0B341", 2)} ${esc(Q.quip)}</p></div>
       <div class="tv-poll"><div class="tv-poll-h">ENCUESTA LBN <span>(totalmente científica)</span></div><div class="tv-poll-q">¿Fue puro talento?</div>
         <div class="tv-poll-b"><i style="width:${Q.poll}%">SÍ ${Q.poll}%</i><em>NO ${100 - Q.poll}%</em></div></div>
       ${others.length ? `<div class="tv-more"><div class="tv-more-h">MÁS TITULARES</div>${others.slice(0, 3).map((o) => `<div class="tv-more-i"><span>S${o.week}</span><b>${esc(o.kicker)}</b> ${esc(o.headline)}</div>`).join("")}</div>` : ""}

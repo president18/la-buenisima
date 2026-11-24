@@ -75,12 +75,12 @@
     const rows = best.lineup.map((x, i) => {
       const curP = e.starters[i];
       const changed = !curSet.has(x.pid);
-      return `<tr><td><span class="pill">${x.slot}</span></td><td>${curP ? UI.pl(D, curP) : "—"}</td><td class="r num">${f1(proj(curP))}</td><td>${changed ? `<b class="gold">→ ${UI.pl(D, x.pid)}</b>` : bestSet.has(curP) ? '<span class="faint">✔</span>' : '<span class="bad">sentarlo</span>'}</td><td class="r num">${changed ? f1(x.val) : ""}</td></tr>`;
+      return `<tr><td><span class="pill">${x.slot}</span></td><td>${curP ? UI.pl(D, curP) : "—"}</td><td class="r num">${f1(proj(curP))}</td><td>${changed ? `<b class="gold">→ ${UI.pl(D, x.pid)}</b>` : bestSet.has(curP) ? '<span class="faint">${IC("check", 15)}</span>' : '<span class="bad">sentarlo</span>'}</td><td class="r num">${changed ? f1(x.val) : ""}</td></tr>`;
     }).join("");
     const bench = pids.filter((p) => !curSet.has(p)).sort((a, b) => proj(b) - proj(a)).map((p) => `<span class="chip">${UI.pl(D, p)} <b>${f1(proj(p))}</b></span>`).join("");
     const done = D.liveWeek === w ? `<p class="note">La semana ${w} ya empezó: solo puedes mover a jugadores cuyo partido no ha arrancado.</p>` : "";
     return `<div class="h3">Lineup de la semana ${w}</div>${done}
-      <div class="kpis" style="margin-bottom:10px"><div class="kpi"><div class="l">Tu lineup proyecta</div><div class="v">${f1(cur)}</div></div><div class="kpi"><div class="l">Lineup óptimo</div><div class="v gold">${f1(best.total)}</div><div class="d">${best.total - cur > 0.4 ? sign(best.total - cur) + " pts si haces los cambios" : "Ya tienes el mejor lineup ✔"}</div></div></div>
+      <div class="kpis" style="margin-bottom:10px"><div class="kpi"><div class="l">Tu lineup proyecta</div><div class="v">${f1(cur)}</div></div><div class="kpi"><div class="l">Lineup óptimo</div><div class="v gold">${f1(best.total)}</div><div class="d">${best.total - cur > 0.4 ? sign(best.total - cur) + " pts si haces los cambios" : "Ya tienes el mejor lineup"}</div></div></div>
       ${outs.length && best.total - cur > 0.4 ? `<div class="note">Sugerencia: sienta a ${outs.map((p) => esc(UI.plName(D, p))).join(", ")} y mete a ${ins.map((p) => esc(UI.plName(D, p))).join(", ")}.</div>` : ""}
       <div class="tbl-wrap" style="margin-top:10px"><table><thead><tr><th>Pos</th><th>Titular actual</th><th class="r">Proy.</th><th>Óptimo</th><th class="r">Proy.</th></tr></thead><tbody>${rows}</tbody></table></div>
       <div class="chips" style="margin-top:8px"><span class="small faint" style="align-self:center">Banca:</span>${bench}</div>
@@ -118,7 +118,7 @@
     return `<div class="h3">Fuerza por posición</div>
       <p class="sub">Valor = puntos por partido esperados de tus titulares (promedio de temporada + proyección, castigando lesiones).</p>
       <div class="tbl-wrap"><table><thead><tr><th>Posición</th><th class="r">Tú</th><th class="r">Promedio liga</th><th class="c">Rank</th><th>El mejor</th></tr></thead><tbody>${rows}</tbody></table></div>
-      <div class="note" style="margin-top:10px">${strong.length ? `💪 Fuerte en: <b>${strong.join(", ")}</b>. ` : ""}${weak.length ? `🩹 Débil en: <b>${weak.join(", ")}</b> — ahí es donde hay que buscar mejoras.` : "Sin huecos graves en el lineup."}</div>`;
+      <div class="note" style="margin-top:10px">${strong.length ? `${IC("up", 15)} Fuerte en: <b>${strong.join(", ")}</b>. ` : ""}${weak.length ? `${IC("down", 15)} Débil en: <b>${weak.join(", ")}</b> — ahí es donde hay que buscar mejoras.` : "Sin huecos graves en el lineup."}</div>`;
   }
   const STATE = {};
 
@@ -149,8 +149,8 @@
       <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Jugador</th><th class="r">PPG</th><th class="r">Proy S${D.projWeek}</th><th class="r">Tendencia</th><th class="r">Mejora lineup</th><th>vs tu peor en su posición</th></tr></thead><tbody>${rows}</tbody></table></div>
       ${dropC.length ? `<p class="note" style="margin-top:10px">Para hacer espacio, los candidatos a soltar son: <b>${dropC.map((p) => esc(UI.plName(D, p)) + " (" + f1(tradeValue(p)) + ")").join(", ")}</b>.</p>` : ""}
       <div class="grid g2" style="margin-top:10px">
-        <div class="card"><div class="h3" style="margin-top:0;font-size:20px">🎯 Streaming de K · semana ${D.projWeek}</div>${st(stream("K"), myK)}<p class="small faint">Tu K: ${myK ? UI.pl(D, myK) + " · " + f1(D.projPts[myK] || 0) : "—"}</p></div>
-        <div class="card"><div class="h3" style="margin-top:0;font-size:20px">🛡️ Streaming de DEF · semana ${D.projWeek}</div>${st(stream("DEF"), myD)}<p class="small faint">Tu DEF: ${myD ? UI.pl(D, myD) + " · " + f1(D.projPts[myD] || 0) : "—"}</p></div></div>`;
+        <div class="card"><div class="h3" style="margin-top:0;font-size:20px">${IC("target")} Streaming de K · semana ${D.projWeek}</div>${st(stream("K"), myK)}<p class="small faint">Tu K: ${myK ? UI.pl(D, myK) + " · " + f1(D.projPts[myK] || 0) : "—"}</p></div>
+        <div class="card"><div class="h3" style="margin-top:0;font-size:20px">${IC("shield")} Streaming de DEF · semana ${D.projWeek}</div>${st(stream("DEF"), myD)}<p class="small faint">Tu DEF: ${myD ? UI.pl(D, myD) + " · " + f1(D.projPts[myD] || 0) : "—"}</p></div></div>`;
   }
 
   /* ---------- valor de mercado ---------- */
@@ -267,12 +267,12 @@
         <div class="grid" style="grid-template-columns:1fr 1fr;gap:12px;margin-top:10px"><div><div class="small faint">Das</div>${x.give.map(pl).join("")}</div><div><div class="small faint">Recibes</div>${x.get.map(pl).join("")}</div></div>
         <div class="stats"><span>Tu lineup <b class="good">+${f1(x.my)}</b> pts/sem</span><span>El suyo <b class="${x.th >= 0 ? "good" : "bad"}">${sign(x.th)}</b></span><span>Mercado <b>${Math.round(x.f.g).toLocaleString()}</b> vs <b>${Math.round(x.f.r).toLocaleString()}</b></span></div>
         <p class="small" style="margin:8px 0 0"><b>Por qué tú:</b> ${esc(whyMe)}<br><b>Por qué ellos dirían que sí:</b> ${esc(whyThem.join(" "))}</p>
-        <div class="row" style="margin-top:8px"><button class="btn" data-copy="${i}" style="padding:6px 10px;font-size:12.5px">📋 Copiar mensaje</button></div>
+        <div class="row" style="margin-top:8px"><button class="btn" data-copy="${i}" style="padding:6px 10px;font-size:12.5px">${IC("copy", 15)} Copiar mensaje</button></div>
         <textarea id="msg${i}" style="display:none">${esc(msg)}</textarea></div>`;
     }).join("");
     STATE.afterRender = () => document.querySelectorAll("[data-copy]").forEach((b) => (b.onclick = async () => {
       const t = document.getElementById("msg" + b.dataset.copy).value;
-      try { await navigator.clipboard.writeText(t); UI.toast("Mensaje copiado ✔"); } catch (e) { UI.toast("No se pudo copiar"); }
+      try { await navigator.clipboard.writeText(t); UI.toast("Mensaje copiado"); } catch (e) { UI.toast("No se pudo copiar"); }
     }));
     // necesidades de la liga
     const needRows = D.rids.filter((r) => r !== ME).map((r) => { const n = need(r); const strong = ["QB", "RB", "WR", "TE"].map((k) => ({ k, rank: PR[r][k] })).sort((a, b) => a.rank - b.rank)[0]; return `<tr><td>${UI.teamCell(D, r, { sm: true, noOwner: true })}</td><td><span class="pill b">${n.k} #${n.rank}</span></td><td><span class="pill g">${strong.k} #${strong.rank}</span></td></tr>`; }).join("");

@@ -15,7 +15,7 @@
   UI.sign = (x, d = 1) => (x > 0 ? "+" : x < 0 ? "−" : "±") + Math.abs(x).toFixed(d);
   UI.rec = (s) => `${s.W}-${s.L}${s.T ? "-" + s.T : ""}`;
 
-  const PALETTE = ["#E85A4F", "#C9A27E", "#6B8F71", "#5B7DB1", "#B47EB3", "#D4A24C", "#4F9A94", "#A0522D", "#7A6F9B", "#E98074", "#8E8D8A", "#C77D5A"];
+  const PALETTE = ["#2F5D50", "#7A5236", "#3E5C76", "#C4553D", "#B08D3A", "#4E7F78", "#6B4E71", "#6E7A3A", "#5A6670", "#A4532F", "#2C3E5C", "#8C6D4F"];
   UI.color = (rid) => PALETTE[(rid - 1) % PALETTE.length];
   const initials = (s) => (s || "?").replace(/[^A-Za-z0-9ÁÉÍÓÚÑáéíóúñ ]/g, "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?";
   UI.avatar = (t, cls = "") => {
@@ -89,7 +89,7 @@
     const parts = [s];
     if (topW) parts.push(pick(R, ["La figura: {pw} con {ppw} pts.", "{pw} cargó al equipo con {ppw}.", "MVP del partido: {pw} ({ppw} pts)."]));
     if (topL && topL.pts >= 20) parts.push(pick(R, ["Por {l} no alcanzó ni con {pl} ({ppl}).", "{pl} hizo {ppl} pero se quedó solo."]));
-    if (tL.max > tW.pf) parts.push(pick(R, ["Lo que más duele: con su mejor lineup posible, {l} ganaba. Dejó {bench} pts en la banca. 🤦", "Ojo {ol}: ese partido estaba en la banca. {bench} pts sin usar."]));
+    if (tL.max > tW.pf) parts.push(pick(R, ["Lo que más duele: con su mejor lineup posible, {l} ganaba. Dejó {bench} pts en la banca.", "Ojo {ol}: ese partido estaba en la banca. {bench} pts sin usar."]));
     return fill(parts.join(" "), o);
   };
 
@@ -103,7 +103,7 @@
     const keyF = (favA ? M.topA : M.topB)[0], keyD = (favA ? M.topB : M.topA)[0];
     const o = { f: UI.tName(D, fav), d: UI.tName(D, dog), of: UI.oName(D, fav), od: UI.oName(D, dog), wp, rf: sf.W != null ? UI.rec(sf) : "", rd: sd.W != null ? UI.rec(sd) : "", kf: keyF ? UI.plName(D, keyF.pid) : "", kd: keyD ? UI.plName(D, keyD.pid) : "", pf: UI.f1(favA ? M.pa : M.pb), pd: UI.f1(favA ? M.pb : M.pa) };
     const parts = [];
-    if (UI.rivals(D, A, B)) parts.push(pick(R, ["🔥 RIVALIDAD. Esto no es un partido cualquiera.", "🔥 Duelo de rivales. Aquí se juega el orgullo."]));
+    if (UI.rivals(D, A, B)) parts.push(pick(R, ["RIVALIDAD. Esto no es un partido cualquiera.", "Duelo de rivales. Aquí se juega el orgullo."]));
     if (wp >= 70) parts.push(pick(R, ["{f} ({rf}) llega como favorito claro: {wp}% de probabilidad.", "En el papel no hay partido: {f} con {wp}% de ganar."]));
     else if (wp <= 56) parts.push(pick(R, ["Moneda al aire: {f} apenas {wp}% contra {d}.", "Partido parejísimo. Las proyecciones casi no separan a {f} y {d}."]));
     else parts.push(pick(R, ["{f} ({rf}) es favorito con {wp}%, pero {d} ({rd}) tiene con qué.", "Ventaja para {f} ({wp}%), sin nada asegurado."]));
@@ -115,7 +115,7 @@
       parts.push(`Ya se vieron en la semana ${last.w}: ganó ${UI.tName(D, wonA ? A : B)} ${UI.f1(Math.max(last.pa, last.pb))}–${UI.f1(Math.min(last.pa, last.pb))}.`);
     }
     const injs = [...M.injA, ...M.injB];
-    if (injs.length) parts.push(`⚠️ Ojo con el lineup: ${injs.map((p) => UI.plName(D, p) + " (" + D.players[p].inj + ")").join(", ")} ${injs.length > 1 ? "están de titulares" : "está de titular"}.`);
+    if (injs.length) parts.push(`Ojo con el lineup: ${injs.map((p) => UI.plName(D, p) + " (" + D.players[p].inj + ")").join(", ")} ${injs.length > 1 ? "están de titulares" : "está de titular"}.`);
     if (sd.streak && /^[3-9]P/.test(sd.streak)) parts.push(fill("{d} trae racha de " + sd.streak.replace("P", " derrotas") + ". Necesita reaccionar.", o));
     if (sf.streak && /^[3-9]G/.test(sf.streak)) parts.push(fill("{f} viene de " + sf.streak.replace("G", " victorias seguidas") + ".", o));
     return fill(parts.join(" "), o);
@@ -155,7 +155,7 @@
       const m = document.getElementById("imgModal");
       m.querySelector(".modal-body").innerHTML = `<img src="${url}" alt="">
         <p class="small muted" style="margin:10px 2px">En el celular: mantén presionada la imagen para guardarla, o usa Compartir para mandarla directo a WhatsApp.</p>
-        <div class="row"><button class="btn pri" id="shareBtn">📤 Compartir</button><a class="btn" href="${url}" download="${filename}.png">⬇️ Descargar</a><span class="sp"></span><button class="btn" onclick="document.getElementById('imgModal').classList.remove('on')">Cerrar</button></div>`;
+        <div class="row"><button class="btn pri" id="shareBtn">${IC("share", 16)} Compartir</button><a class="btn" href="${url}" download="${filename}.png">${IC("download", 16)} Descargar</a><span class="sp"></span><button class="btn" onclick="document.getElementById('imgModal').classList.remove('on')">Cerrar</button></div>`;
       m.classList.add("on");
       document.getElementById("shareBtn").onclick = async () => {
         const file = new File([blob], filename + ".png", { type: "image/png" });

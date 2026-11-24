@@ -33,8 +33,8 @@
     raton: (D) => D.rids.slice().sort((a, b) => D.moveStats[b].moves - D.moveStats[a].moves).map((r) => ({ label: T(D, r), sub: UI.oName(D, r), val: D.moveStats[r].moves + " altas" })),
     racha(D) { const out = []; D.rids.forEach((r) => { let c = 0, b = 0; Object.values(D.tw[r]).filter((x) => x.reg).forEach((x) => { c = x.res === "W" ? c + 1 : 0; b = Math.max(b, c); }); out.push({ r, b }); }); return out.sort((x, y) => y.b - x.b).map((x) => ({ label: T(D, x.r), sub: UI.oName(D, x.r), val: x.b + " V" })); },
     actuacion: (D) => D.records.bestPerf.map((x) => ({ label: P(D, x.pid), sub: `${T(D, x.rid)} · sem ${x.w}`, val: f1(x.pts) })),
-    campeon(D) { const f = final(D); return f && f.w ? [{ label: T(D, f.w), sub: UI.oName(D, f.w), val: "🏆" }] : null; },
-    subcampeon(D) { const f = final(D); return f && f.l ? [{ label: T(D, f.l), sub: UI.oName(D, f.l), val: "🥈" }] : null; },
+    campeon(D) { const f = final(D); return f && f.w ? [{ label: T(D, f.w), sub: UI.oName(D, f.w), val: "Campeón" }] : null; },
+    subcampeon(D) { const f = final(D); return f && f.l ? [{ label: T(D, f.l), sub: UI.oName(D, f.l), val: "Subcampeón" }] : null; },
     mvpPlayoffs(D) {
       const ws = D.playedWeeks.filter((w) => w > D.regEnd);
       if (!ws.length) return null;
@@ -65,17 +65,17 @@
           const list = fn ? fn(D) : null;
           if (!fn) inner = `<p class="small bad">Métrica "${esc(k.metric)}" no existe.</p>`;
           else if (!list || !list.length) inner = `<p class="small muted">Se define ${c === "final" ? "en los playoffs" : "más adelante"}.</p>`;
-          else if (reveal) inner = `<div class="aw-win">🏆 ${esc(list[0].label)}</div><div class="small muted">${esc(list[0].sub)} · <b>${esc(list[0].val)}</b></div>`;
+          else if (reveal) inner = `<div class="aw-win">${IC("trophy", 22)} ${esc(list[0].label)}</div><div class="small muted">${esc(list[0].sub)} · <b>${esc(list[0].val)}</b></div>`;
           else inner = `<div class="small faint" style="margin-bottom:4px">${done ? "Nominados (ganador en la ceremonia)" : "Nominados · van punteando"}</div>` +
             list.slice(0, 3).map((x) => `<div class="list-row small"><span>${esc(x.label)} <span class="faint">${esc(x.sub)}</span></span><span class="sp"></span><b class="num">${esc(x.val)}</b></div>`).join("");
         } else {
           const noms = k.nominees && k.nominees.length ? k.nominees : D.rids.map((r) => UI.tName(D, r));
-          if (reveal && k.winner) inner = `<div class="aw-win">🏆 ${esc(k.winner)}</div>`;
-          else inner = `<div class="small faint">Votación secreta${k.winner && !reveal ? " · resultado guardado 🤫" : ""}</div>
+          if (reveal && k.winner) inner = `<div class="aw-win">${IC("trophy", 22)} ${esc(k.winner)}</div>`;
+          else inner = `<div class="small faint">Votación secreta${k.winner && !reveal ? " · resultado guardado en secreto" : ""}</div>
             <div class="chips" style="margin-top:6px">${noms.map((n) => `<span class="chip">${esc(n)}</span>`).join("")}</div>
-            ${cfg.voteFormUrl ? `<a class="btn pri" style="margin-top:10px" href="${esc(cfg.voteFormUrl)}" target="_blank" rel="noopener">🗳️ Votar</a>` : `<p class="small faint" style="margin-top:8px">El comisionado captura el resultado.</p>`}`;
+            ${cfg.voteFormUrl ? `<a class="btn pri" style="margin-top:10px" href="${esc(cfg.voteFormUrl)}" target="_blank" rel="noopener">${IC("ballot", 16)} Votar</a>` : `<p class="small faint" style="margin-top:8px">El comisionado captura el resultado.</p>`}`;
         }
-        return `<div class="card"><div class="row" style="flex-wrap:nowrap"><span style="font-size:26px">${k.emoji || "🏆"}</span><div style="min-width:0"><div class="tn">${esc(k.name)}</div><div class="small muted">${esc(k.description)}</div></div><span class="sp"></span><span class="pill">${k.type === "vote" ? "Votación" : "Datos"}</span></div><div style="margin-top:10px">${inner}</div></div>`;
+        return `<div class="card"><div class="row" style="flex-wrap:nowrap"><span class="aw-ico">${IC(k.icon || "award", 22)}</span><div style="min-width:0"><div class="tn">${esc(k.name)}</div><div class="small muted">${esc(k.description)}</div></div><span class="sp"></span><span class="pill">${k.type === "vote" ? "Votación" : "Datos"}</span></div><div style="margin-top:10px">${inner}</div></div>`;
       }).join("");
       return `<div class="h3">${esc(cer.name)}</div><p class="sub">${esc(cer.when || "")} · ${reveal ? "¡Ya hay ganadores!" : done ? "Lista para la ceremonia: el comisionado revela ganadores." : "Todavía en juego."}</p><div class="grid g2">${cards}</div>`;
     }).join("");

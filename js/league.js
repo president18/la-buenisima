@@ -6,9 +6,9 @@
   const { esc, f1, pct, sign, rec } = UI;
   const $ = (s) => document.querySelector(s);
   const TABS = [
-    ["inicio", "Inicio", "🏠"], ["power", "Power Rankings", "📊"], ["semana", "Semana", "🏈"], ["manianera", "La Mañanera", "📰"], ["playoffs", "Playoffs", "🏆"],
-    ["roast", "Roast", "🔥"], ["h2h", "Cara a cara", "🥊"], ["calendarios", "Calendarios", "📅"],
-    ["movimientos", "Trades y Waivers", "🔁"], ["draft", "Draft", "📋"], ["oscars", "Óscars", "🎬"], ["historia", "Historia", "📜"],
+    ["inicio", "Inicio", "home"], ["power", "Power Rankings", "chart"], ["semana", "Semana", "ball"], ["manianera", "La Mañanera", "news"], ["playoffs", "Playoffs", "trophy"],
+    ["roast", "Roast", "flame"], ["h2h", "Cara a cara", "versus"], ["calendarios", "Calendarios", "calendar"],
+    ["movimientos", "Trades y Waivers", "swap"], ["draft", "Draft", "clipboard"], ["oscars", "Óscars", "award"], ["historia", "Historia", "book"],
   ];
   const BNAV = ["inicio", "power", "semana", "manianera"];
   let D = null;
@@ -25,9 +25,9 @@
     $("#tabs").innerHTML = TABS.map(([k, l]) => `<button class="tab" data-k="${k}">${l}</button>`).join("");
     $("#tabs").onclick = (e) => { const b = e.target.closest(".tab"); if (b) location.hash = b.dataset.k; };
     const short = { inicio: "Inicio", power: "Power", semana: "Semana", manianera: "Mañanera" };
-    $("#bnav").innerHTML = BNAV.map((k) => { const t = TABS.find((x) => x[0] === k); return `<button data-k="${k}"><i>${t[2]}</i>${short[k]}</button>`; }).join("") + `<button data-k="__more"><i>☰</i>Más</button>`;
+    $("#bnav").innerHTML = BNAV.map((k) => { const t = TABS.find((x) => x[0] === k); return `<button data-k="${k}"><i>${IC(t[2], 22)}</i>${short[k]}</button>`; }).join("") + `<button data-k="__more"><i>${IC("menu", 22)}</i>Más</button>`;
     $("#bnav").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.k === "__more") $("#sheet").classList.add("on"); else location.hash = b.dataset.k; };
-    $("#sheetIn").innerHTML = '<div class="grab"></div>' + TABS.filter((t) => !BNAV.includes(t[0])).map(([k, l, i]) => `<button data-k="${k}"><span>${i}</span>${l}</button>`).join("");
+    $("#sheetIn").innerHTML = '<div class="grab"></div>' + TABS.filter((t) => !BNAV.includes(t[0])).map(([k, l, i]) => `<button data-k="${k}"><span>${IC(i, 20)}</span>${l}</button>`).join("");
     $("#sheetIn").onclick = (e) => { const b = e.target.closest("button"); if (b) { $("#sheet").classList.remove("on"); location.hash = b.dataset.k; } };
   }
   function show() {
@@ -55,11 +55,11 @@
         <td class="num">${rec(s)}</td><td class="r num">${f1(s.pf)}</td><td class="r num hide-m">${f1(s.pa)}</td>
         <td class="r num hide-m">${f1(s.max)}</td><td class="r num">${pct(s.eff, 1)}</td>
         <td class="num hide-m">${s.apW}-${s.apL}</td><td class="r num ${s.luck > 0.5 ? "good" : s.luck < -0.5 ? "bad" : ""}">${sign(s.luck)}</td>
-        <td class="c">${s.streak}</td><td class="r num">${D.sim.remaining.length ? pct(o.playoff) : s.rank <= D.playoffTeams ? "✔" : "✘"}</td></tr>`;
+        <td class="c">${s.streak}</td><td class="r num">${D.sim.remaining.length ? pct(o.playoff) : s.rank <= D.playoffTeams ? IC("check", 15) : IC("x", 15)}</td></tr>`;
     }).join("");
     $("#s-inicio").innerHTML = installHTML() + breakingHTML() + `
       <div class="row"><div><div class="h2">Tabla general</div><p class="sub">Después de la semana ${w} · Top ${D.playoffTeams} a playoffs (semana ${D.regEnd + 1})</p></div><span class="sp"></span>
-      <button class="btn" id="imgStand">🖼️ Imagen</button></div>
+      <button class="btn" id="imgStand">${IC("image", 16)} Imagen</button></div>
       <div class="kpis" style="margin-bottom:14px">
         ${kpi("Líder", esc(D.teams[st[0].rid].name), rec(st[0]) + " · " + esc(D.teams[st[0].rid].ownersNick))}
         ${kpi("Más puntos", f1(byPF.pf), esc(D.teams[byPF.rid].name))}
@@ -84,14 +84,14 @@
       return `<tr class="${UI.isMine(D, r) ? "me" : ""}"><td class="sticky-col">${UI.teamCell(D, r, { sm: true })}</td><td class="r num hide-m">${f1(o.wins)}</td>
       <td class="r num"><b>${pct(o.playoff)}</b></td><td class="r num">${pct(o.bye)}</td><td class="r num hide-m">${pct(o.first)}</td><td class="r num ${o.last > 0.25 ? "bad" : ""}">${pct(o.last)}</td></tr>`;
     }).join("");
-    return `<div class="row" style="margin-top:20px"><div><div class="h3" style="margin:0">Probabilidades de playoffs</div><p class="sub" style="margin:4px 0 10px">${D.sim.N.toLocaleString()} simulaciones de las semanas ${D.lastScored + 1}–${D.regEnd} con el calendario real</p></div><span class="sp"></span><button class="btn" id="imgOdds">🖼️ Imagen</button></div>
+    return `<div class="row" style="margin-top:20px"><div><div class="h3" style="margin:0">Probabilidades de playoffs</div><p class="sub" style="margin:4px 0 10px">${D.sim.N.toLocaleString()} simulaciones de las semanas ${D.lastScored + 1}–${D.regEnd} con el calendario real</p></div><span class="sp"></span><button class="btn" id="imgOdds">${IC("image", 16)} Imagen</button></div>
       <div class="tbl-wrap"><table><thead><tr><th class="sticky-col">Equipo</th><th class="r hide-m">Victorias proy.</th><th class="r">Playoffs</th><th class="r">Bye</th><th class="r hide-m">#1</th><th class="r">Último</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
   function cardStandings() {
     const w = Math.min(D.lastScored, D.regEnd);
     const body = D.standings.map((s) => `<div class="ic-row" style="padding:10px 22px"><div class="ic-rk" style="font-size:46px">${s.rank}</div>
       <div><div class="ic-name">${esc(D.teams[s.rid].name)}</div><div class="ic-meta">${esc(D.teams[s.rid].ownersNick)} · ${f1(s.pf)} PF · racha ${s.streak}</div></div>
-      <div class="ic-score" style="color:${s.rank <= D.playoffTeams ? "#5E8C61" : "#2E2C29"}">${rec(s)}</div></div>`).join("");
+      <div class="ic-score" style="color:${s.rank <= D.playoffTeams ? "#2F5D50" : "#2E2C29"}">${rec(s)}</div></div>`).join("");
     return UI.icFrame(D, `Semana ${w}`, "Tabla general", body);
   }
   function cardOdds() {
@@ -99,7 +99,7 @@
     const ord = D.rids.slice().sort((a, b) => sim[b].playoff - sim[a].playoff);
     const body = ord.map((r, i) => `<div class="ic-row" style="padding:10px 22px"><div class="ic-rk" style="font-size:42px">${i + 1}</div>
       <div><div class="ic-name">${esc(D.teams[r].name)}</div><div class="ic-meta">Bye ${pct(sim[r].bye)} · #1 ${pct(sim[r].first)} · Último ${pct(sim[r].last)}</div></div>
-      <div class="ic-score" style="color:${sim[r].playoff > 0.5 ? "#5E8C61" : "#E85A4F"}">${pct(sim[r].playoff)}</div></div>`).join("");
+      <div class="ic-score" style="color:${sim[r].playoff > 0.5 ? "#2F5D50" : "#E85A4F"}">${pct(sim[r].playoff)}</div></div>`).join("");
     return UI.icFrame(D, "Probabilidades", "¿Quién entra a playoffs?", body);
   }
 
@@ -110,15 +110,15 @@
     const standalone = window.navigator.standalone || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
     if (off || standalone || !/iPhone|iPad|Android/i.test(navigator.userAgent)) return "";
     const ios = /iPhone|iPad/i.test(navigator.userAgent);
-    return `<div class="card" id="instBox" style="display:flex;gap:12px;align-items:center;margin-bottom:14px">${UI.logoHTML(D)}<div class="small" style="flex:1"><b>Tenlo como app</b><br>${ios ? "En Safari toca Compartir ⬆️ y luego “Agregar a inicio”." : "Abre el menú ⋮ y toca “Agregar a pantalla principal”."}</div><button class="btn" onclick="try{localStorage.setItem('lb-install-off','1')}catch(e){};document.getElementById('instBox').remove()">✕</button></div>`;
+    return `<div class="card" id="instBox" style="display:flex;gap:12px;align-items:center;margin-bottom:14px">${UI.logoHTML(D)}<div class="small" style="flex:1"><b>Tenlo como app</b><br>${ios ? "En Safari toca Compartir y luego “Agregar a inicio”." : "Abre el menú ⋮ y toca “Agregar a pantalla principal”."}</div><button class="btn" onclick="try{localStorage.setItem('lb-install-off','1')}catch(e){};document.getElementById('instBox').remove()">${IC("x", 16)}</button></div>`;
   }
   /* ---- Breaking News ---- */
   function breakingHTML() {
     const all = LB.stories.breaking(D);
     const list = sel.bnAll ? all : all.slice(0, 5);
     if (!list.length) return "";
-    return `<div class="row"><div><div class="h2" style="color:var(--bad)">🚨 Breaking News</div><p class="sub">Lo más fuerte que ha pasado en la liga. Toca 🗞️ para la portada.</p></div></div>
-      <div class="grid" style="gap:8px">${list.map((e, i) => `<div class="bn"><div class="bn-art">${LB.art.toImg(LB.art.iconFor(e.type), 52, 52)}</div><div style="min-width:0"><div class="bn-w" style="text-align:left;font-size:12px;letter-spacing:.1em">SEMANA ${e.week}</div><div class="bn-k">${esc(e.kicker)}</div><div class="bn-h">${esc(e.headline)}</div><div class="bn-s">${esc(e.sub)}</div></div><button class="btn" data-bn="${i}" style="padding:7px 10px">🗞️</button></div>`).join("")}</div>
+    return `<div class="row"><div><div class="h2" style="color:var(--bad)">${IC("siren", 28, "currentColor", 1.6)} Breaking News</div><p class="sub">Lo más fuerte que ha pasado en la liga. Toca ${IC("news", 15)} para ver la portada.</p></div></div>
+      <div class="grid" style="gap:8px">${list.map((e, i) => `<div class="bn"><div class="bn-art">${LB.art.toImg(LB.art.iconFor(e.type), 52, 52)}</div><div style="min-width:0"><div class="bn-w" style="text-align:left;font-size:12px;letter-spacing:.1em">SEMANA ${e.week}</div><div class="bn-k">${esc(e.kicker)}</div><div class="bn-h">${esc(e.headline)}</div><div class="bn-s">${esc(e.sub)}</div></div><button class="btn" data-bn="${i}" style="padding:7px 10px">${IC("news", 17)}</button></div>`).join("")}</div>
       ${all.length > 5 ? `<div style="text-align:center;margin-top:8px"><button class="btn" id="bnMore">${sel.bnAll ? "Ver menos" : `Ver todas (${all.length})`}</button></div>` : ""}<div style="height:10px"></div>`;
   }
   function bindBreaking() {
@@ -135,7 +135,7 @@
       return `<tr><td class="num">S${x.w}</td><td>${UI.teamCell(D, x.rid, { sm: true })}</td><td class="r num"><b>${f1(x.pts)}</b></td><td class="r num faint">+${f1(x.pts - (second || 0))}</td><td class="c">${D.tw[x.rid][x.w].res === "W" ? '<span class="good">G</span>' : '<span class="bad">P</span>'}</td></tr>`;
     }).join("");
     const counts = D.rids.filter((r) => R.weeklyTopCount[r]).sort((a, b) => R.weeklyTopCount[b] - R.weeklyTopCount[a]).map((r) => `<span class="chip">${esc(D.teams[r].name)} <b>×${R.weeklyTopCount[r]}</b></span>`).join("");
-    return `<div class="row" style="margin-top:20px"><div><div class="h3" style="margin:0">👑 El que más metió cada semana</div><p class="sub" style="margin:4px 0 10px">Equipo con más puntos de cada jornada y su ventaja sobre el segundo.</p></div><span class="sp"></span><button class="btn" id="imgTop">🖼️ Imagen</button></div>
+    return `<div class="row" style="margin-top:20px"><div><div class="h3" style="margin:0">${IC("crown")} El que más metió cada semana</div><p class="sub" style="margin:4px 0 10px">Equipo con más puntos de cada jornada y su ventaja sobre el segundo.</p></div><span class="sp"></span><button class="btn" id="imgTop">${IC("image", 16)} Imagen</button></div>
       <div class="chips" style="margin-bottom:10px">${counts}</div>
       <div class="tbl-wrap"><table><thead><tr><th>Sem</th><th>Equipo</th><th class="r">Pts</th><th class="r">Ventaja</th><th class="c">Res</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
@@ -153,8 +153,8 @@
     const weeks = mode === "preview" ? future : played;
     let w = sel.np && weeks.includes(sel.np) ? sel.np : mode === "preview" ? (future.includes(D.projWeek) ? D.projWeek : future[0]) : played[played.length - 1];
     $("#s-manianera").innerHTML = `<div class="row"><div><div class="h2">La Mañanera</div><p class="sub">El periódico oficial de La Buenísima, listo para mandarlo al chat.</p></div></div>
-      <div class="row" style="margin-bottom:12px"><button class="btn ${mode === "preview" ? "pri" : ""}" id="npPrev" ${future.length ? "" : "disabled"}>📰 Preview</button><button class="btn ${mode === "results" ? "pri" : ""}" id="npRes" ${played.length ? "" : "disabled"}>🏁 Resultados</button>
-      <select id="npWeek">${weeks.map((x) => `<option value="${x}" ${x === w ? "selected" : ""}>Semana ${x}</option>`).join("")}</select><span class="sp"></span><button class="btn pri" id="npImg">🖼️ Generar imagen</button></div>
+      <div class="row" style="margin-bottom:12px"><button class="btn ${mode === "preview" ? "pri" : ""}" id="npPrev" ${future.length ? "" : "disabled"}>${IC("news", 16)} Preview</button><button class="btn ${mode === "results" ? "pri" : ""}" id="npRes" ${played.length ? "" : "disabled"}>${IC("flag", 16)} Resultados</button>
+      <select id="npWeek">${weeks.map((x) => `<option value="${x}" ${x === w ? "selected" : ""}>Semana ${x}</option>`).join("")}</select><span class="sp"></span><button class="btn pri" id="npImg">${IC("image", 16)} Generar imagen</button></div>
       ${mode === "preview" && w !== D.projWeek ? '<p class="note">Para semanas futuras no hay proyecciones todavía: se usan promedios de temporada.</p>' : ""}
       <div id="npBox"></div>`;
     const html = w ? (mode === "preview" ? LB.np.preview(D, w) : LB.np.results(D, w)) : "";
@@ -186,7 +186,7 @@
     }).join("");
     $("#s-power").innerHTML = `
       <div class="row"><div><div class="h2">Power Rankings</div><p class="sub">No es la tabla: es quién está jugando mejor de verdad.</p></div><span class="sp"></span>
-      <select id="pwWeek">${opts}</select><button class="btn" id="imgPower">🖼️ Imagen</button></div>
+      <select id="pwWeek">${opts}</select><button class="btn" id="imgPower">${IC("image", 16)} Imagen</button></div>
       <details class="card tight" style="margin-bottom:12px"><summary class="small muted" style="cursor:pointer">¿Cómo se calcula?</summary>
         <p class="small muted">Power score de 0 a 100: <b>30%</b> puntos por partido · <b>25%</b> récord all-play (contra todos, cada semana) · <b>20%</b> forma de las últimas 3 semanas · <b>15%</b> récord real · <b>10%</b> eficiencia de lineup (puntos hechos ÷ máximo posible). Las calificaciones de Draft, Waivers, Trades y Lineups comparan a los ${D.numTeams} equipos: puntos como titular de sus picks del draft, puntos como titular de sus altas por waiver/agente libre, puntos netos ganados en trades y eficiencia de lineup.</p></details>
       <div class="grid">${cards}</div>`;
@@ -199,7 +199,7 @@
       const sents = UI.powerBlurb(D, r, w, rows.length).split(/(?<=\.)\s+/).filter((x) => !/^Playoffs/.test(x));
       const short = sents[1] || sents[0] || "";
       return `<div class="ic-row" style="grid-template-columns:70px 1fr auto;padding:10px 22px">
-        <div style="text-align:center"><div class="ic-rk" style="font-size:50px">${r.prank}</div><div style="font-size:18px;font-weight:800;color:${d > 0 ? "#5E8C61" : d < 0 ? "#E85A4F" : "#8E8D8A"}">${d > 0 ? "▲" + d : d < 0 ? "▼" + -d : "—"}</div></div>
+        <div style="text-align:center"><div class="ic-rk" style="font-size:50px">${r.prank}</div><div style="font-size:18px;font-weight:800;color:${d > 0 ? "#2F5D50" : d < 0 ? "#E85A4F" : "#8E8D8A"}">${d > 0 ? "▲" + d : d < 0 ? "▼" + -d : "—"}</div></div>
         <div><div class="ic-name">${esc(D.teams[r.rid].name)} <span style="font-size:22px;color:#6E6C68;font-weight:600">${rec(r)}</span></div><div class="ic-meta">${esc(short)}</div></div>
         <div class="ic-score">${f1(r.score)}</div></div>`;
     }).join("");
@@ -246,7 +246,7 @@
       extra = `<div class="stats" style="margin-top:8px"><span>Máximo posible: <b>${f1(M.ta.max)}</b> vs <b>${f1(M.tb.max)}</b></span><span>Pts en banca: <b>${f1(M.ta.max - M.ta.pf)}</b> vs <b>${f1(M.tb.max - M.tb.pf)}</b></span></div>`;
     }
     return `<div class="card mu">
-      <div class="row" style="padding:10px 14px 0"><span class="tag">${label}</span>${UI.rivals(D_, M.g.a, M.g.b) ? '<span class="tag" style="color:var(--bad)">🔥 Rivalidad</span>' : ""}<span class="sp"></span><button class="btn" style="padding:5px 10px;font-size:12.5px" id="muImg${i}">🖼️</button></div>
+      <div class="row" style="padding:10px 14px 0"><span class="tag">${label}</span>${UI.rivals(D_, M.g.a, M.g.b) ? `<span class="tag" style="color:var(--bad)">${IC("flame", 12)} Rivalidad</span>` : ""}<span class="sp"></span><button class="btn" style="padding:5px 10px;font-size:12.5px" id="muImg${i}">${IC("image", 16)}</button></div>
       <div class="mu-head">${side(M.g.a, sA, aWin, M.sa)}<div class="mu-vs">VS</div>${side(M.g.b, sB, bWin, M.sb)}</div>
       ${!M.played ? `<div style="padding:0 14px 12px"><div class="row small muted" style="margin-bottom:4px"><span>${pct(wpA)}</span><span class="sp"></span><span>Prob. de ganar</span><span class="sp"></span><span>${pct(1 - wpA)}</span></div><div class="wp"><i style="width:${wpA * 100}%"></i></div></div>` : ""}
       <div class="mu-body"><p style="margin:0;font-size:14px">${esc(txt)}</p>
@@ -269,34 +269,34 @@
   }
   function awards(w) {
     const A = weekAwards(w);
-    const it = (ic, t, who, d) => `<div class="kpi"><div class="l">${ic} ${t}</div><div class="v" style="font-size:22px;line-height:1.15;margin:3px 0">${who}</div><div class="d">${d}</div></div>`;
+    const it = (ic, t, who, d) => `<div class="kpi"><div class="l">${IC(ic, 14)} ${t}</div><div class="v" style="font-size:22px;line-height:1.15;margin:3px 0">${who}</div><div class="d">${d}</div></div>`;
     const gn = (g) => `${esc(UI.tName(D, g.pa > g.pb ? g.a : g.b))} ${f1(Math.max(g.pa, g.pb))}–${f1(Math.min(g.pa, g.pb))}`;
-    return `<div class="row" style="margin-top:6px"><div class="h3" style="margin:6px 0">🏆 Premios de la semana</div><span class="sp"></span><button class="btn" id="imgAwards">🖼️ Premios</button><button class="btn" id="imgAll">🖼️ Resultados</button></div>
+    return `<div class="row" style="margin-top:6px"><div class="h3" style="margin:6px 0">${IC("trophy")} Premios de la semana</div><span class="sp"></span><button class="btn" id="imgAwards">${IC("image", 16)} Premios</button><button class="btn" id="imgAll">${IC("image", 16)} Resultados</button></div>
       <div class="kpis">
-        ${it("👑", "Equipo de la semana", esc(UI.tName(D, A.top.rid)), f1(A.top.pf) + " pts")}
-        ${it("⭐", "MVP", UI.pl(D, A.mvp.pid), f1(A.mvp.pts) + " pts · " + esc(UI.tName(D, A.mvp.rid)))}
-        ${it("🧠", "Lineup perfecto", esc(UI.tName(D, A.eff.rid)), pct(A.eff.pf / A.eff.max, 1) + " de su máximo")}
-        ${it("🪑", "Banca de oro", esc(UI.tName(D, A.bench.rid)), f1(A.bench.max - A.bench.pf) + " pts sin usar")}
-        ${it("💩", "Peor equipo", esc(UI.tName(D, A.low.rid)), f1(A.low.pf) + " pts")}
-        ${it("💥", "Paliza", gn(A.blow), "Diferencia " + f1(Math.abs(A.blow.pa - A.blow.pb)))}
-        ${it("😱", "Infarto", gn(A.close), "Diferencia " + f1(Math.abs(A.close.pa - A.close.pb)))}
-        ${A.robbed ? it("🍀", "Robo", esc(UI.tName(D, A.robbed.rid)), "Ganó con solo " + f1(A.robbed.pf)) : ""}
-        ${A.sad ? it("😭", "Mala suerte", esc(UI.tName(D, A.sad.rid)), "Perdió con " + f1(A.sad.pf)) : ""}
+        ${it("crown", "Equipo de la semana", esc(UI.tName(D, A.top.rid)), f1(A.top.pf) + " pts")}
+        ${it("star", "MVP", UI.pl(D, A.mvp.pid), f1(A.mvp.pts) + " pts · " + esc(UI.tName(D, A.mvp.rid)))}
+        ${it("target", "Lineup perfecto", esc(UI.tName(D, A.eff.rid)), pct(A.eff.pf / A.eff.max, 1) + " de su máximo")}
+        ${it("couch", "Banca de oro", esc(UI.tName(D, A.bench.rid)), f1(A.bench.max - A.bench.pf) + " pts sin usar")}
+        ${it("brick", "Peor equipo", esc(UI.tName(D, A.low.rid)), f1(A.low.pf) + " pts")}
+        ${it("zap", "Paliza", gn(A.blow), "Diferencia " + f1(Math.abs(A.blow.pa - A.blow.pb)))}
+        ${it("pulse", "Infarto", gn(A.close), "Diferencia " + f1(Math.abs(A.close.pa - A.close.pb)))}
+        ${A.robbed ? it("dice", "Robo", esc(UI.tName(D, A.robbed.rid)), "Ganó con solo " + f1(A.robbed.pf)) : ""}
+        ${A.sad ? it("rain", "Mala suerte", esc(UI.tName(D, A.sad.rid)), "Perdió con " + f1(A.sad.pf)) : ""}
       </div>`;
   }
   function cardAwards(w) {
     const A = weekAwards(w);
-    const row = (ic, t, who, d) => `<div class="ic-row" style="grid-template-columns:70px 1fr auto"><div style="font-size:48px;text-align:center">${ic}</div><div><div class="ic-meta" style="text-transform:uppercase;letter-spacing:2px;color:#E85A4F;font-weight:700;font-size:18px">${t}</div><div class="ic-name">${esc(who)}</div></div><div class="ic-score" style="font-size:36px">${esc(d)}</div></div>`;
+    const row = (ic, t, who, d) => `<div class="ic-row" style="grid-template-columns:70px 1fr auto"><div style="text-align:center">${LB.icoImg(ic, 52, "#2F5D50", 1.8)}</div><div><div class="ic-meta" style="text-transform:uppercase;letter-spacing:2px;color:#E85A4F;font-weight:700;font-size:18px">${t}</div><div class="ic-name">${esc(who)}</div></div><div class="ic-score" style="font-size:36px">${esc(d)}</div></div>`;
     const gw = (g) => UI.tName(D, g.pa > g.pb ? g.a : g.b) + " vs " + UI.tName(D, g.pa > g.pb ? g.b : g.a);
     const body = [
-      row("👑", "Equipo de la semana", UI.tName(D, A.top.rid), f1(A.top.pf)),
-      row("⭐", "MVP", `${UI.plName(D, A.mvp.pid)} (${UI.tName(D, A.mvp.rid)})`, f1(A.mvp.pts)),
-      row("🧠", "Lineup perfecto", UI.tName(D, A.eff.rid), pct(A.eff.pf / A.eff.max)),
-      row("🪑", "Banca de oro", UI.tName(D, A.bench.rid), f1(A.bench.max - A.bench.pf)),
-      row("💩", "Peor equipo", UI.tName(D, A.low.rid), f1(A.low.pf)),
-      row("💥", "Paliza", gw(A.blow), "+" + f1(Math.abs(A.blow.pa - A.blow.pb))),
-      row("😱", "Infarto", gw(A.close), "+" + f1(Math.abs(A.close.pa - A.close.pb))),
-      A.robbed ? row("🍀", "Robo", UI.tName(D, A.robbed.rid), f1(A.robbed.pf)) : "",
+      row("crown", "Equipo de la semana", UI.tName(D, A.top.rid), f1(A.top.pf)),
+      row("star", "MVP", `${UI.plName(D, A.mvp.pid)} (${UI.tName(D, A.mvp.rid)})`, f1(A.mvp.pts)),
+      row("target", "Lineup perfecto", UI.tName(D, A.eff.rid), pct(A.eff.pf / A.eff.max)),
+      row("couch", "Banca de oro", UI.tName(D, A.bench.rid), f1(A.bench.max - A.bench.pf)),
+      row("brick", "Peor equipo", UI.tName(D, A.low.rid), f1(A.low.pf)),
+      row("zap", "Paliza", gw(A.blow), "+" + f1(Math.abs(A.blow.pa - A.blow.pb))),
+      row("pulse", "Infarto", gw(A.close), "+" + f1(Math.abs(A.close.pa - A.close.pb))),
+      A.robbed ? row("dice", "Robo", UI.tName(D, A.robbed.rid), f1(A.robbed.pf)) : "",
     ].join("");
     return UI.icFrame(D, `Semana ${w}`, "Premios de la semana", body);
   }
@@ -307,12 +307,12 @@
     const side = (rid, s, st, top, win) => `<div style="flex:1;text-align:center;background:#F6F4EE;border:1px solid #DCD4C4;border-radius:22px;padding:24px 16px">
       <div style="width:110px;height:110px;border-radius:50%;margin:0 auto 12px;background:${UI.color(rid)};display:grid;place-items:center;font-size:44px;font-weight:800;color:#111">${esc(D.teams[rid].name.slice(0, 2).toUpperCase())}</div>
       <div class="ic-name" style="font-size:32px">${esc(D.teams[rid].name)}</div><div class="ic-meta">${st && st.W != null ? rec(st) : ""} · ${esc(D.teams[rid].ownersNick)}</div>
-      <div style="font-family:var(--fh);font-size:110px;line-height:1;margin-top:10px;color:${win ? "#5E8C61" : "#2E2C29"}">${f1(s)}</div>
+      <div style="font-family:var(--fh);font-size:110px;line-height:1;margin-top:10px;color:${win ? "#2F5D50" : "#2E2C29"}">${f1(s)}</div>
       <div style="margin-top:12px;text-align:left">${top.slice(0, 3).map((p) => `<div style="display:flex;justify-content:space-between;font-size:22px;padding:4px 0;color:#6E6C68"><span>${esc(UI.plName(D, p.pid))}</span><b style="color:#2E2C29">${f1(p[by])}</b></div>`).join("")}</div></div>`;
     const txt = M.played ? UI.recapText(D, M) : UI.previewText(D, M);
     const wp = M.winA == null ? 0.5 : M.winA;
     const body = `<div style="display:flex;gap:18px;align-items:stretch">${side(M.g.a, sA, M.sa, M.topA, showPts && sA > sB)}<div style="align-self:center;font-family:var(--fh);font-size:50px;color:#8E8D8A">VS</div>${side(M.g.b, sB, M.sb, M.topB, showPts && sB > sA)}</div>
-      ${!M.played ? `<div style="margin-top:22px"><div style="display:flex;justify-content:space-between;font-size:24px;font-weight:700"><span style="color:#5E8C61">${pct(wp)}</span><span style="color:#6E6C68">Probabilidad de ganar</span><span style="color:#E85A4F">${pct(1 - wp)}</span></div><div style="height:16px;border-radius:12px;background:#E85A4F;overflow:hidden;margin-top:8px"><div style="height:100%;width:${wp * 100}%;background:#5E8C61"></div></div></div>` : ""}
+      ${!M.played ? `<div style="margin-top:22px"><div style="display:flex;justify-content:space-between;font-size:24px;font-weight:700"><span style="color:#2F5D50">${pct(wp)}</span><span style="color:#6E6C68">Probabilidad de ganar</span><span style="color:#E85A4F">${pct(1 - wp)}</span></div><div style="height:16px;border-radius:12px;background:#E85A4F;overflow:hidden;margin-top:8px"><div style="height:100%;width:${wp * 100}%;background:#2F5D50"></div></div></div>` : ""}
       <div style="margin-top:22px;font-size:27px;line-height:1.4;color:#2E2C29;background:#F6F4EE;border-left:6px solid #E85A4F;padding:18px 22px;border-radius:0 16px 16px 0">${esc(txt)}</div>`;
     return UI.icFrame(D, `Semana ${M.w} · ${M.played ? "Review" : "Preview"}`, M.played ? "Así quedó" : "Lo que viene", body);
   }
@@ -320,9 +320,9 @@
     const body = mus.map((M) => {
       const a = M.ea.pts, b = M.eb.pts;
       return `<div class="ic-row" style="grid-template-columns:1fr auto 1fr;padding:18px 24px">
-        <div><div class="ic-name" style="color:${a > b ? "#5E8C61" : "#2E2C29"}">${esc(UI.tName(D, M.g.a))}</div><div class="ic-meta">${esc(UI.oName(D, M.g.a))}</div></div>
-        <div style="font-family:var(--fh);font-size:52px;text-align:center"><span style="color:${a > b ? "#5E8C61" : "#2E2C29"}">${f1(a)}</span> <span style="color:#8E8D8A">–</span> <span style="color:${b > a ? "#5E8C61" : "#2E2C29"}">${f1(b)}</span></div>
-        <div style="text-align:right"><div class="ic-name" style="color:${b > a ? "#5E8C61" : "#2E2C29"}">${esc(UI.tName(D, M.g.b))}</div><div class="ic-meta">${esc(UI.oName(D, M.g.b))}</div></div></div>`;
+        <div><div class="ic-name" style="color:${a > b ? "#2F5D50" : "#2E2C29"}">${esc(UI.tName(D, M.g.a))}</div><div class="ic-meta">${esc(UI.oName(D, M.g.a))}</div></div>
+        <div style="font-family:var(--fh);font-size:52px;text-align:center"><span style="color:${a > b ? "#2F5D50" : "#2E2C29"}">${f1(a)}</span> <span style="color:#8E8D8A">–</span> <span style="color:${b > a ? "#2F5D50" : "#2E2C29"}">${f1(b)}</span></div>
+        <div style="text-align:right"><div class="ic-name" style="color:${b > a ? "#2F5D50" : "#2E2C29"}">${esc(UI.tName(D, M.g.b))}</div><div class="ic-meta">${esc(UI.oName(D, M.g.b))}</div></div></div>`;
     }).join("");
     return UI.icFrame(D, `Semana ${mus[0].w}`, "Resultados", body);
   }
@@ -336,7 +336,7 @@
       const cells = ord.map((j) => {
         const x = M[i][j], act = M[i][i];
         const diff = x.W - act.W;
-        const bg = i === j ? "rgba(216,195,165,.55)" : diff > 0 ? `rgba(94,140,97,${Math.min(0.45, 0.1 * diff)})` : diff < 0 ? `rgba(232,90,79,${Math.min(0.45, -0.1 * diff)})` : "transparent";
+        const bg = i === j ? "rgba(216,195,165,.55)" : diff > 0 ? `rgba(47,93,80,${Math.min(0.45, 0.1 * diff)})` : diff < 0 ? `rgba(232,90,79,${Math.min(0.45, -0.1 * diff)})` : "transparent";
         return `<td class="c num" style="background:${bg}">${x.W}-${x.L}${x.T ? "-" + x.T : ""}</td>`;
       }).join("");
       return `<tr class="${UI.isMine(D, i) ? "me" : ""}"><td class="sticky-col">${UI.teamCell(D, i, { sm: true, noOwner: true })}</td>${cells}</tr>`;
@@ -345,7 +345,7 @@
       <div class="small" style="text-align:right">Real <b>${s.actual.W}-${s.actual.L}</b> · Mejor <b class="good">${s.best.W}-${s.best.L}</b> <span class="faint">(cal. de ${esc(UI.tName(D, s.best.j))})</span><br>Peor <b class="bad">${s.worst.W}-${s.worst.L}</b> <span class="faint">(cal. de ${esc(UI.tName(D, s.worst.j))})</span> · Promedio <b>${f1(s.avgW)}</b> V</div></div>`).join("");
     const hard = hardness.slice().sort((a, b) => a.givesAvgW - b.givesAvgW);
     $("#s-calendarios").innerHTML = `
-      <div class="row"><div><div class="h2">¿Y si tuvieras otro calendario?</div><p class="sub">Cada fila es un equipo con sus puntos reales; cada columna es el calendario de otro equipo. Verde = le hubiera ido mejor, rojo = peor. La diagonal es su récord real.</p></div><span class="sp"></span><button class="btn" id="imgCal">🖼️ Imagen</button></div>
+      <div class="row"><div><div class="h2">¿Y si tuvieras otro calendario?</div><p class="sub">Cada fila es un equipo con sus puntos reales; cada columna es el calendario de otro equipo. Verde = le hubiera ido mejor, rojo = peor. La diagonal es su récord real.</p></div><span class="sp"></span><button class="btn" id="imgCal">${IC("image", 16)} Imagen</button></div>
       <div class="tbl-wrap"><table class="heat"><thead><tr><th class="sticky-col">Equipo ↓ / Calendario →</th>${head}</tr></thead><tbody>${body}</tbody></table></div>
       <div class="grid g2" style="margin-top:16px">
         <div class="card"><div class="h3" style="margin-top:0">Lo mejor y lo peor posible</div>${sum}</div>
@@ -359,7 +359,7 @@
     const head = ord.map((j) => `<th style="padding:6px 2px;font-size:15px;color:#6E6C68;width:78px">${esc(D.teams[j].name.slice(0, 7))}</th>`).join("");
     const body = ord.map((i) => `<tr><td style="padding:8px 8px;font-size:19px;font-weight:700;white-space:nowrap;max-width:170px;overflow:hidden;text-overflow:ellipsis">${esc(D.teams[i].name.slice(0, 14))}</td>${ord.map((j) => {
       const x = M[i][j], d = x.W - M[i][i].W;
-      const bg = i === j ? "rgba(216,195,165,.7)" : d > 0 ? `rgba(94,140,97,${Math.min(0.55, 0.13 * d)})` : d < 0 ? `rgba(232,90,79,${Math.min(0.55, -0.13 * d)})` : "transparent";
+      const bg = i === j ? "rgba(216,195,165,.7)" : d > 0 ? `rgba(47,93,80,${Math.min(0.55, 0.13 * d)})` : d < 0 ? `rgba(232,90,79,${Math.min(0.55, -0.13 * d)})` : "transparent";
       return `<td style="text-align:center;font-size:20px;padding:8px 2px;background:${bg};font-weight:700">${x.W}-${x.L}</td>`;
     }).join("")}</tr>`).join("");
     return UI.icFrame(D, "Calendarios alternos", "¿Y si…?", `<table style="width:100%;border-collapse:collapse;background:#F6F4EE;border-radius:16px;overflow:hidden"><thead><tr><th style="text-align:left;padding:8px;font-size:15px;color:#8E8D8A">Equipo ↓ / Calendario de →</th>${head}</tr></thead><tbody>${body}</tbody></table>`);
@@ -378,7 +378,7 @@
         <div class="row" style="margin-top:10px;align-items:stretch">${sides}</div></div>`;
     }).join("") || '<p class="muted">No hay trades todavía.</p>';
     const best = D.pickups.filter((p) => p.start > 0).sort((a, b) => b.start - a.start).slice(0, 12);
-    const bestRows = best.map((p, i) => `<tr><td class="num faint">${i + 1}</td><td>${UI.pl(D, p.pid)}</td><td>${UI.teamCell(D, p.rid, { sm: true, noOwner: true })}</td><td class="c">${p.week}</td><td class="c">${p.type === "waiver" ? "Waiver" : "FA"}</td><td class="r num"><b>${f1(p.start)}</b></td><td class="c">${p.still ? "✔" : "<span class='faint'>soltado</span>"}</td></tr>`).join("");
+    const bestRows = best.map((p, i) => `<tr><td class="num faint">${i + 1}</td><td>${UI.pl(D, p.pid)}</td><td>${UI.teamCell(D, p.rid, { sm: true, noOwner: true })}</td><td class="c">${p.week}</td><td class="c">${p.type === "waiver" ? "Waiver" : "FA"}</td><td class="r num"><b>${f1(p.start)}</b></td><td class="c">${p.still ? IC("check", 15) : "<span class='faint'>soltado</span>"}</td></tr>`).join("");
     const regalos = D.drops.filter((d) => d.to && d.gave > 15).sort((a, b) => b.gave - a.gave).slice(0, 8);
     const regRows = regalos.map((d) => `<div class="list-row small"><span>${UI.pl(D, d.pid)}</span><span class="sp"></span><span>${esc(UI.tName(D, d.rid))} lo soltó (sem ${d.week}) → <b>${esc(UI.tName(D, d.to))}</b> le sacó <b class="bad">${f1(d.gave)}</b></span></div>`).join("") || '<p class="small muted">Nadie ha regalado nada (todavía).</p>';
     const gradeRows = D.standings.map((s) => s.rid).map((r) => {
@@ -392,18 +392,18 @@
       <div class="h3">Calificaciones de manager</div>
       <div class="tbl-wrap"><table><thead><tr><th class="sticky-col">Equipo</th><th class="c">Draft</th><th class="c">Waivers</th><th class="c">Trades</th><th class="c">Lineups</th><th class="r">Altas</th><th class="r">Pts waiver</th><th class="r">Trades</th><th class="r">Neto trades</th></tr></thead><tbody>${gradeRows}</tbody></table></div>
       <p class="small faint">Pts waiver: puntos que le dieron como titulares los jugadores que agarró de waivers/agentes libres. Neto trades: puntos como titular que recibió menos los que le dio al otro equipo.</p>
-      <div class="row"><div class="h3">Historial de trades (${D.trades.length})</div><span class="sp"></span>${D.trades.length ? '<button class="btn" id="imgTrades">🖼️ Imagen</button>' : ""}</div>
+      <div class="row"><div class="h3">Historial de trades (${D.trades.length})</div><span class="sp"></span>${D.trades.length ? `<button class="btn" id="imgTrades">${IC("image", 16)} Imagen</button>` : ""}</div>
       <div class="grid">${tr}</div>
       <div class="grid g2" style="margin-top:6px">
-        <div><div class="row"><div class="h3">💎 Joyas del waiver</div><span class="sp"></span><button class="btn" id="imgWaiv">🖼️</button></div>
+        <div><div class="row"><div class="h3">${IC("gem")} Joyas del waiver</div><span class="sp"></span><button class="btn" id="imgWaiv">${IC("image", 16)}</button></div>
         <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Jugador</th><th>Equipo</th><th class="c">Sem</th><th class="c">Vía</th><th class="r">Pts tit.</th><th class="c">Sigue</th></tr></thead><tbody>${bestRows}</tbody></table></div></div>
-        <div><div class="h3">🎁 Regalos (drops que dolieron)</div><div class="card">${regRows}</div></div></div>`;
+        <div><div class="h3">${IC("gift")} Regalos (drops que dolieron)</div><div class="card">${regRows}</div></div></div>`;
     const ti = $("#imgTrades"); if (ti) ti.onclick = () => UI.makeImage(cardTrades(), "historial-trades");
     $("#imgWaiv").onclick = () => UI.makeImage(cardWaivers(best), "joyas-del-waiver");
   }
   function cardTrades() {
     const body = D.trades.slice(0, 6).map((t) => `<div class="ic-row" style="grid-template-columns:1fr 1fr;gap:20px;padding:16px 22px">${t.sides.map((s) => `<div>
-      <div class="ic-name" style="font-size:26px;color:${t.winner === s.rid ? "#5E8C61" : "#2E2C29"}">${esc(UI.tName(D, s.rid))} ${t.winner === s.rid ? "✔" : ""}</div>
+      <div class="ic-name" style="font-size:26px;color:${t.winner === s.rid ? "#2F5D50" : "#2E2C29"}">${esc(UI.tName(D, s.rid))} ${t.winner === s.rid ? "(gana)" : ""}</div>
       <div class="ic-meta" style="font-size:19px">Recibe: ${esc(s.gets.map((g) => UI.plName(D, g.pid)).join(", ") || "—")}</div>
       <div class="ic-meta" style="font-size:19px">${f1(s.startPts)} pts como titular</div></div>`).join("")}</div>`).join("");
     return UI.icFrame(D, "Mercado", "Trades de la temporada", body + (D.trades.length > 6 ? `<div class="ic-meta" style="text-align:center">+ ${D.trades.length - 6} más en el sitio</div>` : ""));
@@ -422,8 +422,8 @@
     const teamRows = D.rids.slice().sort((a, b) => D.draftStats[b].start - D.draftStats[a].start).map((r, i) => `<div class="list-row"><span class="num faint" style="width:18px">${i + 1}</span>${UI.teamCell(D, r, { sm: true })}<span class="sp"></span><div class="small" style="text-align:right"><b class="num">${f1(D.draftStats[r].start)}</b> pts tit.<br><span class="faint">${f1(D.draftStats[r].pts)} pts totales de sus picks</span></div></div>`).join("");
     const th = '<thead><tr><th>Pick</th><th>Jugador</th><th>Equipo</th><th class="r">Pts temp.</th><th class="r">Rank</th></tr></thead>';
     $("#s-draft").innerHTML = `<div class="h2">Draft ${D.season}</div><p class="sub">¿Quién la armó en el draft? Rank = lugar en puntos entre todos los jugadores drafteados.</p>
-      <div class="grid g2"><div><div class="h3">🕵️ Robos</div><div class="tbl-wrap"><table>${th}<tbody>${steals.map(row).join("")}</tbody></table></div></div>
-      <div><div class="h3">💸 Fracasos (rondas 1–5)</div><div class="tbl-wrap"><table>${th}<tbody>${busts.map(row).join("")}</tbody></table></div></div></div>
+      <div class="grid g2"><div><div class="h3">${IC("search")} Robos</div><div class="tbl-wrap"><table>${th}<tbody>${steals.map(row).join("")}</tbody></table></div></div>
+      <div><div class="h3">${IC("dollar")} Fracasos (rondas 1–5)</div><div class="tbl-wrap"><table>${th}<tbody>${busts.map(row).join("")}</tbody></table></div></div></div>
       <div class="h3">Puntos que le ha dado su draft a cada equipo</div><div class="card">${teamRows}</div>`;
   }
 
@@ -466,7 +466,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     tabs();
     window.addEventListener("hashchange", show);
-    $("#refreshBtn").onclick = async () => { UI.toast("Actualizando…"); await boot(true); UI.toast("Listo ✔"); };
+    $("#refreshBtn").onclick = async () => { UI.toast("Actualizando…"); await boot(true); UI.toast("Listo"); };
     boot(false);
     // En días de partido se refresca solo cada 2 minutos
     setInterval(() => { if (D && D.liveWeek && !document.hidden) boot(true); }, 120000);
