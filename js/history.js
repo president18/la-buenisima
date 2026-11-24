@@ -117,7 +117,7 @@
     return b ? `${S.players[b[0]] ? S.players[b[0]].name : b[0]} (${f1(b[1])})` : null;
   }
 
-  const POSC = { QB: "#FF5C7A", RB: "#3DDC97", WR: "#5AA9FF", TE: "#F5C542", K: "#C084FC", DEF: "#A9B4C8" };
+  const POSC = { QB: "#E85A4F", RB: "#5E8C61", WR: "#5AA9FF", TE: "#E85A4F", K: "#C084FC", DEF: "#6E6C68" };
   function draftBoard(S) {
     const rounds = Math.max(...S.draft.map((p) => p.round));
     const n = S.numTeams;
@@ -140,7 +140,7 @@
     const rows = D.standings.map((s) => s.rid).map((r) => `<tr class="${UI.isMine(D, r) ? "me" : ""}"><td class="sticky-col">${UI.teamCell(D, r, { sm: true, noOwner: true })}</td>${weeks.map((w) => {
       const x = D.tw[r][w]; if (!x) return "<td></td>";
       const t = (x.pf - mn) / (mx - mn || 1);
-      return `<td style="background:hsla(${Math.round(t * 140)},70%,45%,${0.18 + 0.5 * Math.abs(t - 0.5)})">${f1(x.pf)}<div style="font-size:10px" class="${x.res === "W" ? "good" : "bad"}">${x.res === "W" ? "G" : x.res === "L" ? "P" : ""}</div></td>`;
+      return `<td style="background:${t >= 0.5 ? `rgba(232,90,79,${((t - 0.5) * 1.1).toFixed(2)})` : `rgba(142,141,138,${((0.5 - t) * 0.7).toFixed(2)})`}">${f1(x.pf)}<div style="font-size:10px" class="${x.res === "W" ? "good" : "bad"}">${x.res === "W" ? "G" : x.res === "L" ? "P" : ""}</div></td>`;
     }).join("")}</tr>`).join("");
     return `<div class="tbl-wrap"><table class="heat"><thead><tr><th class="sticky-col">Equipo</th>${weeks.map((w) => `<th class="c">S${w}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>`;
   }

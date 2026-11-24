@@ -8,10 +8,10 @@ window.LB_CONFIG = {
 
   // Logo: pon aquí la ruta de tu logo (ej. "assets/logo.png").
   // Si lo dejas vacío se usa el avatar de la liga en Sleeper.
-  logo: "",
+  logo: (window.LB_BASE || "") + "assets/logo.jpg",
 
   // Colores principales del sitio (y de las imágenes).
-  colors: { accent: "#F5C542", accent2: "#3DDC97", bad: "#FF5C7A" },
+  colors: { bg: "#EAE7DC", sand: "#D8C3A5", gray: "#8E8D8A", coral: "#E98074", red: "#E85A4F" },
 
   // Usuario de Sleeper del dueño de la página privada.
   myUsername: "Napugi",

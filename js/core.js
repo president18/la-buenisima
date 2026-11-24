@@ -45,7 +45,24 @@
   }
   LB.util = { sum, avg, sd, r1, r2, norm, rng, hashStr, normCdf };
 
-  async function getJSON(url) {
+  // Caché local (Cache Storage): lo que no cambia seguido se guarda en el teléfono para que cargue rápido.
+  const CACHE = "lb-cache-v1";
+  async function getJSON(url, ttlMin) {
+    if (ttlMin && window.caches) {
+      try {
+        const c = await caches.open(CACHE);
+        const hit = await c.match(url);
+        if (hit) {
+          const t = Number(hit.headers.get("x-lb-time") || 0);
+          if (Date.now() - t < ttlMin * 60000) return hit.json();
+        }
+        const r = await fetch(url);
+        if (!r.ok) throw new Error("Sleeper respondió " + r.status);
+        const body = await r.text();
+        c.put(url, new Response(body, { headers: { "content-type": "application/json", "x-lb-time": String(Date.now()) } })).catch(() => {});
+        return JSON.parse(body);
+      } catch (e) { if (String(e.message).startsWith("Sleeper")) throw e; }
+    }
     const r = await fetch(url);
     if (!r.ok) throw new Error("Sleeper respondió " + r.status);
     return r.json();
@@ -107,19 +124,19 @@
     const wk = [...Array(totalWeeks).keys()].map((i) => i + 1);
     const txWeeks = wk.filter((w) => w <= Math.min(curWeek, totalWeeks));
     const [mList, tList, drafts, bracket] = await Promise.all([
-      Promise.all(wk.map((w) => getJSON(`${API}/v1/league/${id}/matchups/${w}`).catch(() => []))),
-      Promise.all(txWeeks.map((w) => getJSON(`${API}/v1/league/${id}/transactions/${w}`).catch(() => []))),
+      Promise.all(wk.map((w) => getJSON(`${API}/v1/league/${id}/matchups/${w}`, w < lastScored ? 720 : 0).catch(() => []))),
+      Promise.all(txWeeks.map((w) => getJSON(`${API}/v1/league/${id}/transactions/${w}`, w < curWeek - 1 ? 720 : 0).catch(() => []))),
       getJSON(`${API}/v1/league/${id}/drafts`).catch(() => []),
       getJSON(`${API}/v1/league/${id}/winners_bracket`).catch(() => []),
     ]);
     const draft = drafts.find((d) => d.status === "complete") || drafts[0];
-    const draftPicks = draft ? await getJSON(`${API}/v1/draft/${draft.draft_id}/picks`).catch(() => []) : [];
+    const draftPicks = draft ? await getJSON(`${API}/v1/draft/${draft.draft_id}/picks`, 1440).catch(() => []) : [];
 
     step("Bajando estadísticas y proyecciones de jugadores…");
     const projWeek = Math.min(curWeek, totalWeeks);
     const [stats, proj, trending] = await Promise.all([
-      getJSON(`${API}/stats/nfl/${league.season}?season_type=regular${POS_Q}&order_by=pts_half_ppr`).catch(() => []),
-      getJSON(`${API}/projections/nfl/${league.season}/${projWeek}?season_type=regular${POS_Q}&order_by=pts_half_ppr`).catch(() => []),
+      getJSON(`${API}/stats/nfl/${league.season}?season_type=regular${POS_Q}&order_by=pts_half_ppr`, 60).catch(() => []),
+      getJSON(`${API}/projections/nfl/${league.season}/${projWeek}?season_type=regular${POS_Q}&order_by=pts_half_ppr`, 30).catch(() => []),
       getJSON(`${API}/v1/players/nfl/trending/add?lookback_hours=72&limit=60`).catch(() => []),
     ]);
 
@@ -131,7 +148,7 @@
     if (missing.length > 3) {
       step("Completando nombres de jugadores…");
       try {
-        const all = await getJSON(`${API}/v1/players/nfl`);
+        const all = await getJSON(`${API}/v1/players/nfl`, 1440);
         for (const p of missing) if (all[p]) D.players[p] = mkPlayer(p, all[p]);
       } catch (e) { /* no pasa nada */ }
     }

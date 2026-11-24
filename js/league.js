@@ -6,9 +6,11 @@
   const { esc, f1, pct, sign, rec } = UI;
   const $ = (s) => document.querySelector(s);
   const TABS = [
-    ["inicio", "Inicio"], ["power", "Power Rankings"], ["semana", "Semana"], ["manianera", "La Mañanera"], ["calendarios", "Calendarios"],
-    ["movimientos", "Trades y Waivers"], ["draft", "Draft"], ["oscars", "Óscars"], ["historia", "Historia"],
+    ["inicio", "Inicio", "🏠"], ["power", "Power Rankings", "📊"], ["semana", "Semana", "🏈"], ["manianera", "La Mañanera", "📰"], ["playoffs", "Playoffs", "🏆"],
+    ["roast", "Roast", "🔥"], ["h2h", "Cara a cara", "🥊"], ["calendarios", "Calendarios", "📅"],
+    ["movimientos", "Trades y Waivers", "🔁"], ["draft", "Draft", "📋"], ["oscars", "Óscars", "🎬"], ["historia", "Historia", "📜"],
   ];
+  const BNAV = ["inicio", "power", "semana", "manianera"];
   let D = null;
   const sel = { power: null, semana: null, np: null, npMode: null, bnAll: false };
 
@@ -22,11 +24,17 @@
   function tabs() {
     $("#tabs").innerHTML = TABS.map(([k, l]) => `<button class="tab" data-k="${k}">${l}</button>`).join("");
     $("#tabs").onclick = (e) => { const b = e.target.closest(".tab"); if (b) location.hash = b.dataset.k; };
+    const short = { inicio: "Inicio", power: "Power", semana: "Semana", manianera: "Mañanera" };
+    $("#bnav").innerHTML = BNAV.map((k) => { const t = TABS.find((x) => x[0] === k); return `<button data-k="${k}"><i>${t[2]}</i>${short[k]}</button>`; }).join("") + `<button data-k="__more"><i>☰</i>Más</button>`;
+    $("#bnav").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.k === "__more") $("#sheet").classList.add("on"); else location.hash = b.dataset.k; };
+    $("#sheetIn").innerHTML = '<div class="grab"></div>' + TABS.filter((t) => !BNAV.includes(t[0])).map(([k, l, i]) => `<button data-k="${k}"><span>${i}</span>${l}</button>`).join("");
+    $("#sheetIn").onclick = (e) => { const b = e.target.closest("button"); if (b) { $("#sheet").classList.remove("on"); location.hash = b.dataset.k; } };
   }
   function show() {
     const k = (location.hash || "#inicio").slice(1);
     const key = TABS.some((t) => t[0] === k) ? k : "inicio";
     document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("on", b.dataset.k === key));
+    document.querySelectorAll("#bnav button").forEach((b) => b.classList.toggle("on", b.dataset.k === key || (b.dataset.k === "__more" && !BNAV.includes(key))));
     document.querySelectorAll(".sec").forEach((s) => s.classList.toggle("on", s.id === "s-" + key));
     window.scrollTo(0, 0);
   }
@@ -49,7 +57,7 @@
         <td class="num hide-m">${s.apW}-${s.apL}</td><td class="r num ${s.luck > 0.5 ? "good" : s.luck < -0.5 ? "bad" : ""}">${sign(s.luck)}</td>
         <td class="c">${s.streak}</td><td class="r num">${D.sim.remaining.length ? pct(o.playoff) : s.rank <= D.playoffTeams ? "✔" : "✘"}</td></tr>`;
     }).join("");
-    $("#s-inicio").innerHTML = breakingHTML() + `
+    $("#s-inicio").innerHTML = installHTML() + breakingHTML() + `
       <div class="row"><div><div class="h2">Tabla general</div><p class="sub">Después de la semana ${w} · Top ${D.playoffTeams} a playoffs (semana ${D.regEnd + 1})</p></div><span class="sp"></span>
       <button class="btn" id="imgStand">🖼️ Imagen</button></div>
       <div class="kpis" style="margin-bottom:14px">
@@ -83,7 +91,7 @@
     const w = Math.min(D.lastScored, D.regEnd);
     const body = D.standings.map((s) => `<div class="ic-row" style="padding:10px 22px"><div class="ic-rk" style="font-size:46px">${s.rank}</div>
       <div><div class="ic-name">${esc(D.teams[s.rid].name)}</div><div class="ic-meta">${esc(D.teams[s.rid].ownersNick)} · ${f1(s.pf)} PF · racha ${s.streak}</div></div>
-      <div class="ic-score" style="color:${s.rank <= D.playoffTeams ? "#3DDC97" : "#EEF2F8"}">${rec(s)}</div></div>`).join("");
+      <div class="ic-score" style="color:${s.rank <= D.playoffTeams ? "#5E8C61" : "#2E2C29"}">${rec(s)}</div></div>`).join("");
     return UI.icFrame(D, `Semana ${w}`, "Tabla general", body);
   }
   function cardOdds() {
@@ -91,18 +99,26 @@
     const ord = D.rids.slice().sort((a, b) => sim[b].playoff - sim[a].playoff);
     const body = ord.map((r, i) => `<div class="ic-row" style="padding:10px 22px"><div class="ic-rk" style="font-size:42px">${i + 1}</div>
       <div><div class="ic-name">${esc(D.teams[r].name)}</div><div class="ic-meta">Bye ${pct(sim[r].bye)} · #1 ${pct(sim[r].first)} · Último ${pct(sim[r].last)}</div></div>
-      <div class="ic-score" style="color:${sim[r].playoff > 0.5 ? "#3DDC97" : "#FF5C7A"}">${pct(sim[r].playoff)}</div></div>`).join("");
+      <div class="ic-score" style="color:${sim[r].playoff > 0.5 ? "#5E8C61" : "#E85A4F"}">${pct(sim[r].playoff)}</div></div>`).join("");
     return UI.icFrame(D, "Probabilidades", "¿Quién entra a playoffs?", body);
   }
 
 
+  /* ---- Instalar como app ---- */
+  function installHTML() {
+    let off = false; try { off = localStorage.getItem("lb-install-off") === "1"; } catch (e) {}
+    const standalone = window.navigator.standalone || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+    if (off || standalone || !/iPhone|iPad|Android/i.test(navigator.userAgent)) return "";
+    const ios = /iPhone|iPad/i.test(navigator.userAgent);
+    return `<div class="card" id="instBox" style="display:flex;gap:12px;align-items:center;margin-bottom:14px">${UI.logoHTML(D)}<div class="small" style="flex:1"><b>Tenlo como app</b><br>${ios ? "En Safari toca Compartir ⬆️ y luego “Agregar a inicio”." : "Abre el menú ⋮ y toca “Agregar a pantalla principal”."}</div><button class="btn" onclick="try{localStorage.setItem('lb-install-off','1')}catch(e){};document.getElementById('instBox').remove()">✕</button></div>`;
+  }
   /* ---- Breaking News ---- */
   function breakingHTML() {
     const all = LB.stories.breaking(D);
     const list = sel.bnAll ? all : all.slice(0, 5);
     if (!list.length) return "";
     return `<div class="row"><div><div class="h2" style="color:var(--bad)">🚨 Breaking News</div><p class="sub">Lo más fuerte que ha pasado en la liga. Toca 🗞️ para la portada.</p></div></div>
-      <div class="grid" style="gap:8px">${list.map((e, i) => `<div class="bn"><div class="bn-w">S${e.week}</div><div style="min-width:0"><div class="bn-k">${esc(e.kicker)}</div><div class="bn-h">${esc(e.headline)}</div><div class="bn-s">${esc(e.sub)}</div></div><button class="btn" data-bn="${i}" style="padding:7px 10px">🗞️</button></div>`).join("")}</div>
+      <div class="grid" style="gap:8px">${list.map((e, i) => `<div class="bn"><div class="bn-art">${LB.art.toImg(LB.art.iconFor(e.type), 52, 52)}</div><div style="min-width:0"><div class="bn-w" style="text-align:left;font-size:12px;letter-spacing:.1em">SEMANA ${e.week}</div><div class="bn-k">${esc(e.kicker)}</div><div class="bn-h">${esc(e.headline)}</div><div class="bn-s">${esc(e.sub)}</div></div><button class="btn" data-bn="${i}" style="padding:7px 10px">🗞️</button></div>`).join("")}</div>
       ${all.length > 5 ? `<div style="text-align:center;margin-top:8px"><button class="btn" id="bnMore">${sel.bnAll ? "Ver menos" : `Ver todas (${all.length})`}</button></div>` : ""}<div style="height:10px"></div>`;
   }
   function bindBreaking() {
@@ -183,8 +199,8 @@
       const sents = UI.powerBlurb(D, r, w, rows.length).split(/(?<=\.)\s+/).filter((x) => !/^Playoffs/.test(x));
       const short = sents[1] || sents[0] || "";
       return `<div class="ic-row" style="grid-template-columns:70px 1fr auto;padding:10px 22px">
-        <div style="text-align:center"><div class="ic-rk" style="font-size:50px">${r.prank}</div><div style="font-size:18px;font-weight:800;color:${d > 0 ? "#3DDC97" : d < 0 ? "#FF5C7A" : "#6E7A93"}">${d > 0 ? "▲" + d : d < 0 ? "▼" + -d : "—"}</div></div>
-        <div><div class="ic-name">${esc(D.teams[r.rid].name)} <span style="font-size:22px;color:#A9B4C8;font-weight:600">${rec(r)}</span></div><div class="ic-meta">${esc(short)}</div></div>
+        <div style="text-align:center"><div class="ic-rk" style="font-size:50px">${r.prank}</div><div style="font-size:18px;font-weight:800;color:${d > 0 ? "#5E8C61" : d < 0 ? "#E85A4F" : "#8E8D8A"}">${d > 0 ? "▲" + d : d < 0 ? "▼" + -d : "—"}</div></div>
+        <div><div class="ic-name">${esc(D.teams[r.rid].name)} <span style="font-size:22px;color:#6E6C68;font-weight:600">${rec(r)}</span></div><div class="ic-meta">${esc(short)}</div></div>
         <div class="ic-score">${f1(r.score)}</div></div>`;
     }).join("");
     return UI.icFrame(D, `Semana ${w}`, "Power Rankings", body);
@@ -270,7 +286,7 @@
   }
   function cardAwards(w) {
     const A = weekAwards(w);
-    const row = (ic, t, who, d) => `<div class="ic-row" style="grid-template-columns:70px 1fr auto"><div style="font-size:48px;text-align:center">${ic}</div><div><div class="ic-meta" style="text-transform:uppercase;letter-spacing:2px;color:#F5C542;font-weight:700;font-size:18px">${t}</div><div class="ic-name">${esc(who)}</div></div><div class="ic-score" style="font-size:36px">${esc(d)}</div></div>`;
+    const row = (ic, t, who, d) => `<div class="ic-row" style="grid-template-columns:70px 1fr auto"><div style="font-size:48px;text-align:center">${ic}</div><div><div class="ic-meta" style="text-transform:uppercase;letter-spacing:2px;color:#E85A4F;font-weight:700;font-size:18px">${t}</div><div class="ic-name">${esc(who)}</div></div><div class="ic-score" style="font-size:36px">${esc(d)}</div></div>`;
     const gw = (g) => UI.tName(D, g.pa > g.pb ? g.a : g.b) + " vs " + UI.tName(D, g.pa > g.pb ? g.b : g.a);
     const body = [
       row("👑", "Equipo de la semana", UI.tName(D, A.top.rid), f1(A.top.pf)),
@@ -288,25 +304,25 @@
     const showPts = M.played || M.live;
     const sA = showPts ? M.ea.pts : M.pa != null ? M.pa : M.sa.ppg, sB = showPts ? M.eb.pts : M.pb != null ? M.pb : M.sb.ppg;
     const by = showPts ? "pts" : "proj";
-    const side = (rid, s, st, top, win) => `<div style="flex:1;text-align:center;background:rgba(27,36,54,.85);border:1px solid #26314A;border-radius:22px;padding:24px 16px">
+    const side = (rid, s, st, top, win) => `<div style="flex:1;text-align:center;background:#F6F4EE;border:1px solid #DCD4C4;border-radius:22px;padding:24px 16px">
       <div style="width:110px;height:110px;border-radius:50%;margin:0 auto 12px;background:${UI.color(rid)};display:grid;place-items:center;font-size:44px;font-weight:800;color:#111">${esc(D.teams[rid].name.slice(0, 2).toUpperCase())}</div>
       <div class="ic-name" style="font-size:32px">${esc(D.teams[rid].name)}</div><div class="ic-meta">${st && st.W != null ? rec(st) : ""} · ${esc(D.teams[rid].ownersNick)}</div>
-      <div style="font-family:var(--fh);font-size:110px;line-height:1;margin-top:10px;color:${win ? "#3DDC97" : "#EEF2F8"}">${f1(s)}</div>
-      <div style="margin-top:12px;text-align:left">${top.slice(0, 3).map((p) => `<div style="display:flex;justify-content:space-between;font-size:22px;padding:4px 0;color:#A9B4C8"><span>${esc(UI.plName(D, p.pid))}</span><b style="color:#EEF2F8">${f1(p[by])}</b></div>`).join("")}</div></div>`;
+      <div style="font-family:var(--fh);font-size:110px;line-height:1;margin-top:10px;color:${win ? "#5E8C61" : "#2E2C29"}">${f1(s)}</div>
+      <div style="margin-top:12px;text-align:left">${top.slice(0, 3).map((p) => `<div style="display:flex;justify-content:space-between;font-size:22px;padding:4px 0;color:#6E6C68"><span>${esc(UI.plName(D, p.pid))}</span><b style="color:#2E2C29">${f1(p[by])}</b></div>`).join("")}</div></div>`;
     const txt = M.played ? UI.recapText(D, M) : UI.previewText(D, M);
     const wp = M.winA == null ? 0.5 : M.winA;
-    const body = `<div style="display:flex;gap:18px;align-items:stretch">${side(M.g.a, sA, M.sa, M.topA, showPts && sA > sB)}<div style="align-self:center;font-family:var(--fh);font-size:50px;color:#6E7A93">VS</div>${side(M.g.b, sB, M.sb, M.topB, showPts && sB > sA)}</div>
-      ${!M.played ? `<div style="margin-top:22px"><div style="display:flex;justify-content:space-between;font-size:24px;font-weight:700"><span style="color:#3DDC97">${pct(wp)}</span><span style="color:#A9B4C8">Probabilidad de ganar</span><span style="color:#FF5C7A">${pct(1 - wp)}</span></div><div style="height:16px;border-radius:12px;background:#FF5C7A;overflow:hidden;margin-top:8px"><div style="height:100%;width:${wp * 100}%;background:#3DDC97"></div></div></div>` : ""}
-      <div style="margin-top:22px;font-size:27px;line-height:1.4;color:#DDE3EE;background:rgba(27,36,54,.6);border-left:6px solid #F5C542;padding:18px 22px;border-radius:0 16px 16px 0">${esc(txt)}</div>`;
+    const body = `<div style="display:flex;gap:18px;align-items:stretch">${side(M.g.a, sA, M.sa, M.topA, showPts && sA > sB)}<div style="align-self:center;font-family:var(--fh);font-size:50px;color:#8E8D8A">VS</div>${side(M.g.b, sB, M.sb, M.topB, showPts && sB > sA)}</div>
+      ${!M.played ? `<div style="margin-top:22px"><div style="display:flex;justify-content:space-between;font-size:24px;font-weight:700"><span style="color:#5E8C61">${pct(wp)}</span><span style="color:#6E6C68">Probabilidad de ganar</span><span style="color:#E85A4F">${pct(1 - wp)}</span></div><div style="height:16px;border-radius:12px;background:#E85A4F;overflow:hidden;margin-top:8px"><div style="height:100%;width:${wp * 100}%;background:#5E8C61"></div></div></div>` : ""}
+      <div style="margin-top:22px;font-size:27px;line-height:1.4;color:#2E2C29;background:#F6F4EE;border-left:6px solid #E85A4F;padding:18px 22px;border-radius:0 16px 16px 0">${esc(txt)}</div>`;
     return UI.icFrame(D, `Semana ${M.w} · ${M.played ? "Review" : "Preview"}`, M.played ? "Así quedó" : "Lo que viene", body);
   }
   function cardAllMatchups(mus) {
     const body = mus.map((M) => {
       const a = M.ea.pts, b = M.eb.pts;
       return `<div class="ic-row" style="grid-template-columns:1fr auto 1fr;padding:18px 24px">
-        <div><div class="ic-name" style="color:${a > b ? "#3DDC97" : "#EEF2F8"}">${esc(UI.tName(D, M.g.a))}</div><div class="ic-meta">${esc(UI.oName(D, M.g.a))}</div></div>
-        <div style="font-family:var(--fh);font-size:52px;text-align:center"><span style="color:${a > b ? "#3DDC97" : "#EEF2F8"}">${f1(a)}</span> <span style="color:#6E7A93">–</span> <span style="color:${b > a ? "#3DDC97" : "#EEF2F8"}">${f1(b)}</span></div>
-        <div style="text-align:right"><div class="ic-name" style="color:${b > a ? "#3DDC97" : "#EEF2F8"}">${esc(UI.tName(D, M.g.b))}</div><div class="ic-meta">${esc(UI.oName(D, M.g.b))}</div></div></div>`;
+        <div><div class="ic-name" style="color:${a > b ? "#5E8C61" : "#2E2C29"}">${esc(UI.tName(D, M.g.a))}</div><div class="ic-meta">${esc(UI.oName(D, M.g.a))}</div></div>
+        <div style="font-family:var(--fh);font-size:52px;text-align:center"><span style="color:${a > b ? "#5E8C61" : "#2E2C29"}">${f1(a)}</span> <span style="color:#8E8D8A">–</span> <span style="color:${b > a ? "#5E8C61" : "#2E2C29"}">${f1(b)}</span></div>
+        <div style="text-align:right"><div class="ic-name" style="color:${b > a ? "#5E8C61" : "#2E2C29"}">${esc(UI.tName(D, M.g.b))}</div><div class="ic-meta">${esc(UI.oName(D, M.g.b))}</div></div></div>`;
     }).join("");
     return UI.icFrame(D, `Semana ${mus[0].w}`, "Resultados", body);
   }
@@ -320,7 +336,7 @@
       const cells = ord.map((j) => {
         const x = M[i][j], act = M[i][i];
         const diff = x.W - act.W;
-        const bg = i === j ? "rgba(245,197,66,.22)" : diff > 0 ? `rgba(61,220,151,${Math.min(0.45, 0.1 * diff)})` : diff < 0 ? `rgba(255,92,122,${Math.min(0.45, -0.1 * diff)})` : "transparent";
+        const bg = i === j ? "rgba(216,195,165,.55)" : diff > 0 ? `rgba(94,140,97,${Math.min(0.45, 0.1 * diff)})` : diff < 0 ? `rgba(232,90,79,${Math.min(0.45, -0.1 * diff)})` : "transparent";
         return `<td class="c num" style="background:${bg}">${x.W}-${x.L}${x.T ? "-" + x.T : ""}</td>`;
       }).join("");
       return `<tr class="${UI.isMine(D, i) ? "me" : ""}"><td class="sticky-col">${UI.teamCell(D, i, { sm: true, noOwner: true })}</td>${cells}</tr>`;
@@ -340,13 +356,13 @@
   }
   function cardCal(ord) {
     const { M } = D.scheduleMatrix;
-    const head = ord.map((j) => `<th style="padding:6px 2px;font-size:15px;color:#A9B4C8;width:78px">${esc(D.teams[j].name.slice(0, 7))}</th>`).join("");
+    const head = ord.map((j) => `<th style="padding:6px 2px;font-size:15px;color:#6E6C68;width:78px">${esc(D.teams[j].name.slice(0, 7))}</th>`).join("");
     const body = ord.map((i) => `<tr><td style="padding:8px 8px;font-size:19px;font-weight:700;white-space:nowrap;max-width:170px;overflow:hidden;text-overflow:ellipsis">${esc(D.teams[i].name.slice(0, 14))}</td>${ord.map((j) => {
       const x = M[i][j], d = x.W - M[i][i].W;
-      const bg = i === j ? "rgba(245,197,66,.35)" : d > 0 ? `rgba(61,220,151,${Math.min(0.55, 0.13 * d)})` : d < 0 ? `rgba(255,92,122,${Math.min(0.55, -0.13 * d)})` : "transparent";
+      const bg = i === j ? "rgba(216,195,165,.7)" : d > 0 ? `rgba(94,140,97,${Math.min(0.55, 0.13 * d)})` : d < 0 ? `rgba(232,90,79,${Math.min(0.55, -0.13 * d)})` : "transparent";
       return `<td style="text-align:center;font-size:20px;padding:8px 2px;background:${bg};font-weight:700">${x.W}-${x.L}</td>`;
     }).join("")}</tr>`).join("");
-    return UI.icFrame(D, "Calendarios alternos", "¿Y si…?", `<table style="width:100%;border-collapse:collapse;background:rgba(27,36,54,.85);border-radius:16px;overflow:hidden"><thead><tr><th style="text-align:left;padding:8px;font-size:15px;color:#6E7A93">Equipo ↓ / Calendario de →</th>${head}</tr></thead><tbody>${body}</tbody></table>`);
+    return UI.icFrame(D, "Calendarios alternos", "¿Y si…?", `<table style="width:100%;border-collapse:collapse;background:#F6F4EE;border-radius:16px;overflow:hidden"><thead><tr><th style="text-align:left;padding:8px;font-size:15px;color:#8E8D8A">Equipo ↓ / Calendario de →</th>${head}</tr></thead><tbody>${body}</tbody></table>`);
   }
 
   /* ============ MOVIMIENTOS ============ */
@@ -387,7 +403,7 @@
   }
   function cardTrades() {
     const body = D.trades.slice(0, 6).map((t) => `<div class="ic-row" style="grid-template-columns:1fr 1fr;gap:20px;padding:16px 22px">${t.sides.map((s) => `<div>
-      <div class="ic-name" style="font-size:26px;color:${t.winner === s.rid ? "#3DDC97" : "#EEF2F8"}">${esc(UI.tName(D, s.rid))} ${t.winner === s.rid ? "✔" : ""}</div>
+      <div class="ic-name" style="font-size:26px;color:${t.winner === s.rid ? "#5E8C61" : "#2E2C29"}">${esc(UI.tName(D, s.rid))} ${t.winner === s.rid ? "✔" : ""}</div>
       <div class="ic-meta" style="font-size:19px">Recibe: ${esc(s.gets.map((g) => UI.plName(D, g.pid)).join(", ") || "—")}</div>
       <div class="ic-meta" style="font-size:19px">${f1(s.startPts)} pts como titular</div></div>`).join("")}</div>`).join("");
     return UI.icFrame(D, "Mercado", "Trades de la temporada", body + (D.trades.length > 6 ? `<div class="ic-meta" style="text-align:center">+ ${D.trades.length - 6} más en el sitio</div>` : ""));
@@ -411,6 +427,12 @@
       <div class="h3">Puntos que le ha dado su draft a cada equipo</div><div class="card">${teamRows}</div>`;
   }
 
+  /* ============ PLAYOFFS / ROAST / CARA A CARA ============ */
+  function renderPlayoffs() { LB.extras.renderPlayoffs(D, $("#s-playoffs")); }
+  function renderRoast() { LB.extras.renderRoast(D, $("#s-roast")); }
+  let h2hDone = false;
+  function renderH2H() { LB.extras.renderH2H(D, $("#s-h2h")); }
+
   /* ============ ÓSCARS ============ */
   function renderOscars() { LB.awards.render(D, $("#s-oscars")); }
 
@@ -424,7 +446,7 @@
   /* ============ arranque ============ */
   function renderAll() {
     header();
-    [renderInicio, renderPower, renderSemana, renderManianera, renderCalendarios, renderMovimientos, renderDraft, renderOscars, renderHistoria].forEach((f) => {
+    [renderInicio, renderPower, renderSemana, renderManianera, renderPlayoffs, renderRoast, renderH2H, renderCalendarios, renderMovimientos, renderDraft, renderOscars, renderHistoria].forEach((f) => {
       try { f(); } catch (e) { console.error(e); }
     });
   }

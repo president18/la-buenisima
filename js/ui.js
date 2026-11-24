@@ -15,7 +15,7 @@
   UI.sign = (x, d = 1) => (x > 0 ? "+" : x < 0 ? "−" : "±") + Math.abs(x).toFixed(d);
   UI.rec = (s) => `${s.W}-${s.L}${s.T ? "-" + s.T : ""}`;
 
-  const PALETTE = ["#F5C542", "#3DDC97", "#5AA9FF", "#FF8A5C", "#C084FC", "#FF5C7A", "#2DD4BF", "#FACC15", "#A3E635", "#F472B6", "#60A5FA", "#FB923C"];
+  const PALETTE = ["#E85A4F", "#C9A27E", "#6B8F71", "#5B7DB1", "#B47EB3", "#D4A24C", "#4F9A94", "#A0522D", "#7A6F9B", "#E98074", "#8E8D8A", "#C77D5A"];
   UI.color = (rid) => PALETTE[(rid - 1) % PALETTE.length];
   const initials = (s) => (s || "?").replace(/[^A-Za-z0-9ÁÉÍÓÚÑáéíóúñ ]/g, "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?";
   UI.avatar = (t, cls = "") => {
@@ -148,7 +148,7 @@
       const node = host.firstElementChild;
       await Promise.all([...node.querySelectorAll("img")].map((im) => (im.complete ? 0 : new Promise((r) => { im.onload = im.onerror = r; }))));
       if (document.fonts && document.fonts.ready) await document.fonts.ready;
-      const canvas = await window.html2canvas(node, { backgroundColor: "#0B0F17", scale: 1, useCORS: true, logging: false });
+      const canvas = await window.html2canvas(node, { backgroundColor: "#EAE7DC", scale: 1, useCORS: true, logging: false });
       host.innerHTML = "";
       const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
       const url = URL.createObjectURL(blob);

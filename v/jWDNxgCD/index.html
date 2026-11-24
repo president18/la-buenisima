@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La Buenísima · Fantasy Football</title>
+<meta name="theme-color" content="#EAE7DC">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&family=Lora:ital,wght@0,400;0,700;1,400&family=UnifrakturMaguntia&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="../../css/paper.css">
+
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<link rel="icon" href="../../assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="La Buenísima">
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div id="brandLogo" class="logo">LB</div>
+    <div class="brand"><h1>La Buenísima</h1><small id="brandSub">Fantasy Football</small></div>
+    <div class="live"><span id="liveDot" class="dot off"></span><span id="liveTxt">Cargando…</span>
+      <button class="btn" id="refreshBtn" style="padding:5px 9px" title="Actualizar">↻</button></div>
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+</header>
+
+<div id="loading" class="loading"><div><div class="spin"></div><div id="loadTxt">Conectando con Sleeper…</div></div></div>
+
+<main id="main" class="wrap" style="display:none">
+  <section class="sec" id="s-inicio"></section>
+  <section class="sec" id="s-power"></section>
+  <section class="sec" id="s-semana"></section>
+  <section class="sec" id="s-manianera"></section>
+  <section class="sec" id="s-playoffs"></section>
+  <section class="sec" id="s-roast"></section>
+  <section class="sec" id="s-h2h"></section>
+  <section class="sec" id="s-calendarios"></section>
+  <section class="sec" id="s-movimientos"></section>
+  <section class="sec" id="s-draft"></section>
+  <section class="sec" id="s-oscars"></section>
+  <section class="sec" id="s-historia"></section>
+</main>
+
+<nav class="bnav" id="bnav"></nav>
+<div class="sheet" id="sheet" onclick="if(event.target===this)this.classList.remove('on')"><div class="sheet-in" id="sheetIn"></div></div>
+<div class="modal" id="imgModal" onclick="if(event.target===this)this.classList.remove('on')"><div class="modal-in"><div class="modal-body"></div></div></div>
+<div class="toast" id="toast"></div>
+<div id="canvasHost"></div>
+
+<script>
+(function(){
+  window.LB_BASE = '../../';
+  var EXP = 1795589364553;
+  if (Date.now() > EXP) {
+    document.getElementById('loading').innerHTML = '<div><div style="font-size:42px">⌛</div><h2 style="font-weight:300;letter-spacing:.14em;color:#E85A4F">LINK EXPIRADO</h2><p>Este link de La Buenísima ya no está disponible. Pídele uno nuevo al comisionado.</p></div>';
+    return;
+  }
+  var list = ["../../config.js", "../../js/core.js", "../../js/ui.js", "../../awards.js", "../../js/stories.js", "../../js/art.js", "../../js/newspaper.js", "../../js/awards.js", "../../js/history.js", "../../js/extras.js", "../../js/league.js"];
+  (function next(i){ if (i >= list.length) { document.dispatchEvent(new Event('DOMContentLoaded')); return; } var s = document.createElement('script'); s.src = list[i]; s.onload = function(){ next(i + 1); }; document.body.appendChild(s); })(0);
+})();
+</script>
+</body>
+</html>

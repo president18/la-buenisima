@@ -358,13 +358,121 @@
       else s = `Triunfo por ${f1(mg)}.`;
       if (top1) s += ` Figura: ${UI.plName(D, top1.pid)} (${f1(top1.pts)}).`;
       if (tL.max > tW.pf) s += ` ${T(D, L)} tenía la victoria en la banca.`;
-      const h2h = m.h2h.length ? ` Serie: ${seriesText(D, m, W)}.` : "";
+      const ser = m.h2h.length ? seriesText(D, m, W) : "";
+      const h2h = ser && !ser.startsWith("empatada") ? ` Serie: ${ser}.` : "";
       return { m, W, L, tW, tL, text: s + h2h };
     });
     const awards = { top, low, mvp: null };
     D.rids.forEach((r) => { const e = D.weeks[w][r]; e.starters.forEach((p, i) => { const pts = e.sp[i] || 0; if (!awards.mvp || pts > awards.mvp.pts) awards.mvp = { pid: p, pts, rid: r }; }); });
     awards.bench = tws.slice().sort((a, b) => (b.max - b.pf) - (a.max - a.pf))[0];
     return { w, kicker, headline, sub, body: parts.join(" "), lines, standings: st, prev, awards, extra: evs.slice(1, 3) };
+  };
+
+  /* ---------------- secciones de humor del periódico ---------------- */
+  function weakPos(D, r) {
+    const P = ["QB", "RB", "WR", "TE"];
+    const val = (rid, k) => { const e = D.weeks[D.lastScored] && D.weeks[D.lastScored][rid]; return 0; };
+    const by = {};
+    P.forEach((k) => {
+      const ord = D.rids.slice().sort((a, b) => posPts(D, b, k) - posPts(D, a, k));
+      by[k] = ord.indexOf(r) + 1;
+    });
+    return P.slice().sort((a, b) => by[b] - by[a])[0];
+  }
+  function posPts(D, r, k) {
+    let s = 0;
+    D.playedWeeks.slice(-4).forEach((w) => { const e = D.weeks[w][r]; if (!e) return; e.starters.forEach((p, i) => { if (D.posOf(p) === k) s += e.sp[i] || 0; }); });
+    return s;
+  }
+  ST.clasificados = function (D, w) {
+    const R = rng("cl" + w);
+    const st = D.standings;
+    const out = [];
+    const last = st[st.length - 1];
+    const bench = st.slice().sort((a, b) => (b.max - b.pf) - (a.max - a.pf))[0];
+    const eff = st.slice().sort((a, b) => a.eff - b.eff)[0];
+    const cold = st.filter((x) => x.gp >= 3).sort((a, b) => (a.last3 - a.ppg) - (b.last3 - b.ppg))[0];
+    const needy = st[Math.floor(R() * st.length)];
+    out.push({ h: "SE BUSCA", t: `${weakPos(D, needy.rid)} que sí juegue. Pagamos en lo que se pueda (menos en el K). Informes con ${O(D, needy.rid)}, ${T(D, needy.rid)}.` });
+    out.push({ h: "SE VENDE", t: `Banca de lujo con ${f1(bench.max - bench.pf)} pts sin estrenar. Poco uso (nunca). Trato directo: ${T(D, bench.rid)}.` });
+    out.push({ h: "SE RENTA", t: `Sótano de la tabla, amplio y con vista a los playoffs (de lejos). Disponible de inmediato. Pregunte por ${T(D, last.rid)}.` });
+    out.push({ h: "CURSOS", t: `"Cómo armar tu lineup en 5 pasos". Inscripciones abiertas. Becado al 100%: ${T(D, eff.rid)}.` });
+    if (cold && cold.last3 < cold.ppg) out.push({ h: "SE PERDIÓ", t: `La ofensiva de ${T(D, cold.rid)}. Vista por última vez hace un mes. Se gratifica.` });
+    // mezcla estable
+    out.forEach((o) => (o.t = o.t.replace(/\.\.(?!\.)/g, ".")));
+    return out.sort(() => R() - 0.5).slice(0, 3);
+  };
+  const SIGNOS = ["♈ Aries", "♉ Tauro", "♊ Géminis", "♋ Cáncer", "♌ Leo", "♍ Virgo", "♎ Libra", "♏ Escorpio", "♐ Sagitario", "♑ Capricornio", "♒ Acuario", "♓ Piscis"];
+  ST.horoscopo = function (D, w) {
+    const R = rng("hs" + w);
+    const mus = (D.games[w] || []).map((g) => LB.matchupInfo(D, w, g));
+    const lines = [];
+    mus.forEach((M) => [M.g.a, M.g.b].forEach((r) => {
+      const isA = r === M.g.a;
+      const wp = M.winA == null ? 0.5 : isA ? M.winA : 1 - M.winA;
+      const opp = isA ? M.g.b : M.g.a;
+      let t;
+      const k = lines.length;
+      const pk = (arr) => arr[(k + Math.floor(R() * 3)) % arr.length];
+      if (wp >= 0.7) t = pk([`Los astros te sonríen (${Math.round(wp * 100)}%). No hagas nada estúpido el domingo.`, `Semana de abundancia. ${T(D, opp)} será tu escalón.`]);
+      else if (wp <= 0.3) t = pk([`Mercurio retrógrado en tu lineup (${Math.round(wp * 100)}%). Prende una veladora.`, `Evita decisiones importantes… y a ${T(D, opp)}.`]);
+      else t = pk([`Energía de moneda al aire. Tu número de la suerte: ${Math.round(40 + R() * 60)}.`, `Un desconocido del waiver cambiará tu semana.`, `Escucha a tu corazón, pero más a las proyecciones.`, `Hoy no es día para experimentos: pon a los de siempre.`, `Un amigo te ofrecerá un trade. Desconfía.`]);
+      lines.push({ r, sign: SIGNOS[(r - 1) % 12], t });
+    }));
+    return lines.sort(() => R() - 0.5).slice(0, 3);
+  };
+  ST.clima = function (D, w) {
+    const mus = (D.games[w] || []).map((g) => LB.matchupInfo(D, w, g));
+    if (!mus.length) return [];
+    const comb = (M) => (M.pa != null ? M.pa + M.pb : (M.sa.ppg || 0) + (M.sb.ppg || 0));
+    const hot = mus.slice().sort((a, b) => comb(b) - comb(a))[0];
+    const fog = mus.slice().sort((a, b) => Math.abs((a.winA || 0.5) - 0.5) - Math.abs((b.winA || 0.5) - 0.5))[0];
+    const sun = mus.slice().sort((a, b) => Math.abs((b.winA || 0.5) - 0.5) - Math.abs((a.winA || 0.5) - 0.5))[0];
+    const fav = (M) => ((M.winA || 0.5) >= 0.5 ? M.g.a : M.g.b);
+    return [
+      { i: "☀️", t: `Soleado para ${T(D, fav(sun))}: ${Math.round(Math.max(sun.winA || 0.5, 1 - (sun.winA || 0.5)) * 100)}% de probabilidad de victoria.` },
+      { i: "🌩️", t: `Tormenta de puntos en ${T(D, hot.g.a)} vs ${T(D, hot.g.b)}: se esperan ${f1(comb(hot))} combinados.` },
+      { i: "🌫️", t: `Neblina total en ${T(D, fog.g.a)} vs ${T(D, fog.g.b)}. No se ve quién gana.` },
+    ];
+  };
+  ST.erratas = function (D, w) {
+    if (w <= 1) return "Primera edición: todavía no hemos tenido tiempo de equivocarnos.";
+    const pw = D.powerAt(Math.min(w - 1, D.regEnd));
+    const pr = (r) => (pw.find((x) => x.rid === r) || {}).prank || 0;
+    let best = null;
+    for (const g of D.games[w] || []) {
+      const a = D.tw[g.a][w], b = D.tw[g.b][w];
+      if (!a || !b) continue;
+      const W = a.pf > b.pf ? g.a : g.b, L = W === g.a ? g.b : g.a;
+      const gap = pr(W) - pr(L);
+      if (gap >= 3 && (!best || gap > best.gap)) best = { W, L, gap };
+    }
+    if (!best) return "Esta semana no hubo erratas. Nuestro departamento de análisis pide un aumento.";
+    return `En nuestro Power Ranking pusimos a ${T(D, best.L)} en el ${pr(best.L)}° lugar y a ${T(D, best.W)} en el ${pr(best.W)}°. ${T(D, best.W)} ganó. El analista responsable ya fue reubicado en la sección de horóscopos.`;
+  };
+  // Remates chistosos para Breaking News
+  ST.quip = function (D, e) {
+    const R = rng("q" + e.id);
+    const Q = {
+      lider: ["Fuentes cercanas al vestidor reportan que ya se mandó a hacer la corona.", "Los demás equipos piden revisión del VAR."],
+      porfin: ["Se reportan fuegos artificiales y un par de vecinos molestos.", "Testigos aseguran haber visto lágrimas de felicidad."],
+      cae: ["Se busca al responsable de la derrota. Se sospecha del kicker.", "El ego del afectado fue trasladado al hospital más cercano."],
+      crisis: ["La directiva ya consulta a un chamán.", "Se recomienda no preguntarle nada al manager en los próximos días."],
+      racha: ["Nadie sabe cómo pararlo. Se aceptan sugerencias, rezos y trades.", "Expertos confirman que es real y no un error de Sleeper."],
+      batacazo: ["Los apostadores siguen en shock.", "El líder ya pidió el replay… tres veces."],
+      banca: ["La banca agradece la confianza.", "Se busca: alguien que le recuerde revisar el lineup el domingo."],
+      record_alto: ["La calculadora de Sleeper pidió vacaciones.", "Se reportan daños en el marcador."],
+      record_bajo: ["Ni el equipo de prácticas hubiera hecho menos.", "La directiva emitió un comunicado: 'Fue el clima'."],
+      paliza: ["Se recomienda discreción al pasar cerca del perdedor.", "La ONU pidió un cese al fuego."],
+      explosion: ["Sus compañeros piden que le aumenten el sueldo.", "Los demás managers ya lo están buscando en el waiver (no está)."],
+      waiver: ["Mientras otros dormían, alguien sí revisó el waiver.", "Costo: cero. Valor: incalculable."],
+      trade: ["Uno de los dos se va a arrepentir. Aún no sabemos cuál.", "Abogados de ambas partes revisan la letra chiquita."],
+      clasificado: ["Ya están cotizando el viaje a los playoffs.", "Que alguien le avise que todavía falta ganarlos."],
+      eliminado: ["Le queda jugar por el orgullo… y por no quedar último.", "Descanse en paz su temporada."],
+      campeon: ["Que alguien le quite el celular: ya empezó a presumir.", "El trofeo ya tiene dueño por un año entero."],
+    };
+    const poll = { si: 50 + Math.round(R() * 45) };
+    return { quip: pick(R, Q[e.type] || ["La redacción sigue en shock."]), poll: poll.si };
   };
   function seriesText(D, m, W) {
     let wa = 0, wb = 0;
