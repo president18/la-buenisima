@@ -75,7 +75,7 @@
     const rows = best.lineup.map((x, i) => {
       const curP = e.starters[i];
       const changed = !curSet.has(x.pid);
-      return `<tr><td><span class="pill">${x.slot}</span></td><td>${curP ? UI.pl(D, curP) : "—"}</td><td class="r num">${f1(proj(curP))}</td><td>${changed ? `<b class="gold">→ ${UI.pl(D, x.pid)}</b>` : bestSet.has(curP) ? '<span class="faint">${IC("check", 15)}</span>' : '<span class="bad">sentarlo</span>'}</td><td class="r num">${changed ? f1(x.val) : ""}</td></tr>`;
+      return `<tr><td><span class="pill">${x.slot}</span></td><td>${curP ? UI.pl(D, curP) : "—"}</td><td class="r num">${f1(proj(curP))}</td><td>${changed ? `<b class="gold">→ ${UI.pl(D, x.pid)}</b>` : bestSet.has(curP) ? `<span class="faint">${IC("check", 15)}</span>` : '<span class="bad">sentarlo</span>'}</td><td class="r num">${changed ? f1(x.val) : ""}</td></tr>`;
     }).join("");
     const bench = pids.filter((p) => !curSet.has(p)).sort((a, b) => proj(b) - proj(a)).map((p) => `<span class="chip">${UI.pl(D, p)} <b>${f1(proj(p))}</b></span>`).join("");
     const done = D.liveWeek === w ? `<p class="note">La semana ${w} ya empezó: solo puedes mover a jugadores cuyo partido no ha arrancado.</p>` : "";

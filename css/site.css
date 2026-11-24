@@ -14,6 +14,26 @@
   --fb:"Barlow",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   --fs:"Lora",Georgia,serif;
 }
+/* ---------- modo noche (diseñado aparte, no invertido) ---------- */
+:root[data-theme="dark"]{
+  --bg:#1B1916; --bg2:#22201C; --card:#25221E; --card2:#2D2A25; --line:#3A3630; --line2:#4E483F;
+  --tx:#ECE7DC; --tx2:#B4ADA1; --tx3:#8A8378;
+  --sand:#B49E7C; --gray:#8A8378; --coral:#EE7468; --red:#EE7468;
+  --forest:#7FB59D; --forest2:#93C4AE; --cafe:#C9A27E; --blue:#8EB2D3;
+  --acc:#7FB59D; --acc2:#8EB2D3; --bad:#EE7468; --good:#7FB59D; --tint:#24302B;
+  color-scheme:dark;
+}
+:root[data-theme="dark"] .btn.pri{color:#14211C}
+:root[data-theme="dark"] .pill.b{background:#3A2422}
+:root[data-theme="dark"] .pill.y{background:#3A3024}
+:root[data-theme="dark"] .tp-f.w,:root[data-theme="dark"] .subtabs button.on,:root[data-theme="dark"] .tab.on{color:var(--bg)}
+:root[data-theme="dark"] .tp-f.w{color:#14211C}
+:root[data-theme="dark"] .logo,:root[data-theme="dark"] .ic-logo{filter:brightness(.92)}
+:root[data-theme="dark"] .np-view{box-shadow:0 18px 50px rgba(0,0,0,.6)}
+:root[data-theme="dark"] .st-art img,:root[data-theme="dark"] .bn-art img{filter:brightness(.9)}
+.theme-btn{border:1px solid var(--line2);background:transparent;color:var(--tx);border-radius:4px;width:32px;height:30px;display:grid;place-items:center;cursor:pointer;padding:0}
+.theme-btn:hover{border-color:var(--tx)}
+html{transition:background-color .2s}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--fb);font-size:15.5px;line-height:1.45;-webkit-font-smoothing:antialiased;overflow-x:clip}
 a{color:var(--forest)}
@@ -70,6 +90,7 @@ button{font-family:inherit;color:inherit}
 .btn{border:1px solid var(--tx);background:transparent;color:var(--tx);padding:7px 13px;border-radius:4px;font-family:var(--fh);font-weight:600;font-size:15px;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none;line-height:1.1}
 .btn:hover{background:var(--tx);color:var(--bg)}
 .btn.pri{background:var(--forest);color:#fff;border-color:var(--forest)}
+.tab.on{color:var(--tx)}
 .btn.pri:hover{background:var(--forest2)}
 .btn[disabled]{opacity:.35;pointer-events:none}
 select{background:transparent;color:var(--tx);border:1px solid var(--tx);border-radius:4px;padding:7px 30px 7px 11px;font-size:14.5px;font-family:var(--fb);font-weight:500;-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--tx) 50%),linear-gradient(135deg,var(--tx) 50%,transparent 50%);background-position:calc(100% - 15px) 52%,calc(100% - 10px) 52%;background-size:5px 5px;background-repeat:no-repeat}

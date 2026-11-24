@@ -118,7 +118,7 @@
     return b ? `${S.players[b[0]] ? S.players[b[0]].name : b[0]} (${f1(b[1])})` : null;
   }
 
-  const POSC = { QB: "#E85A4F", RB: "#2F5D50", WR: "#5AA9FF", TE: "#E85A4F", K: "#C084FC", DEF: "#6E6C68" };
+  const POSC = { QB: "var(--coral)", RB: "var(--forest)", WR: "var(--blue)", TE: "var(--cafe)", K: "var(--tx3)", DEF: "var(--tx3)" };
   function draftBoard(S) {
     const rounds = Math.max(...S.draft.map((p) => p.round));
     const n = S.numTeams;
@@ -129,7 +129,7 @@
       const ps = S.draft.filter((p) => p.round === r).sort((a, b) => a.pick - b.pick);
       const bySlot = {};
       ps.forEach((p) => { const idx = (p.pick - 1) % n; const slot = r % 2 ? idx + 1 : n - idx; bySlot[slot] = p; });
-      html += `<tr><td class="num faint">${r}</td>${[...Array(n).keys()].map((i) => { const p = bySlot[i + 1]; if (!p) return "<td></td>"; const pl = S.players[p.pid] || { short: p.pid, pos: "?" }; return `<td style="border-left:3px solid ${POSC[pl.pos] || "#555"}"><div style="font-weight:600;font-size:12px">${esc(pl.short)}</div><div class="faint" style="font-size:10.5px">${esc(pl.pos)} · ${f1(p.pts)} pts · #${p.ptsRank}</div></td>`; }).join("")}</tr>`;
+      html += `<tr><td class="num faint">${r}</td>${[...Array(n).keys()].map((i) => { const p = bySlot[i + 1]; if (!p) return "<td></td>"; const pl = S.players[p.pid] || { short: p.pid, pos: "?" }; return `<td><div style="font-weight:600;font-size:12px">${esc(pl.short)}</div><div class="faint" style="font-size:10.5px"><b style="color:${POSC[pl.pos] || "var(--tx3)"}">${esc(pl.pos)}</b> · ${f1(p.pts)} pts · #${p.ptsRank}</div></td>`; }).join("")}</tr>`;
     }
     return html + `</tbody></table></div><p class="small faint">Debajo de cada jugador: puntos en la temporada y su lugar en puntos entre todos los drafteados.</p>`;
   }

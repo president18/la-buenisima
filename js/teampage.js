@@ -47,14 +47,14 @@
     const y = (v) => pt + ((hi - v) * (H - pt - pb)) / (hi - lo);
     const path = (arr) => arr.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("");
     let grid = "";
-    for (let v = Math.ceil(lo / 20) * 20; v <= hi; v += 20) grid += `<line x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}" stroke="#D3CAB8"/><text x="${pl - 6}" y="${y(v) + 4}" font-size="16" text-anchor="end" fill="#8A857C">${v}</text>`;
-    const xl = ws.map((w, i) => `<text x="${x(i)}" y="${H - 6}" font-size="16" text-anchor="middle" fill="#8A857C">S${w}</text>`).join("");
-    const dots = ws.map((w, i) => { const t = D.tw[r][w]; return `<circle cx="${x(i)}" cy="${y(t.pf)}" r="6" fill="${t.res === "W" ? "#2F5D50" : "#EAE7DC"}" stroke="#2F5D50" stroke-width="2"><title>Semana ${w}: ${f1(t.pf)} (${t.res === "W" ? "ganó" : "perdió"})</title></circle>`; }).join("");
+    for (let v = Math.ceil(lo / 20) * 20; v <= hi; v += 20) grid += `<line x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--line)"/><text x="${pl - 6}" y="${y(v) + 4}" font-size="16" text-anchor="end" style="fill:var(--tx3)">${v}</text>`;
+    const xl = ws.map((w, i) => `<text x="${x(i)}" y="${H - 6}" font-size="16" text-anchor="middle" style="fill:var(--tx3)">S${w}</text>`).join("");
+    const dots = ws.map((w, i) => { const t = D.tw[r][w]; return `<circle cx="${x(i)}" cy="${y(t.pf)}" r="6" style="fill:${t.res === "W" ? "var(--forest)" : "var(--bg)"};stroke:var(--forest)" stroke-width="2"><title>Semana ${w}: ${f1(t.pf)} (${t.res === "W" ? "ganó" : "perdió"})</title></circle>`; }).join("");
     return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;max-width:${W}px">${grid}
-      <path d="${path(mx)}" fill="none" stroke="#B9A47E" stroke-width="1.5" stroke-dasharray="2 4"/>
-      <path d="${path(avg)}" fill="none" stroke="#8A857C" stroke-width="1.5" stroke-dasharray="6 5"/>
-      <path d="${path(pts)}" fill="none" stroke="#2F5D50" stroke-width="3.5"/>${dots}${xl}</svg>
-      <div class="tp-legend"><span><i style="background:#2F5D50"></i>Sus puntos (relleno = ganó)</span><span><i class="dash"></i>Promedio de la liga</span><span><i class="dot2"></i>Su máximo posible</span></div>`;
+      <path d="${path(mx)}" fill="none" style="stroke:var(--sand)" stroke-width="1.5" stroke-dasharray="2 4"/>
+      <path d="${path(avg)}" fill="none" style="stroke:var(--tx3)" stroke-width="1.5" stroke-dasharray="6 5"/>
+      <path d="${path(pts)}" fill="none" style="stroke:var(--forest)" stroke-width="3.5"/>${dots}${xl}</svg>
+      <div class="tp-legend"><span><i style="background:var(--forest)"></i>Sus puntos (relleno = ganó)</span><span><i class="dash"></i>Promedio de la liga</span><span><i class="dot2"></i>Su máximo posible</span></div>`;
   }
 
   TP.render = function (D, el, rid, onPick) {
