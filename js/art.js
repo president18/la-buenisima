@@ -82,5 +82,30 @@
     const d = vals.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("");
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><path d="${d}" fill="none" stroke="${C.red}" stroke-width="3"/>${vals.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="${i === vals.length - 1 ? 6 : 3.5}" fill="${i === vals.length - 1 ? C.red : C.ink}"/>`).join("")}</svg>`;
   };
+
+  /* ---------------- banner editorial 16:9 para notas ---------------- */
+  const TONE = { lider: "blue", porfin: "forest", cae: "cafe", crisis: "cafe", racha: "forest", batacazo: "coral", banca: "cafe", record_alto: "forest", record_bajo: "cafe", paliza: "coral", explosion: "forest", waiver: "blue", trade: "blue", clasificado: "forest", eliminado: "ink", campeon: "forest" };
+  A.banner = function (e, w = 800, h = 450) {
+    const tone = { forest: C.forest, blue: C.blue, cafe: C.cafe, coral: "#C4553D", ink: C.ink }[TONE[e.type] || "forest"];
+    const icon = A.iconFor(e.type).replace('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">', `<svg x="${w * 0.52}" y="${h * 0.12}" width="${h * 0.76}" height="${h * 0.76}" viewBox="0 0 300 300">`);
+    const stat = e.stat ? esc(String(e.stat.v)) : "";
+    const lbl = e.stat ? esc(String(e.stat.l).toUpperCase()) : "";
+    let lines = "";
+    for (let i = -h; i < w; i += 22) lines += `<path d="M${i} ${h} L${i + h} 0" stroke="rgba(255,255,255,.05)" stroke-width="8"/>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
+      <rect width="${w}" height="${h}" fill="${tone}"/>${lines}
+      <circle cx="${w * 0.52 + h * 0.38}" cy="${h * 0.5}" r="${h * 0.47}" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="2"/>
+      <circle cx="${w * 0.52 + h * 0.38}" cy="${h * 0.5}" r="${h * 0.55}" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+      ${icon}
+      ${stat ? `<text x="${w * 0.06}" y="${h * 0.62}" font-family="Arial Narrow,Helvetica Neue,Arial" font-weight="700" font-size="${stat.length > 5 ? 96 : 128}" fill="#F6F4EE">${stat}</text>
+      <text x="${w * 0.06}" y="${h * 0.74}" font-family="Helvetica Neue,Arial" font-weight="700" font-size="18" letter-spacing="2" fill="rgba(246,244,238,.8)">${lbl.length > 34 ? lbl.slice(0, 33) + "…" : lbl}</text>` : ""}
+      <text x="${w * 0.06}" y="${h * 0.16}" font-family="Helvetica Neue,Arial" font-weight="700" font-size="15" letter-spacing="3" fill="rgba(246,244,238,.75)">SEMANA ${e.week}</text>
+    </svg>`;
+  };
+  A.thumb = function (e) {
+    const tone = { forest: C.forest, blue: C.blue, cafe: C.cafe, coral: "#C4553D", ink: C.ink }[TONE[e.type] || "forest"];
+    const icon = A.iconFor(e.type).replace('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">', '<svg x="45" y="45" width="210" height="210" viewBox="0 0 300 300">');
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300"><rect width="300" height="300" fill="${tone}"/>${icon}</svg>`;
+  };
   A.colors = C;
 })();

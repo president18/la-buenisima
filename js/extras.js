@@ -195,7 +195,7 @@
     if (!w) { el.innerHTML = '<p class="muted">Todavía no hay semanas jugadas.</p>'; return; }
     const list = X.roasts(D, w);
     el.innerHTML = `<div class="row"><div><div class="h2">Roast semanal</div><p class="sub">Una tarjeta de carrilla para cada equipo, lista para el chat.</p></div><span class="sp"></span><select id="roW">${weeks.map((x) => `<option value="${x}" ${x === w ? "selected" : ""}>Semana ${x}</option>`).join("")}</select></div>
-      <div class="grid g2">${list.map((x, i) => `<div class="card tstripe" style="--tc:${UI.color(x.r)}"><div class="row">${UI.teamCell(D, x.r)}<span class="sp"></span><span class="pill ${x.t.res === "W" ? "g" : "b"}">${x.t.res === "W" ? "Ganó" : "Perdió"} · ${f1(x.t.pf)}</span></div>
+      <div class="grid g2">${list.map((x, i) => `<div class="card"><div class="row">${UI.teamCell(D, x.r)}<span class="sp"></span><span class="pill ${x.t.res === "W" ? "g" : "b"}">${x.t.res === "W" ? "Ganó" : "Perdió"} · ${f1(x.t.pf)}</span></div>
         ${x.lines.map((l) => `<p style="margin:10px 0 0;display:flex;gap:8px"><span style="color:var(--coral);flex:none">${IC("flame", 17)}</span><span>${esc(l)}</span></p>`).join("")}<div style="margin-top:10px"><button class="btn" data-ro="${i}" style="padding:6px 12px;font-size:13px">${IC("image", 16)} Imagen</button></div></div>`).join("")}</div>`;
     document.getElementById("roW").onchange = (e) => X.renderRoast(D, el, Number(e.target.value));
     el.querySelectorAll("[data-ro]").forEach((b) => (b.onclick = () => {

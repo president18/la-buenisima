@@ -96,7 +96,7 @@
     const draftOpts = list.filter((S) => S.draft.length).map((S, i) => `<option value="${i}">${S.season}</option>`).join("");
 
     el.innerHTML = `<div class="h2">Historia de La Buenísima</div><p class="sub">Campeones, récords de todos los tiempos, managers y drafts. Cada temporada nueva en Sleeper se agrega sola.</p>
-      <div class="grid g2"><div class="card"><div class="h3" style="margin-top:0">${IC("trophy")} Salón de la fama</div>${hall || `<p class="small muted">El primer campeón se corona en la semana ${cur.totalWeeks} de ${cur.season}.</p>`}
+      <div class="grid g2"><div class="card"><div class="h3" style="margin-top:0">Salón de la fama</div>${hall || `<p class="small muted">El primer campeón se corona en la semana ${cur.totalWeeks} de ${cur.season}.</p>`}
         ${CFG.trophy ? `<p class="small"><b>Trofeo:</b> ${esc(CFG.trophy)}</p>` : ""}${CFG.punishment ? `<p class="small"><b>Castigo del último:</b> ${esc(CFG.punishment)}</p>` : ""}</div>
       <div class="grid">${seasonCards}</div></div>
       <div class="h3">Tabla histórica de managers</div>

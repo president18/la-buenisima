@@ -112,20 +112,66 @@
     const ios = /iPhone|iPad/i.test(navigator.userAgent);
     return `<div class="card" id="instBox" style="display:flex;gap:12px;align-items:center;margin-bottom:14px">${UI.logoHTML(D)}<div class="small" style="flex:1"><b>Tenlo como app</b><br>${ios ? "En Safari toca Compartir y luego “Agregar a inicio”." : "Abre el menú ⋮ y toca “Agregar a pantalla principal”."}</div><button class="btn" onclick="try{localStorage.setItem('lb-install-off','1')}catch(e){};document.getElementById('instBox').remove()">${IC("x", 16)}</button></div>`;
   }
-  /* ---- Breaking News ---- */
+  /* ---- Noticias (portada estilo periódico en línea) ---- */
+  let NEWS = [];
+  function newsList() {
+    const seen = new Set();
+    return LB.stories.events(D).filter((e) => e.imp >= 45).sort((a, b) => b.week - a.week || b.imp - a.imp).filter((e) => { const k = e.type + e.week + (e.rids || [])[0]; if (seen.has(k)) return false; seen.add(k); return true; });
+  }
+  const artImg = (e) => LB.art.toImg(LB.art.banner(e), 800, 450, "width:100%;height:100%;object-fit:cover");
+  const thumbImg = (e) => LB.art.toImg(LB.art.thumb(e), 300, 300, "width:100%;height:100%;object-fit:cover");
+  const meta = (e) => `Semana ${e.week} · La Redacción`;
+  function storyHTML(e, i, cls = "", withArt = true, withDek = true) {
+    return `<article class="story ${cls}" data-st="${i}">${withArt ? `<div class="st-art">${cls === "lead" ? artImg(e) : `<span class="a-wide">${artImg(e)}</span><span class="a-sq">${thumbImg(e)}</span>`}</div>` : ""}<div class="st-k">${esc(e.kicker)}</div><h3 class="st-h">${esc(e.headline)}</h3>${withDek ? `<p class="st-d">${esc(e.sub)}</p>` : ""}<div class="st-m">${meta(e)}</div></article>`;
+  }
   function breakingHTML() {
-    const all = LB.stories.breaking(D);
-    const list = sel.bnAll ? all : all.slice(0, 5);
-    if (!list.length) return "";
-    return `<div class="row"><div><div class="h2" style="color:var(--bad)">${IC("siren", 28, "currentColor", 1.6)} Breaking News</div><p class="sub">Lo más fuerte que ha pasado en la liga. Toca ${IC("news", 15)} para ver la portada.</p></div></div>
-      <div class="grid" style="gap:8px">${list.map((e, i) => `<div class="bn"><div class="bn-art">${LB.art.toImg(LB.art.iconFor(e.type), 52, 52)}</div><div style="min-width:0"><div class="bn-w" style="text-align:left;font-size:12px;letter-spacing:.1em">SEMANA ${e.week}</div><div class="bn-k">${esc(e.kicker)}</div><div class="bn-h">${esc(e.headline)}</div><div class="bn-s">${esc(e.sub)}</div></div><button class="btn" data-bn="${i}" style="padding:7px 10px">${IC("news", 17)}</button></div>`).join("")}</div>
-      ${all.length > 5 ? `<div style="text-align:center;margin-top:8px"><button class="btn" id="bnMore">${sel.bnAll ? "Ver menos" : `Ver todas (${all.length})`}</button></div>` : ""}<div style="height:10px"></div>`;
+    NEWS = newsList();
+    if (!NEWS.length) return "";
+    const lead = NEWS[0], side = NEWS.slice(1, 3), grid = NEWS.slice(3, 6), rest = NEWS.slice(6, sel.bnAll ? 40 : 14);
+    const lastW = D.playedWeeks[D.playedWeeks.length - 1];
+    return `<section class="news">
+      <div class="news-mast"><b>Noticias</b><span>Actualizado ${new Date().toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" })}</span></div>
+      <div class="news-top">${storyHTML(lead, 0, "lead")}<div class="news-side">${side.map((e, k) => storyHTML(e, k + 1, "", true, false)).join("")}</div></div>
+      ${grid.length ? `<div class="news-grid">${grid.map((e, k) => storyHTML(e, k + 3, "", true, false)).join("")}</div>` : ""}
+      ${lastW ? `<div class="promo" id="promoNP"><div class="promo-img" id="promoThumb"></div><div><div class="st-k" style="color:var(--forest)">La Mañanera</div><h3 class="st-h">La edición de la semana ${lastW} ya está en la calle</h3><p class="st-d">Resultados, la tabla, el clima en la liga, el horóscopo y los clasificados. Lista para mandar al chat.</p><span class="btn">Leer la edición</span></div></div>` : ""}
+      ${rest.length ? `<div class="latest"><div class="h3">Lo último</div>${rest.map((e, k) => `<div class="latest-i" data-st="${k + 6}"><div class="lt-w">Sem ${e.week}</div><div><div class="lt-k">${esc(e.kicker)}</div><div class="lt-h">${esc(e.headline)}</div></div></div>`).join("")}</div>` : ""}
+      ${NEWS.length > 14 ? `<div style="margin-top:12px"><button class="btn" id="bnMore">${sel.bnAll ? "Ver menos" : "Ver todas las noticias"}</button></div>` : ""}
+    </section>`;
   }
   function bindBreaking() {
-    const all = LB.stories.breaking(D);
-    const list = sel.bnAll ? all : all.slice(0, 5);
-    document.querySelectorAll("[data-bn]").forEach((b) => (b.onclick = () => { const e = list[Number(b.dataset.bn)]; UI.makeImage(LB.np.breaking(D, e), `breaking-${slug(e.headline)}`); }));
+    document.querySelectorAll("#s-inicio [data-st]").forEach((b) => (b.onclick = () => openArticle(NEWS[Number(b.dataset.st)])));
     const m = $("#bnMore"); if (m) m.onclick = () => { sel.bnAll = !sel.bnAll; renderInicio(); };
+    const pr = $("#promoNP");
+    if (pr) {
+      pr.onclick = () => { sel.npMode = "results"; sel.np = null; location.hash = "manianera"; };
+      const th = $("#promoThumb");
+      const lw = D.playedWeeks[D.playedWeeks.length - 1];
+      th.innerHTML = `<div style="transform:scale(${120 / 1080});transform-origin:top left;width:1080px;pointer-events:none">${LB.np.results(D, lw)}</div>`;
+    }
+  }
+  function openArticle(e) {
+    if (!e) return;
+    const el = $("#article");
+    const related = NEWS.filter((x) => x !== e && (x.rids || []).some((r) => (e.rids || []).includes(r))).slice(0, 4);
+    const Q = LB.stories.quip(D, e);
+    const ctx = LB.stories.context(D, e);
+    el.innerHTML = `<div class="art-bar"><button class="btn" id="artBack">${IC("x", 15)} Cerrar</button><span class="sp"></span><button class="btn pri" id="artImg">${IC("image", 15)} Portada</button></div>
+      <div class="art-in"><div class="st-k">${esc(e.kicker)}</div><h1 class="art-h">${esc(e.headline)}</h1><p class="art-d">${esc(e.sub)}</p>
+        <div class="art-by">Por <b>La Redacción</b> · Semana ${e.week} · Temporada ${esc(D.season)}</div>
+        <div class="st-art" style="margin-bottom:18px">${artImg(e)}</div>
+        <div class="art-body"><p>${esc(e.body)}</p>${ctx ? `<p>${esc(ctx)}</p>` : ""}</div>
+        ${e.stat ? `<div class="art-fact"><b>${esc(e.stat.v)}</b><span>${esc(e.stat.l)}</span></div>` : ""}
+        <p class="art-quote">“${esc(Q.quip)}”</p><p class="small faint" style="margin-top:-12px">— Fuentes cercanas al vestidor</p>
+        ${(e.rids || []).length ? `<div class="h3">Los protagonistas</div>${e.rids.filter((r) => D.teams[r]).map((r) => { const st = D.standings.find((x) => x.rid === r); return `<div class="list-row">${UI.teamCell(D, r)}<span class="sp"></span><span class="small">${st ? UI.rec(st) + " · " + st.rank + "° lugar" : ""}</span></div>`; }).join("")}` : ""}
+        ${related.length ? `<div class="h3">Relacionadas</div>${related.map((x) => `<div class="latest-i" data-rel="${NEWS.indexOf(x)}"><div class="lt-w">Sem ${x.week}</div><div><div class="lt-k">${esc(x.kicker)}</div><div class="lt-h">${esc(x.headline)}</div></div></div>`).join("")}` : ""}
+      </div>`;
+    el.classList.add("on");
+    el.scrollTop = 0;
+    document.body.style.overflow = "hidden";
+    const close = () => { el.classList.remove("on"); document.body.style.overflow = ""; };
+    $("#artBack").onclick = close;
+    $("#artImg").onclick = () => UI.makeImage(LB.np.breaking(D, e), `breaking-${slug(e.headline)}`);
+    el.querySelectorAll("[data-rel]").forEach((b) => (b.onclick = () => openArticle(NEWS[Number(b.dataset.rel)])));
   }
   /* ---- Equipo con más puntos por semana ---- */
   function topScorersHTML() {
@@ -135,7 +181,7 @@
       return `<tr><td class="num">S${x.w}</td><td>${UI.teamCell(D, x.rid, { sm: true })}</td><td class="r num"><b>${f1(x.pts)}</b></td><td class="r num faint">+${f1(x.pts - (second || 0))}</td><td class="c">${D.tw[x.rid][x.w].res === "W" ? '<span class="good">G</span>' : '<span class="bad">P</span>'}</td></tr>`;
     }).join("");
     const counts = D.rids.filter((r) => R.weeklyTopCount[r]).sort((a, b) => R.weeklyTopCount[b] - R.weeklyTopCount[a]).map((r) => `<span class="chip">${esc(D.teams[r].name)} <b>×${R.weeklyTopCount[r]}</b></span>`).join("");
-    return `<div class="row" style="margin-top:20px"><div><div class="h3" style="margin:0">${IC("crown")} El que más metió cada semana</div><p class="sub" style="margin:4px 0 10px">Equipo con más puntos de cada jornada y su ventaja sobre el segundo.</p></div><span class="sp"></span><button class="btn" id="imgTop">${IC("image", 16)} Imagen</button></div>
+    return `<div class="row" style="margin-top:20px"><div><div class="h3" style="margin:0">El que más metió cada semana</div><p class="sub" style="margin:4px 0 10px">Equipo con más puntos de cada jornada y su ventaja sobre el segundo.</p></div><span class="sp"></span><button class="btn" id="imgTop">${IC("image", 16)} Imagen</button></div>
       <div class="chips" style="margin-bottom:10px">${counts}</div>
       <div class="tbl-wrap"><table><thead><tr><th>Sem</th><th>Equipo</th><th class="r">Pts</th><th class="r">Ventaja</th><th class="c">Res</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
@@ -271,7 +317,7 @@
     const A = weekAwards(w);
     const it = (ic, t, who, d) => `<div class="kpi"><div class="l">${IC(ic, 14)} ${t}</div><div class="v" style="font-size:22px;line-height:1.15;margin:3px 0">${who}</div><div class="d">${d}</div></div>`;
     const gn = (g) => `${esc(UI.tName(D, g.pa > g.pb ? g.a : g.b))} ${f1(Math.max(g.pa, g.pb))}–${f1(Math.min(g.pa, g.pb))}`;
-    return `<div class="row" style="margin-top:6px"><div class="h3" style="margin:6px 0">${IC("trophy")} Premios de la semana</div><span class="sp"></span><button class="btn" id="imgAwards">${IC("image", 16)} Premios</button><button class="btn" id="imgAll">${IC("image", 16)} Resultados</button></div>
+    return `<div class="row" style="margin-top:6px"><div class="h3" style="margin:6px 0">Premios de la semana</div><span class="sp"></span><button class="btn" id="imgAwards">${IC("image", 16)} Premios</button><button class="btn" id="imgAll">${IC("image", 16)} Resultados</button></div>
       <div class="kpis">
         ${it("crown", "Equipo de la semana", esc(UI.tName(D, A.top.rid)), f1(A.top.pf) + " pts")}
         ${it("star", "MVP", UI.pl(D, A.mvp.pid), f1(A.mvp.pts) + " pts · " + esc(UI.tName(D, A.mvp.rid)))}
@@ -395,9 +441,9 @@
       <div class="row"><div class="h3">Historial de trades (${D.trades.length})</div><span class="sp"></span>${D.trades.length ? `<button class="btn" id="imgTrades">${IC("image", 16)} Imagen</button>` : ""}</div>
       <div class="grid">${tr}</div>
       <div class="grid g2" style="margin-top:6px">
-        <div><div class="row"><div class="h3">${IC("gem")} Joyas del waiver</div><span class="sp"></span><button class="btn" id="imgWaiv">${IC("image", 16)}</button></div>
+        <div><div class="row"><div class="h3">Joyas del waiver</div><span class="sp"></span><button class="btn" id="imgWaiv">${IC("image", 16)}</button></div>
         <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Jugador</th><th>Equipo</th><th class="c">Sem</th><th class="c">Vía</th><th class="r">Pts tit.</th><th class="c">Sigue</th></tr></thead><tbody>${bestRows}</tbody></table></div></div>
-        <div><div class="h3">${IC("gift")} Regalos (drops que dolieron)</div><div class="card">${regRows}</div></div></div>`;
+        <div><div class="h3">Regalos (drops que dolieron)</div><div class="card">${regRows}</div></div></div>`;
     const ti = $("#imgTrades"); if (ti) ti.onclick = () => UI.makeImage(cardTrades(), "historial-trades");
     $("#imgWaiv").onclick = () => UI.makeImage(cardWaivers(best), "joyas-del-waiver");
   }
@@ -422,8 +468,8 @@
     const teamRows = D.rids.slice().sort((a, b) => D.draftStats[b].start - D.draftStats[a].start).map((r, i) => `<div class="list-row"><span class="num faint" style="width:18px">${i + 1}</span>${UI.teamCell(D, r, { sm: true })}<span class="sp"></span><div class="small" style="text-align:right"><b class="num">${f1(D.draftStats[r].start)}</b> pts tit.<br><span class="faint">${f1(D.draftStats[r].pts)} pts totales de sus picks</span></div></div>`).join("");
     const th = '<thead><tr><th>Pick</th><th>Jugador</th><th>Equipo</th><th class="r">Pts temp.</th><th class="r">Rank</th></tr></thead>';
     $("#s-draft").innerHTML = `<div class="h2">Draft ${D.season}</div><p class="sub">¿Quién la armó en el draft? Rank = lugar en puntos entre todos los jugadores drafteados.</p>
-      <div class="grid g2"><div><div class="h3">${IC("search")} Robos</div><div class="tbl-wrap"><table>${th}<tbody>${steals.map(row).join("")}</tbody></table></div></div>
-      <div><div class="h3">${IC("dollar")} Fracasos (rondas 1–5)</div><div class="tbl-wrap"><table>${th}<tbody>${busts.map(row).join("")}</tbody></table></div></div></div>
+      <div class="grid g2"><div><div class="h3">Robos</div><div class="tbl-wrap"><table>${th}<tbody>${steals.map(row).join("")}</tbody></table></div></div>
+      <div><div class="h3">Fracasos (rondas 1–5)</div><div class="tbl-wrap"><table>${th}<tbody>${busts.map(row).join("")}</tbody></table></div></div></div>
       <div class="h3">Puntos que le ha dado su draft a cada equipo</div><div class="card">${teamRows}</div>`;
   }
 

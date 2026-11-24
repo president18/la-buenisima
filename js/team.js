@@ -149,8 +149,8 @@
       <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Jugador</th><th class="r">PPG</th><th class="r">Proy S${D.projWeek}</th><th class="r">Tendencia</th><th class="r">Mejora lineup</th><th>vs tu peor en su posición</th></tr></thead><tbody>${rows}</tbody></table></div>
       ${dropC.length ? `<p class="note" style="margin-top:10px">Para hacer espacio, los candidatos a soltar son: <b>${dropC.map((p) => esc(UI.plName(D, p)) + " (" + f1(tradeValue(p)) + ")").join(", ")}</b>.</p>` : ""}
       <div class="grid g2" style="margin-top:10px">
-        <div class="card"><div class="h3" style="margin-top:0;font-size:20px">${IC("target")} Streaming de K · semana ${D.projWeek}</div>${st(stream("K"), myK)}<p class="small faint">Tu K: ${myK ? UI.pl(D, myK) + " · " + f1(D.projPts[myK] || 0) : "—"}</p></div>
-        <div class="card"><div class="h3" style="margin-top:0;font-size:20px">${IC("shield")} Streaming de DEF · semana ${D.projWeek}</div>${st(stream("DEF"), myD)}<p class="small faint">Tu DEF: ${myD ? UI.pl(D, myD) + " · " + f1(D.projPts[myD] || 0) : "—"}</p></div></div>`;
+        <div class="card"><div class="h3" style="margin-top:0;font-size:20px">Streaming de K · semana ${D.projWeek}</div>${st(stream("K"), myK)}<p class="small faint">Tu K: ${myK ? UI.pl(D, myK) + " · " + f1(D.projPts[myK] || 0) : "—"}</p></div>
+        <div class="card"><div class="h3" style="margin-top:0;font-size:20px">Streaming de DEF · semana ${D.projWeek}</div>${st(stream("DEF"), myD)}<p class="small faint">Tu DEF: ${myD ? UI.pl(D, myD) + " · " + f1(D.projPts[myD] || 0) : "—"}</p></div></div>`;
   }
 
   /* ---------- valor de mercado ---------- */
