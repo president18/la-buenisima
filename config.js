@@ -18,11 +18,29 @@ window.LB_CONFIG = {
 
   // Apodos: user de Sleeper -> apodo que se muestra en recaps.
   // Ej: { "marcossaade13": "Marcos", "Pony28": "El Pony" }
-  nicknames: {},
+  nicknames: {
+    "EytanSt": "Pelvis",
+    "Napugi": "El Commish",
+    "EDUPUGI": "El Cummish",
+    "reylago": "Rey Lago",
+    "oldaktlamete": "Oldak",
+    "Arizg99": "El Doc",
+    "MITRALAN": "Mitrani",
+    "marcossaade13": "Marcos",
+    "MVPurdy26": "Juan",
+    "Pony28": "Porny",
+    "TofiZonana": "Tofi"
+  },
 
-  // Rivalidades: pares de users de Sleeper. Se destacan en previews.
-  // Ej: [["Napugi", "EDUPUGI"]]
-  rivalries: [],
+  // Apodo del equipo completo (opcional), por usuario dueño.
+  teamNicknames: { "Napugi": "Pupko Bros" },
+
+  // Rivalidades con nombre: usuarios de Sleeper de cada lado. Se destacan en previews, periódico y noticias.
+  rivalries: [
+    { a: "EytanSt", b: "Napugi", name: "El Clásico" },
+    { a: "EytanSt", b: "Arizg99", name: "Clásico Primos" },
+    { a: "Arizg99", b: "reylago", name: "El ZaGay" }
+  ],
 
   // Trofeo y castigo (se muestran en la sección Historia).
   trophy: "",

@@ -274,7 +274,7 @@
     const wp = Math.round(Math.max(M.winA || 0.5, 1 - (M.winA || 0.5)) * 100);
     const sA = st.find((x) => x.rid === A) || {}, sB = st.find((x) => x.rid === B) || {};
     let headline, kicker;
-    if (main.tags.includes("rivalidad")) { kicker = "DUELO DE RIVALES"; headline = `${T(D, A)} vs ${T(D, B)}: aquí se juega el orgullo`; }
+    if (main.tags.includes("rivalidad")) { const rv = UI.rivals(D, A, B); kicker = rv.toUpperCase(); headline = pick(R, [`${rv}: ${T(D, A)} contra ${T(D, B)}`, `Llega ${rv} y nadie quiere perderlo`, `${O(D, A)} vs ${O(D, B)}: se juega ${rv}`]); }
     else if (main.tags.includes("titanes")) { kicker = "DUELO DE TITANES"; headline = pick(R, [`Choque de gigantes: ${T(D, A)} contra ${T(D, B)}`, `${T(D, A)} y ${T(D, B)}, el partido que paraliza a la liga`]); }
     else if (main.tags.includes("revancha")) { const l = M.h2h[M.h2h.length - 1]; const lost = l.pa > l.pb ? B : A; kicker = "LA REVANCHA"; headline = `${T(D, lost)} busca venganza contra ${T(D, lost === A ? B : A)}`; }
     else if (main.tags.includes("burbuja")) { kicker = "SE DEFINE LA BURBUJA"; headline = `${T(D, A)} vs ${T(D, B)}: partido de vida o muerte`; }
@@ -360,7 +360,8 @@
       if (tL.max > tW.pf) s += ` ${T(D, L)} tenía la victoria en la banca.`;
       const ser = m.h2h.length ? seriesText(D, m, W) : "";
       const h2h = ser && !ser.startsWith("empatada") ? ` Serie: ${ser}.` : "";
-      return { m, W, L, tW, tL, text: s + h2h };
+      const rv = UI.rivals(D, m.g.a, m.g.b);
+      return { m, W, L, tW, tL, text: (rv ? `${rv}: ` : "") + s + h2h };
     });
     const awards = { top, low, mvp: null };
     D.rids.forEach((r) => { const e = D.weeks[w][r]; e.starters.forEach((p, i) => { const pts = e.sp[i] || 0; if (!awards.mvp || pts > awards.mvp.pts) awards.mvp = { pid: p, pts, rid: r }; }); });

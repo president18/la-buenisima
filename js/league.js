@@ -5,14 +5,18 @@
   const LB = window.LB, UI = LB.ui, CFG = window.LB_CONFIG;
   const { esc, f1, pct, sign, rec } = UI;
   const $ = (s) => document.querySelector(s);
-  const TABS = [
-    ["inicio", "Inicio", "home"], ["power", "Power Rankings", "chart"], ["semana", "Semana", "ball"], ["manianera", "La Mañanera", "news"], ["playoffs", "Playoffs", "trophy"],
-    ["roast", "Roast", "flame"], ["h2h", "Cara a cara", "versus"], ["calendarios", "Calendarios", "calendar"],
-    ["movimientos", "Trades y Waivers", "swap"], ["draft", "Draft", "clipboard"], ["oscars", "Óscars", "award"], ["historia", "Historia", "book"],
+  // 5 secciones, cada una con sus sub-pestañas. El hash es la sub-pestaña (ej. #power).
+  const GROUPS = [
+    { k: "inicio", l: "Inicio", i: "home", subs: [["inicio", "Noticias"]] },
+    { k: "liga", l: "Liga", i: "chart", subs: [["tabla", "Tabla"], ["power", "Power"], ["playoffs", "Playoffs"], ["calendarios", "Calendarios"]] },
+    { k: "semana", l: "Semana", i: "ball", subs: [["semana", "Partidos"], ["manianera", "La Mañanera"], ["roast", "Roast"]] },
+    { k: "equipos", l: "Equipos", i: "user", subs: [["equipo", "Equipos"], ["h2h", "Cara a cara"]] },
+    { k: "historia", l: "Historia", i: "book", subs: [["historia", "Récords"], ["draft", "Draft"], ["movimientos", "Trades y waivers"], ["oscars", "Óscars"]] },
   ];
-  const BNAV = ["inicio", "power", "semana", "manianera"];
+  const groupOf = (sub) => GROUPS.find((g) => g.subs.some((x) => x[0] === sub)) || GROUPS[0];
+  const lastSub = {};
   let D = null;
-  const sel = { power: null, semana: null, np: null, npMode: null, bnAll: false };
+  const sel = { power: null, semana: null, np: null, npMode: null, bnAll: false, team: null };
 
   function header() {
     $("#brandLogo").outerHTML = UI.logoHTML(D);
@@ -22,20 +26,29 @@
     else { live.textContent = `Actualizado ${new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}`; dot.classList.add("off"); }
   }
   function tabs() {
-    $("#tabs").innerHTML = TABS.map(([k, l]) => `<button class="tab" data-k="${k}">${l}</button>`).join("");
-    $("#tabs").onclick = (e) => { const b = e.target.closest(".tab"); if (b) location.hash = b.dataset.k; };
-    const short = { inicio: "Inicio", power: "Power", semana: "Semana", manianera: "Mañanera" };
-    $("#bnav").innerHTML = BNAV.map((k) => { const t = TABS.find((x) => x[0] === k); return `<button data-k="${k}"><i>${IC(t[2], 22)}</i>${short[k]}</button>`; }).join("") + `<button data-k="__more"><i>${IC("menu", 22)}</i>Más</button>`;
-    $("#bnav").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.k === "__more") $("#sheet").classList.add("on"); else location.hash = b.dataset.k; };
-    $("#sheetIn").innerHTML = '<div class="grab"></div>' + TABS.filter((t) => !BNAV.includes(t[0])).map(([k, l, i]) => `<button data-k="${k}"><span>${IC(i, 20)}</span>${l}</button>`).join("");
-    $("#sheetIn").onclick = (e) => { const b = e.target.closest("button"); if (b) { $("#sheet").classList.remove("on"); location.hash = b.dataset.k; } };
+    const goGroup = (k) => { const g = GROUPS.find((x) => x.k === k); location.hash = lastSub[k] || g.subs[0][0]; };
+    $("#tabs").innerHTML = GROUPS.map((g) => `<button class="tab" data-g="${g.k}">${g.l}</button>`).join("");
+    $("#tabs").onclick = (e) => { const b = e.target.closest(".tab"); if (b) goGroup(b.dataset.g); };
+    $("#bnav").innerHTML = GROUPS.map((g) => `<button data-g="${g.k}"><i>${IC(g.i, 22)}</i>${g.l}</button>`).join("");
+    $("#bnav").onclick = (e) => { const b = e.target.closest("button"); if (b) goGroup(b.dataset.g); };
+    $("#subtabs").onclick = (e) => { const b = e.target.closest("button"); if (b) location.hash = b.dataset.k; };
+  }
+  function parseHash() {
+    const h = (location.hash || "#inicio").slice(1);
+    const m = h.match(/^equipo-(\d+)$/);
+    if (m) return { sub: "equipo", team: Number(m[1]) };
+    return { sub: GROUPS.some((g) => g.subs.some((x) => x[0] === h)) ? h : "inicio" };
   }
   function show() {
-    const k = (location.hash || "#inicio").slice(1);
-    const key = TABS.some((t) => t[0] === k) ? k : "inicio";
-    document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("on", b.dataset.k === key));
-    document.querySelectorAll("#bnav button").forEach((b) => b.classList.toggle("on", b.dataset.k === key || (b.dataset.k === "__more" && !BNAV.includes(key))));
-    document.querySelectorAll(".sec").forEach((s) => s.classList.toggle("on", s.id === "s-" + key));
+    const { sub, team } = parseHash();
+    const g = groupOf(sub);
+    lastSub[g.k] = sub;
+    document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("on", b.dataset.g === g.k));
+    document.querySelectorAll("#bnav button").forEach((b) => b.classList.toggle("on", b.dataset.g === g.k));
+    $("#subtabs").innerHTML = g.subs.length > 1 ? g.subs.map(([k, l]) => `<button class="${k === sub ? "on" : ""}" data-k="${k}">${l}</button>`).join("") : "";
+    $("#subtabs").style.display = g.subs.length > 1 ? "" : "none";
+    if (sub === "equipo" && D) { if (team && team !== sel.team) { sel.team = team; try { localStorage.setItem("lb-team", String(team)); } catch (e) {} renderEquipo(); } }
+    document.querySelectorAll(".sec").forEach((s) => s.classList.toggle("on", s.id === "s-" + sub));
     window.scrollTo(0, 0);
   }
 
@@ -57,21 +70,22 @@
         <td class="num hide-m">${s.apW}-${s.apL}</td><td class="r num ${s.luck > 0.5 ? "good" : s.luck < -0.5 ? "bad" : ""}">${sign(s.luck)}</td>
         <td class="c">${s.streak}</td><td class="r num">${D.sim.remaining.length ? pct(o.playoff) : s.rank <= D.playoffTeams ? IC("check", 15) : IC("x", 15)}</td></tr>`;
     }).join("");
-    $("#s-inicio").innerHTML = installHTML() + breakingHTML() + `
+    $("#s-inicio").innerHTML = installHTML() + breakingHTML() + miniTabla();
+    bindBreaking();
+    $("#s-tabla").innerHTML = `
       <div class="row"><div><div class="h2">Tabla general</div><p class="sub">Después de la semana ${w} · Top ${D.playoffTeams} a playoffs (semana ${D.regEnd + 1})</p></div><span class="sp"></span>
       <button class="btn" id="imgStand">${IC("image", 16)} Imagen</button></div>
       <div class="kpis" style="margin-bottom:14px">
-        ${kpi("Líder", esc(D.teams[st[0].rid].name), rec(st[0]) + " · " + esc(D.teams[st[0].rid].ownersNick))}
+        ${kpi("Líder", `<span style="font-size:.72em;line-height:1.1;display:block">${esc(D.teams[st[0].rid].name)}</span>`, rec(st[0]) + " · " + esc(D.teams[st[0].rid].ownersNick))}
         ${kpi("Más puntos", f1(byPF.pf), esc(D.teams[byPF.rid].name))}
         ${kpi("Mejor lineup", pct(byEff.eff, 1), esc(D.teams[byEff.rid].name) + " · de su máximo")}
         ${kpi("Más suertudo", sign(lucky.luck), esc(D.teams[lucky.rid].name) + " · victorias vs esperado")}
         ${kpi("Más salado", sign(unlucky.luck), esc(D.teams[unlucky.rid].name))}
       </div>
-      <div class="tbl-wrap"><table><thead><tr><th>#</th><th class="sticky-col">Equipo</th><th>Récord</th><th class="r">PF</th><th class="r hide-m">PC</th><th class="r hide-m">Máx</th><th class="r">Efic.</th><th class="hide-m">All-play</th><th class="r">Suerte</th><th class="c">Racha</th><th class="r">Playoffs</th></tr></thead><tbody>${rows}</tbody></table></div>
+      ${UI.mtable(st.map((x) => UI.mrow(D, x.rid, x.rank, rec(x), `${f1(x.pf)} PF · racha ${x.streak}`, D.sim.remaining.length ? `${pct(sim[x.rid].playoff)} playoffs` : (x.rank <= D.playoffTeams ? "En playoffs" : "Fuera"))).join(""), `<div class="tbl-wrap"><table><thead><tr><th>#</th><th class="sticky-col">Equipo</th><th>Récord</th><th class="r">PF</th><th class="r hide-m">PC</th><th class="r hide-m">Máx</th><th class="r">Efic.</th><th class="hide-m">All-play</th><th class="r">Suerte</th><th class="c">Racha</th><th class="r">Playoffs</th></tr></thead><tbody>${rows}</tbody></table></div>`)}
       <p class="small faint">PF: puntos a favor · PC: en contra · Máx: lo que hubiera sumado con el lineup perfecto · All-play: récord si jugara contra todos cada semana · Suerte: victorias reales menos las esperadas por puntos.</p>
       ${D.sim.remaining.length ? renderOdds() : ""}
       ${topScorersHTML()}`;
-    bindBreaking();
     const ts = $("#imgTop"); if (ts) ts.onclick = () => UI.makeImage(cardTop(), `mas-puntos-por-semana`);
     $("#imgStand").onclick = () => UI.makeImage(cardStandings(), `tabla-semana-${w}`);
     const ib = $("#imgOdds"); if (ib) ib.onclick = () => UI.makeImage(cardOdds(), `playoffs-semana-${w}`);
@@ -85,7 +99,7 @@
       <td class="r num"><b>${pct(o.playoff)}</b></td><td class="r num">${pct(o.bye)}</td><td class="r num hide-m">${pct(o.first)}</td><td class="r num ${o.last > 0.25 ? "bad" : ""}">${pct(o.last)}</td></tr>`;
     }).join("");
     return `<div class="row" style="margin-top:20px"><div><div class="h3" style="margin:0">Probabilidades de playoffs</div><p class="sub" style="margin:4px 0 10px">${D.sim.N.toLocaleString()} simulaciones de las semanas ${D.lastScored + 1}–${D.regEnd} con el calendario real</p></div><span class="sp"></span><button class="btn" id="imgOdds">${IC("image", 16)} Imagen</button></div>
-      <div class="tbl-wrap"><table><thead><tr><th class="sticky-col">Equipo</th><th class="r hide-m">Victorias proy.</th><th class="r">Playoffs</th><th class="r">Bye</th><th class="r hide-m">#1</th><th class="r">Último</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      ${UI.mtable(ord.map((r, k) => UI.mrow(D, r, k + 1, pct(sim[r].playoff), `Bye ${pct(sim[r].bye)} · Último ${pct(sim[r].last)}`, `${f1(sim[r].wins)} V proy.`)).join(""), `<div class="tbl-wrap"><table><thead><tr><th class="sticky-col">Equipo</th><th class="r hide-m">Victorias proy.</th><th class="r">Playoffs</th><th class="r">Bye</th><th class="r hide-m">#1</th><th class="r">Último</th></tr></thead><tbody>${rows}</tbody></table></div>`)}`;
   }
   function cardStandings() {
     const w = Math.min(D.lastScored, D.regEnd);
@@ -104,6 +118,17 @@
   }
 
 
+  function miniTabla() {
+    const st = D.standings;
+    if (!st[0] || !st[0].gp) return "";
+    return `<div class="h3">La tabla</div>${st.slice(0, 6).map((x) => UI.mrow(D, x.rid, x.rank, rec(x), `${f1(x.pf)} PF`, D.sim.remaining.length ? `${pct(D.sim.out[x.rid].playoff)} playoffs` : "")).join("")}
+      <div style="margin-top:10px"><a class="btn" href="#tabla">Ver la tabla completa</a></div>`;
+  }
+  function renderEquipo() {
+    if (sel.team == null) { try { const t = Number(localStorage.getItem("lb-team")); if (t && D.teams[t]) sel.team = t; } catch (e) {} }
+    LB.teampage.render(D, $("#s-equipo"), sel.team, (r) => { location.hash = "equipo-" + r; });
+  }
+  LB.openArticle = (e) => openArticle(e);
   /* ---- Instalar como app ---- */
   function installHTML() {
     let off = false; try { off = localStorage.getItem("lb-install-off") === "1"; } catch (e) {}
@@ -299,7 +324,7 @@
       extra = `<div class="stats" style="margin-top:8px"><span>Máximo posible: <b>${f1(M.ta.max)}</b> vs <b>${f1(M.tb.max)}</b></span><span>Pts en banca: <b>${f1(M.ta.max - M.ta.pf)}</b> vs <b>${f1(M.tb.max - M.tb.pf)}</b></span></div>`;
     }
     return `<div class="card mu">
-      <div class="row" style="padding:10px 14px 0"><span class="tag">${label}</span>${UI.rivals(D_, M.g.a, M.g.b) ? `<span class="tag" style="color:var(--bad)">${IC("flame", 12)} Rivalidad</span>` : ""}<span class="sp"></span><button class="btn" style="padding:5px 10px;font-size:12.5px" id="muImg${i}">${IC("image", 16)}</button></div>
+      <div class="row" style="padding:10px 14px 0"><span class="tag">${label}</span>${UI.rivals(D_, M.g.a, M.g.b) ? `<span class="tag" style="color:var(--coral)">${esc(UI.rivals(D_, M.g.a, M.g.b))}</span>` : ""}}<span class="sp"></span><button class="btn" style="padding:5px 10px;font-size:12.5px" id="muImg${i}">${IC("image", 16)}</button></div>
       <div class="mu-head">${side(M.g.a, sA, aWin, M.sa)}<div class="mu-vs">VS</div>${side(M.g.b, sB, bWin, M.sb)}</div>
       ${!M.played ? `<div style="padding:0 14px 12px"><div class="row small muted" style="margin-bottom:4px"><span>${pct(wpA)}</span><span class="sp"></span><span>Prob. de ganar</span><span class="sp"></span><span>${pct(1 - wpA)}</span></div><div class="wp"><i style="width:${wpA * 100}%"></i></div></div>` : ""}
       <div class="mu-body"><p style="margin:0;font-size:14px">${esc(txt)}</p>
@@ -499,7 +524,7 @@
   /* ============ arranque ============ */
   function renderAll() {
     header();
-    [renderInicio, renderPower, renderSemana, renderManianera, renderPlayoffs, renderRoast, renderH2H, renderCalendarios, renderMovimientos, renderDraft, renderOscars, renderHistoria].forEach((f) => {
+    [renderInicio, renderPower, renderSemana, renderManianera, renderPlayoffs, renderRoast, renderH2H, renderEquipo, renderCalendarios, renderMovimientos, renderDraft, renderOscars, renderHistoria].forEach((f) => {
       try { f(); } catch (e) { console.error(e); }
     });
   }

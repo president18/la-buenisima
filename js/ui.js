@@ -44,10 +44,19 @@
     return src ? `<img class="${cls}" src="${src}" alt="" onerror="this.outerHTML='<div class=&quot;${cls}&quot;>LB</div>'">` : `<div class="${cls}">LB</div>`;
   };
   UI.rivals = (D, a, b) => {
-    const oa = D.teams[a].owners, ob = D.teams[b].owners;
-    return (CFG.rivalries || []).some(([x, y]) => (oa.includes(x) && ob.includes(y)) || (oa.includes(y) && ob.includes(x)));
+    const low = (arr) => arr.map((x) => (x || "").toLowerCase());
+    const oa = low(D.teams[a].owners), ob = low(D.teams[b].owners);
+    for (const r of CFG.rivalries || []) {
+      const x = (Array.isArray(r) ? r[0] : r.a || "").toLowerCase(), y = (Array.isArray(r) ? r[1] : r.b || "").toLowerCase();
+      if ((oa.includes(x) && ob.includes(y)) || (oa.includes(y) && ob.includes(x))) return (Array.isArray(r) ? "Rivalidad" : r.name) || "Rivalidad";
+    }
+    return null;
   };
 
+
+  /* ---- tablas en celular: lista con datos clave + botón para la tabla completa ---- */
+  UI.mrow = (D, rid, rank, main, sub, right) => `<div class="ml-row ${UI.isMine(D, rid) ? "me" : ""}"><span class="ml-rk">${rank}</span>${UI.avatar(D.teams[rid], "sm")}<div class="ml-t"><div class="tn">${esc(D.teams[rid].name)}</div><div class="to">${esc(sub || "")}</div></div><div class="ml-v"><b>${main}</b>${right ? `<span>${right}</span>` : ""}</div></div>`;
+  UI.mtable = (listHTML, tableHTML) => `<div class="mt"><div class="mt-list">${listHTML}</div><div class="mt-full">${tableHTML}</div><button class="btn mt-tog" onclick="var m=this.parentNode;m.classList.toggle('full');this.textContent=m.classList.contains('full')?'Ver lista':'Ver tabla completa'">Ver tabla completa</button></div>`;
   /* ---------------- textos ---------------- */
   const pick = (R, arr) => arr[Math.floor(R() * arr.length)];
   const fill = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => (o[k] != null ? String(o[k]).trim() : "")).replace(/\.\.(?!\.)/g, ".");
@@ -57,18 +66,19 @@
     const t = D.teams[row.rid];
     const sim = D.sim && D.sim.out[row.rid];
     const o = { team: t.name, rec: UI.rec(row), ppg: UI.f1(row.ppg), l3: UI.f1(row.last3), eff: Math.round(row.eff * 100), luck: Math.abs(row.luck).toFixed(1), po: sim ? Math.round(sim.playoff * 100) : null };
+    o.own = t.ownersNick;
     const out = [];
-    if (row.prank === 1) out.push(pick(R, ["El equipo a vencer, y no está cerca.", "Número uno y con argumentos: {ppg} pts por semana.", "Aquí está la vara. Todos los demás están jugando por el segundo lugar… por ahora."]));
-    else if (row.prank <= 3) out.push(pick(R, ["Contendiente serio, de los que nadie quiere en playoffs.", "Top 3 con todas las de la ley.", "Se ve que va en serio: {rec} y {ppg} pts por partido."]));
-    else if (row.prank >= total) out.push(pick(R, ["El sótano tiene dueño. Ya huele a castigo.", "Último en el power. Hay que pedir milagro… o un trade.", "Ni el waiver lo salva esta semana."]));
-    else if (row.prank >= total - 2) out.push(pick(R, ["Zona de peligro. Necesita reaccionar ya.", "Va cuesta abajo y sin frenos.", "Le urge una semana grande para no quedarse atrás."]));
-    else out.push(pick(R, ["En la pelea, sin ser favorito.", "Equipo de media tabla buscando identidad.", "Puede ganarle a cualquiera… y perder con cualquiera."]));
-    if (row.luck >= 1.2) out.push(pick(R, ["Le están saliendo todas: lleva {luck} victorias más de lo que dicen sus puntos.", "La suerte trae su camiseta: +{luck} victorias sobre lo esperado."]));
-    else if (row.luck <= -1.2) out.push(pick(R, ["El calendario lo odia: {luck} victorias menos de lo que merecen sus puntos.", "Juega para más, pero le tocan rivales encendidos (−{luck} victorias de pura mala suerte)."]));
-    if (row.gp >= 3 && row.last3 > row.ppg * 1.1) out.push(pick(R, ["Viene encendido: {l3} pts por semana en las últimas 3.", "Tendencia hacia arriba: {l3} de promedio reciente."]));
-    else if (row.gp >= 3 && row.last3 < row.ppg * 0.9) out.push(pick(R, ["Se está enfriando: bajó a {l3} en las últimas 3.", "Alerta roja: solo {l3} pts por semana en el último mes."]));
-    if (row.eff < 0.86) out.push(pick(R, ["Y deja demasiados puntos en la banca (saca el {eff}% de su máximo).", "Alguien explíquele el lineup: {eff}% de eficiencia."]));
-    else if (row.eff > 0.93) out.push(pick(R, ["Lineup de cirujano: {eff}% de su máximo posible.", "Casi no se equivoca con titulares ({eff}% de eficiencia)."]));
+    if (row.prank === 1) out.push(pick(R, ["El equipo a vencer, y no está cerca.", "Número uno y con argumentos: {ppg} pts por semana.", "Aquí está la vara. Todos los demás están jugando por el segundo lugar… por ahora.", "{own} manda en la liga y lo sabe.", "Arriba de todos. La pregunta ya no es si llega a playoffs, sino quién lo baja.", "El rey de la colina, con {rec} y sin pedir permiso."]));
+    else if (row.prank <= 3) out.push(pick(R, ["Contendiente serio, de los que nadie quiere en playoffs.", "Top 3 con todas las de la ley.", "Se ve que va en serio: {rec} y {ppg} pts por partido.", "{own} está a un paso de la cima y lo está oliendo.", "Equipo peligroso: nadie quiere toparse con él en diciembre.", "Sin hacer ruido, ya está en el podio."]));
+    else if (row.prank >= total) out.push(pick(R, ["El sótano tiene dueño. Ya huele a castigo.", "Último en el power. Hay que pedir milagro… o un trade.", "Ni el waiver lo salva esta semana.", "{own}, el castigo ya tiene tu nombre escrito con lápiz. Todavía se puede borrar.", "Tocó fondo. Desde aquí solo se puede subir (en teoría).", "Si la temporada fuera una película, esta sería la parte triste."]));
+    else if (row.prank >= total - 2) out.push(pick(R, ["Zona de peligro. Necesita reaccionar ya.", "Va cuesta abajo y sin frenos.", "Le urge una semana grande para no quedarse atrás.", "{own} está viendo los playoffs por la ventana.", "Se le está haciendo tarde. Muy tarde.", "Le queda poca cuerda; cada partido ya es final."]));
+    else out.push(pick(R, ["En la pelea, sin ser favorito.", "Equipo de media tabla buscando identidad.", "Puede ganarle a cualquiera… y perder con cualquiera.", "Ni frío ni caliente: el clásico equipo de media tabla.", "{own} está en la zona gris: un par de semanas buenas y cambia todo.", "Ahí la lleva, sin pena ni gloria (por ahora)."]));
+    if (row.luck >= 1.2) out.push(pick(R, ["Le están saliendo todas: lleva {luck} victorias más de lo que dicen sus puntos.", "La suerte trae su camiseta: +{luck} victorias sobre lo esperado.", "Su récord está inflado: los puntos dicen que debería tener {luck} victorias menos.", "Si la suerte fuera un jugador, sería su MVP (+{luck} victorias)."]));
+    else if (row.luck <= -1.2) out.push(pick(R, ["El calendario lo odia: {luck} victorias menos de lo que merecen sus puntos.", "Juega para más, pero le tocan rivales encendidos (−{luck} victorias de pura mala suerte).", "Merecía {luck} victorias más. Que alguien le prenda una veladora.", "Más salado que un cacahuate japonés: −{luck} victorias de pura mala suerte."]));
+    if (row.gp >= 3 && row.last3 > row.ppg * 1.1) out.push(pick(R, ["Viene encendido: {l3} pts por semana en las últimas 3.", "Tendencia hacia arriba: {l3} de promedio reciente.", "Está en su mejor momento: {l3} pts en las últimas tres.", "Agarró vuelo: {l3} pts por semana últimamente."]));
+    else if (row.gp >= 3 && row.last3 < row.ppg * 0.9) out.push(pick(R, ["Se está enfriando: bajó a {l3} en las últimas 3.", "Alerta roja: solo {l3} pts por semana en el último mes.", "Se le apagó la luz: {l3} pts en las últimas tres.", "Bajón preocupante: {l3} de promedio reciente."]));
+    if (row.eff < 0.86) out.push(pick(R, ["Y deja demasiados puntos en la banca (saca el {eff}% de su máximo).", "Alguien explíquele el lineup: {eff}% de eficiencia.", "Su banca juega mejor que sus titulares ({eff}% de eficiencia).", "Los domingos se le olvida revisar el lineup ({eff}%)."]));
+    else if (row.eff > 0.93) out.push(pick(R, ["Lineup de cirujano: {eff}% de su máximo posible.", "Casi no se equivoca con titulares ({eff}% de eficiencia).", "Sabe exactamente a quién sentar: {eff}% de su máximo.", "Lineup al centímetro: {eff}%."]));
     if (o.po != null && week <= D.regEnd && D.sim.remaining.length) out.push(`Playoffs: ${o.po}%.`);
     return fill(out.slice(0, 3).join(" "), o);
   };
@@ -83,9 +93,9 @@
     const o = { w: UI.tName(D, W), l: UI.tName(D, L), ow: UI.oName(D, W), ol: UI.oName(D, L), sw: UI.f1(tW.pf), sl: UI.f1(tL.pf), m: UI.f1(margin), pw: topW ? UI.plName(D, topW.pid) : "", ppw: topW ? UI.f1(topW.pts) : "", pl: topL ? UI.plName(D, topL.pid) : "", ppl: topL ? UI.f1(topL.pts) : "", bench: UI.f1(tL.max - tL.pf) };
     if (tW.pf === tL.pf) return fill("Empate {sw} a {sl}. Nadie se lleva la gloria, todos se llevan la vergüenza.", o);
     let s;
-    if (margin < 5) s = pick(R, ["{w} se lo llevó por un pelo, {sw} a {sl}. Infarto hasta el último snap.", "Partidazo: {w} gana por apenas {m} pts. {ol} todavía no lo supera.", "Cardiaco. {w} {sw}, {l} {sl}. Diferencia: {m}."]);
-    else if (margin > 40) s = pick(R, ["Paliza. {w} le pasó por encima a {l}, {sw} a {sl}.", "{w} le metió {m} pts de diferencia a {l}. Esto fue un atropello.", "Se acabó temprano: {w} {sw}, {l} {sl}. Sin piedad."]);
-    else s = pick(R, ["{w} venció a {l} {sw} a {sl}.", "Triunfo sólido de {w}: {sw} contra {sl} de {l}.", "{w} hizo su chamba y le ganó a {l} por {m}."]);
+    if (margin < 5) s = pick(R, ["{w} se lo llevó por un pelo, {sw} a {sl}. Infarto hasta el último snap.", "Partidazo: {w} gana por apenas {m} pts. {ol} todavía no lo supera.", "Cardiaco. {w} {sw}, {l} {sl}. Diferencia: {m}.", "Se decidió en el Monday Night: {w} por {m} puntitos.", "{ow} sobrevivió: {sw} contra {sl}. {ol} va a revisar el lineup toda la semana."]);
+    else if (margin > 40) s = pick(R, ["Paliza. {w} le pasó por encima a {l}, {sw} a {sl}.", "{w} le metió {m} pts de diferencia a {l}. Esto fue un atropello.", "Se acabó temprano: {w} {sw}, {l} {sl}. Sin piedad.", "{ow} no tuvo compasión: {m} puntos de diferencia.", "Para {ol} el domingo terminó antes de empezar: {sl} contra {sw}."]);
+    else s = pick(R, ["{w} venció a {l} {sw} a {sl}.", "Triunfo sólido de {w}: {sw} contra {sl} de {l}.", "{w} hizo su chamba y le ganó a {l} por {m}.", "{ow} cumplió: {sw} a {sl} sobre {l}.", "Sin sobresaltos, {w} se impuso por {m}.", "{w} controló el partido de principio a fin: {sw}–{sl}."]);
     const parts = [s];
     if (topW) parts.push(pick(R, ["La figura: {pw} con {ppw} pts.", "{pw} cargó al equipo con {ppw}.", "MVP del partido: {pw} ({ppw} pts)."]));
     if (topL && topL.pts >= 20) parts.push(pick(R, ["Por {l} no alcanzó ni con {pl} ({ppl}).", "{pl} hizo {ppl} pero se quedó solo."]));
@@ -103,7 +113,8 @@
     const keyF = (favA ? M.topA : M.topB)[0], keyD = (favA ? M.topB : M.topA)[0];
     const o = { f: UI.tName(D, fav), d: UI.tName(D, dog), of: UI.oName(D, fav), od: UI.oName(D, dog), wp, rf: sf.W != null ? UI.rec(sf) : "", rd: sd.W != null ? UI.rec(sd) : "", kf: keyF ? UI.plName(D, keyF.pid) : "", kd: keyD ? UI.plName(D, keyD.pid) : "", pf: UI.f1(favA ? M.pa : M.pb), pd: UI.f1(favA ? M.pb : M.pa) };
     const parts = [];
-    if (UI.rivals(D, A, B)) parts.push(pick(R, ["RIVALIDAD. Esto no es un partido cualquiera.", "Duelo de rivales. Aquí se juega el orgullo."]));
+    const rv = UI.rivals(D, A, B);
+    if (rv) parts.push(pick(R, [`${rv.toUpperCase()}. Esto no es un partido cualquiera.`, `Se juega ${rv}, y aquí el récord no importa: importa el orgullo.`, `${rv}: la semana más esperada del calendario.`]));
     if (wp >= 70) parts.push(pick(R, ["{f} ({rf}) llega como favorito claro: {wp}% de probabilidad.", "En el papel no hay partido: {f} con {wp}% de ganar."]));
     else if (wp <= 56) parts.push(pick(R, ["Moneda al aire: {f} apenas {wp}% contra {d}.", "Partido parejísimo. Las proyecciones casi no separan a {f} y {d}."]));
     else parts.push(pick(R, ["{f} ({rf}) es favorito con {wp}%, pero {d} ({rd}) tiene con qué.", "Ventaja para {f} ({wp}%), sin nada asegurado."]));

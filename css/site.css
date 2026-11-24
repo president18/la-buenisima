@@ -228,6 +228,48 @@ tr.me td.sticky-col{background:var(--tint)}
 .ic-score{font-family:var(--fh);font-weight:700;font-size:50px;text-align:right;line-height:1;color:#2F5D50}
 .ic-foot{display:flex;justify-content:space-between;margin-top:24px;padding-top:14px;border-top:1.5px solid #22201C;color:#5F5B54;font-size:19px;letter-spacing:.08em;text-transform:uppercase}
 
+/* sub-pestañas de cada sección */
+.subtabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:14px 0 0;margin-bottom:-6px}
+.subtabs::-webkit-scrollbar{display:none}
+.subtabs button{flex:none;border:1px solid var(--line2);background:transparent;padding:6px 12px;border-radius:3px;font-family:var(--fh);font-weight:600;font-size:15px;letter-spacing:.03em;text-transform:uppercase;color:var(--tx2);cursor:pointer}
+.subtabs button.on{background:var(--tx);border-color:var(--tx);color:var(--bg)}
+
+/* lista para celular (tablas) */
+.mt-list{display:none}
+.mt-tog{display:none;margin-top:10px}
+.ml-row{display:grid;grid-template-columns:22px 26px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.ml-row.me{background:var(--tint);margin:0 -14px;padding:10px 14px}
+.ml-rk{font-family:var(--fh);font-weight:700;font-size:18px;color:var(--tx2);text-align:right}
+.ml-t{min-width:0}
+.ml-v{text-align:right;line-height:1.2}
+.ml-v b{font-family:var(--fh);font-size:20px;font-weight:700;display:block;font-variant-numeric:tabular-nums}
+.ml-v span{font-size:12px;color:var(--tx3)}
+.mt-list .ml-row:first-child{border-top:2px solid var(--tx)}
+
+/* página por equipo */
+.tp-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0;border-top:2px solid var(--tx)}
+.tp-chip{display:flex;align-items:center;gap:10px;border:0;border-bottom:1px solid var(--line);background:transparent;padding:12px 4px;text-align:left;font-weight:600;font-size:15px;cursor:pointer}
+.tp-chip:hover span{text-decoration:underline}
+.tp-chip.on{background:var(--tint)}
+.tp-head{display:flex;align-items:center;gap:16px;margin:6px 0 14px}
+.av.xl{width:72px;height:72px;font-size:28px}
+.tp-form{display:flex;gap:4px;margin-top:8px}
+.tp-f{width:22px;height:22px;display:grid;place-items:center;font-family:var(--fh);font-weight:700;font-size:13px;border-radius:2px}
+.tp-f.w{background:var(--forest);color:#fff}
+.tp-f.l{background:var(--card2);color:var(--tx2)}
+.tp-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--tx2);margin-top:6px}
+.tp-legend i{display:inline-block;width:16px;height:3px;vertical-align:middle;margin-right:5px}
+.tp-legend i.dash{border-top:2px dashed #8A857C;height:0}
+.tp-legend i.dot2{border-top:2px dotted #B9A47E;height:0}
+.tp-diag p{font-family:var(--fs);font-size:16px;line-height:1.55;margin:0 0 10px}
+.tp-grades{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0 24px;margin-top:6px}
+.tp-grade{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:start;padding:10px 0;border-top:1px solid var(--line)}
+.tp-grade>b{font-family:var(--fh);font-size:34px;line-height:1;color:var(--forest)}
+.tp-str{display:grid;grid-template-columns:90px 1fr 34px;gap:10px;align-items:center;padding:6px 0;font-size:14px}
+.tp-strbar{height:6px;background:var(--line)}
+.tp-strbar i{display:block;height:100%;background:var(--blue)}
+.tp-str b{text-align:right;font-family:var(--fh);font-size:17px}
+
 /* ---------- celular ---------- */
 @media (max-width:760px){
   .news-top{grid-template-columns:1fr}
@@ -278,4 +320,10 @@ tr.me td.sticky-col{background:var(--tint)}
   .toast{bottom:84px}
   .art-in{padding:16px 16px 80px}
   .art-body p{font-size:17px}
+  .mt-list{display:block}
+  .mt-full{display:none}
+  .mt-tog{display:inline-flex}
+  .mt.full .mt-list{display:none}
+  .mt.full .mt-full{display:block}
+  .subtabs{padding-top:12px}
 }

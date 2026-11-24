@@ -188,7 +188,8 @@
 
     const userById = {};
     users.forEach((u) => (userById[u.user_id] = u));
-    const nick = (u) => (u && (CFG.nicknames[u.display_name] || u.display_name)) || "Sin dueño";
+    const NK = {}; Object.keys(CFG.nicknames || {}).forEach((k) => (NK[k.toLowerCase()] = CFG.nicknames[k]));
+    const nick = (u) => (u && (NK[(u.display_name || "").toLowerCase()] || u.display_name)) || "Sin dueño";
     const teams = {};
     rosters.forEach((r) => {
       const u = userById[r.owner_id];
