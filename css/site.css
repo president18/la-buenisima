@@ -26,7 +26,8 @@
 :root[data-theme="dark"] .btn.pri{color:#14211C}
 :root[data-theme="dark"] .pill.b{background:#3A2422}
 :root[data-theme="dark"] .pill.y{background:#3A3024}
-:root[data-theme="dark"] .tp-f.w,:root[data-theme="dark"] .subtabs button.on,:root[data-theme="dark"] .tab.on{color:var(--bg)}
+:root[data-theme="dark"] .subtabs button.on{color:var(--bg)}
+:root[data-theme="dark"] .tab.on{color:var(--tx)}
 :root[data-theme="dark"] .tp-f.w{color:#14211C}
 :root[data-theme="dark"] .logo,:root[data-theme="dark"] .ic-logo{filter:brightness(.92)}
 :root[data-theme="dark"] .np-view{box-shadow:0 18px 50px rgba(0,0,0,.6)}
