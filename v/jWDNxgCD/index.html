@@ -9,8 +9,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=Playfair+Display:wght@700;900&family=Lora:ital,wght@0,400;0,700;1,400&family=UnifrakturMaguntia&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../css/site.css">
-<link rel="stylesheet" href="../../css/paper.css">
+<link rel="stylesheet" href="../../css/site.css?v=1795564413">
+<link rel="stylesheet" href="../../css/paper.css?v=1795564413">
 
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
 <link rel="icon" href="../../assets/icon-192.png">
@@ -64,7 +64,7 @@
     document.getElementById('loading').innerHTML = '<div><div style="color:#2F5D50"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h2 style="font-weight:300;letter-spacing:.14em;color:#E85A4F">LINK EXPIRADO</h2><p>Este link de La Buenísima ya no está disponible. Pídele uno nuevo al comisionado.</p></div>';
     return;
   }
-  var list = ["../../js/theme.js", "../../config.js", "../../js/icons.js", "../../js/core.js", "../../js/ui.js", "../../awards.js", "../../js/stories.js", "../../js/art.js", "../../js/newspaper.js", "../../js/awards.js", "../../js/history.js", "../../js/extras.js", "../../js/teampage.js", "../../js/league.js"];
+  var list = ["../../js/theme.js?v=1795564413", "../../config.js?v=1795564413", "../../js/icons.js?v=1795564413", "../../js/core.js?v=1795564413", "../../js/ui.js?v=1795564413", "../../awards.js?v=1795564413", "../../js/stories.js?v=1795564413", "../../js/art.js?v=1795564413", "../../js/newspaper.js?v=1795564413", "../../js/awards.js?v=1795564413", "../../js/history.js?v=1795564413", "../../js/extras.js?v=1795564413", "../../js/teampage.js?v=1795564413", "../../js/league.js?v=1795564413"];
   (function next(i){ if (i >= list.length) { document.dispatchEvent(new Event('DOMContentLoaded')); return; } var s = document.createElement('script'); s.src = list[i]; s.onload = function(){ next(i + 1); }; document.body.appendChild(s); })(0);
 })();
 </script>
