@@ -116,7 +116,14 @@
   let NEWS = [];
   function newsList() {
     const seen = new Set();
-    return LB.stories.events(D).filter((e) => e.imp >= 45).sort((a, b) => b.week - a.week || b.imp - a.imp).filter((e) => { const k = e.type + e.week + (e.rids || [])[0]; if (seen.has(k)) return false; seen.add(k); return true; });
+    const list = LB.stories.events(D).filter((e) => e.imp >= 45).sort((a, b) => b.week - a.week || b.imp - a.imp).filter((e) => { const k = e.type + e.week + (e.rids || [])[0]; if (seen.has(k)) return false; seen.add(k); return true; });
+    // Portada variada: las 6 notas de arriba no repiten tipo; clasificados/eliminados no abren la portada
+    const top = [], rest = [], used = new Set();
+    for (const e of list) {
+      const status = e.type === "clasificado" || e.type === "eliminado";
+      if (top.length < 6 && !used.has(e.type) && !(top.length === 0 && status)) { top.push(e); used.add(e.type); } else rest.push(e);
+    }
+    return [...top, ...rest];
   }
   const artImg = (e) => LB.art.toImg(LB.art.banner(e), 800, 450, "width:100%;height:100%;object-fit:cover");
   const thumbImg = (e) => LB.art.toImg(LB.art.thumb(e), 300, 300, "width:100%;height:100%;object-fit:cover");
