@@ -1,0 +1,240 @@
+/* ============ LA BUENÍSIMA WRAPPED ============ */
+/* --- visor --- */
+.wr-ov{position:fixed;inset:0;z-index:300;background:#0B0B0A;display:flex;flex-direction:column;padding:8px 8px calc(8px + env(safe-area-inset-bottom));color:#F4F1E8;font-family:"Barlow",sans-serif}
+.wr-bars{display:flex;gap:4px;padding:4px 4px 8px}
+.wr-bars i{flex:1;height:4px;background:rgba(255,255,255,.22);border-radius:3px;overflow:hidden}
+.wr-bars i b{display:block;height:100%;width:0;background:#fff}
+.wr-bars i.done b{width:100%}
+.wr-bars i.on b{animation:wrbar .5s ease-out forwards}
+@keyframes wrbar{from{width:0}to{width:100%}}
+.wr-stage{flex:1;position:relative;overflow:hidden;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;min-height:0}
+.wr-scale{transform-origin:top left;border-radius:22px;overflow:hidden}
+.wr-conf{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.wr-dock{display:flex;gap:10px;align-items:stretch;padding-top:8px}
+.wr-yt{flex:0 0 200px;width:200px;height:200px;border-radius:14px;overflow:hidden;background:#000}
+.wr-yt iframe{width:200px;height:200px;display:block}
+.wr-dinfo{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:8px}
+.wr-np{display:flex;gap:10px;align-items:center;min-width:0}
+.wr-np>div:last-child{min-width:0}
+.wr-np b{display:block;font:700 17px/1.15 "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wr-np span{display:block;font-size:13px;opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wr-eq{display:flex;gap:3px;align-items:flex-end;height:22px;flex:0 0 auto}
+.wr-eq i{width:4px;height:5px;background:#C8F169;border-radius:2px}
+.wr-ov.playing .wr-eq i{animation:wreq .9s ease-in-out infinite alternate}
+.wr-eq i:nth-child(2){animation-delay:-.3s!important}.wr-eq i:nth-child(3){animation-delay:-.6s!important}.wr-eq i:nth-child(4){animation-delay:-.15s!important}
+@keyframes wreq{from{height:4px}to{height:22px}}
+.wr-ythint{display:none;font-size:13px;background:#C8F169;color:#0F2A20;border-radius:8px;padding:6px 9px;font-weight:600}
+.wr-ythint.on{display:block}
+.wr-btns{display:flex;flex-wrap:wrap;gap:6px}
+.wr-btns button{font:700 14px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.06em;padding:9px 12px;border-radius:999px;border:1.5px solid rgba(244,241,232,.6);background:transparent;color:#F4F1E8;cursor:pointer}
+.wr-btns button[data-a="img"]{background:#F4F1E8;color:#121212;border-color:#F4F1E8}
+.wr-ov.nomus .wr-yt{display:none}
+.wr-ov.nomus .wr-dock{padding-top:6px}
+.wr-ov.nomus .wr-dinfo{flex-direction:row;align-items:center;justify-content:space-between}
+@media (min-width:900px){
+  .wr-ov{display:grid;grid-template-columns:1fr 280px;grid-template-rows:auto 1fr;padding:14px 18px}
+  .wr-bars{grid-column:1/-1}
+  .wr-stage{grid-column:1;grid-row:2}
+  .wr-dock{grid-column:2;grid-row:2;flex-direction:column;justify-content:flex-end;padding:0 0 0 18px}
+  .wr-yt{flex:0 0 auto;width:240px;height:240px}.wr-yt iframe{width:240px;height:240px}
+  .wr-dinfo{flex:0 0 auto}
+  .wr-ov.nomus .wr-dinfo{flex-direction:column;align-items:stretch}
+}
+
+/* --- tarjeta --- */
+.wr-card{width:1080px;height:1920px;box-sizing:border-box;padding:70px 80px;display:flex;flex-direction:column;font-family:"Barlow",sans-serif;position:relative;overflow:hidden}
+.wr-decor{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.wr-decor g{transform-box:fill-box;transform-origin:center}
+.wr-top,.wr-body,.wr-foot{position:relative;z-index:1}
+.wr-top{display:flex;align-items:center;gap:18px;font:800 30px "Barlow Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.wr-top img{width:70px;height:70px;border-radius:50%;object-fit:cover;border:4px solid currentColor}
+.wr-body{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0}
+.wr-foot{display:flex;justify-content:space-between;font:700 28px "Barlow Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+.wr-kick{margin-bottom:34px}
+.wr-kick span{display:inline-block;background:var(--fg);color:var(--bg);font:800 38px "Barlow Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;padding:12px 30px;border-radius:999px}
+.wr-title{font-family:"Barlow Condensed",sans-serif;font-weight:800;line-height:.9;text-transform:uppercase;margin-bottom:28px;letter-spacing:-.01em;overflow-wrap:normal;hyphens:none}
+.wr-w{display:inline-block}
+.wr-sub{font:800 40px "Barlow Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
+.wr-big{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:330px;line-height:.82;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.wr-big.ac{color:var(--ac)}
+.wr-big small{font-size:90px;margin-left:16px;letter-spacing:.02em;opacity:.8}
+.wr-line{font-size:54px;line-height:1.22;margin-top:22px;font-weight:500}
+.wr-line b{font-weight:800}
+.wr-line.lg{font-size:64px;line-height:1.14}
+.wr-line.dim{font-size:42px;opacity:.82}
+.wr-tiles{display:grid;gap:18px;margin-top:40px}
+.wr-tiles div{background:var(--fg);color:var(--bg);border-radius:26px;padding:26px 26px 22px;min-width:0}
+.wr-tiles div.hl{background:var(--ac);color:var(--bg)}
+.wr-tiles b{display:block;font:800 82px/1 "Barlow Condensed",sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wr-tiles span{display:block;font:700 26px "Barlow Condensed",sans-serif;letter-spacing:.08em;text-transform:uppercase;opacity:.8;margin-top:6px}
+.wr-chart{max-width:100%;height:auto;margin:30px 0 10px;overflow:visible}
+.wr-chart.sm{margin:30px 0 0}
+.wr-legend{display:flex;gap:14px;align-items:center;font:700 24px "Barlow Condensed",sans-serif;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.wr-legend i{display:inline-block;width:26px;height:26px;border-radius:6px}
+.wr-legend i.dash{background:none!important;border-top:4px dashed;height:0;border-radius:0}
+.wr-tap{display:flex;align-items:center;gap:20px;margin-top:80px;font:800 44px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.08em}
+.wr-tap i{width:70px;height:70px;border-radius:50%;background:var(--ac);position:relative;flex:0 0 auto}
+.wr-tap i::after{content:"";position:absolute;left:27px;top:20px;border-left:24px solid var(--bg);border-top:15px solid transparent;border-bottom:15px solid transparent}
+.wr-tap span{font-size:30px;opacity:.75;font-weight:700}
+.wr-row{display:flex;gap:40px;align-items:center;margin:20px 0}
+.wr-row.two{justify-content:space-between;gap:24px}
+.wr-side{flex:1}
+.wr-donut{flex:0 0 auto}
+
+/* adivina */
+.wr-guess{display:flex;flex-direction:column;gap:22px;margin:10px 0 40px}
+.wr-guess button{font:800 58px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.04em;padding:26px;border:6px solid currentColor;background:transparent;color:inherit;border-radius:999px;cursor:pointer}
+.wr-guess button.ok{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.wr-guess button.no{text-decoration:line-through;opacity:.55}
+.wr-guess button.off{opacity:.35}
+.wr-reveal.hid{visibility:hidden}
+.wr-reveal:not(.hid){animation:wrPop .6s cubic-bezier(.2,1.4,.4,1) both}
+
+/* tú vs la liga */
+.wr-vs{display:flex;flex-direction:column;gap:46px;margin-top:20px}
+.wr-vsl{display:flex;justify-content:space-between;align-items:baseline;font:700 36px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.05em;margin-bottom:18px}
+.wr-vsl b{font-size:64px;font-weight:800;color:var(--ac)}
+.wr-vsl small{font-size:30px;opacity:.7;color:var(--fg)}
+.wr-vsl span small{display:block;font-size:48px;opacity:1;font-weight:800;margin-top:2px}
+.wr-track{position:relative;height:16px;border-radius:8px;background:rgba(255,255,255,.16);margin:0 30px}
+.wr-track i{position:absolute;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:var(--fg);opacity:.55}
+.wr-track em{position:absolute;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:var(--ac);border:6px solid var(--bg);animation:wrSlideIn 1.1s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d)}
+.wr-track em u{position:absolute;bottom:56px;left:50%;transform:translateX(-50%);text-decoration:none;font:800 34px "Barlow Condensed",sans-serif;white-space:nowrap;color:var(--ac)}
+.wr-vse{display:flex;justify-content:space-between;font:700 22px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;opacity:.55;margin-top:14px}
+@keyframes wrSlideIn{from{left:0;opacity:0}}
+
+/* cromos */
+.wr-chromo{position:relative;width:560px;flex:0 0 auto;border-radius:34px;padding:16px;background:linear-gradient(135deg,#FFE9A8,#C9A227 30%,#FFF6D0 50%,#B8860B 70%,#FFE9A8);box-shadow:0 30px 60px rgba(0,0,0,.35);overflow:hidden;animation:wrTilt 5s ease-in-out infinite alternate}
+.wr-chromo.sm{width:430px;padding:12px}
+.wr-chromo.cursed{background:linear-gradient(135deg,#9A9A9A,#4A4A4A 40%,#A8A8A8 60%,#3A3A3A)}
+.wr-ch-in{background:#141414;border-radius:24px;overflow:hidden;color:#F4F1E8}
+.wr-ch-top{display:flex;align-items:center;gap:14px;padding:18px 22px;background:var(--pc);font:800 34px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.06em}
+.wr-ch-top span{opacity:.85;font-weight:700}
+.wr-ch-top em{margin-left:auto;font-style:normal;background:#141414;color:#FFD166;border-radius:999px;padding:4px 16px;font-size:26px}
+.wr-ch-art{position:relative;aspect-ratio:1/0.82;background:var(--pc);overflow:hidden}
+.wr-ch-art svg{width:100%;height:100%;display:block}
+.wr-chromo.cursed .wr-ch-art{filter:grayscale(1)}
+.wr-crack{position:absolute;inset:0;width:100%;height:100%}
+.wr-ch-name{font:800 50px/1 "Barlow Condensed",sans-serif;text-transform:uppercase;padding:22px 24px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wr-chromo.sm .wr-ch-name{font-size:40px}
+.wr-ch-stats{padding:6px 24px 10px}
+.wr-ch-stats div{display:flex;justify-content:space-between;gap:12px;border-top:2px solid rgba(244,241,232,.15);padding:10px 0;font:600 28px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.04em}
+.wr-chromo.sm .wr-ch-stats div{font-size:24px}
+.wr-ch-stats b{font-weight:800;color:#FFD166;white-space:nowrap}
+.wr-ch-foot{background:#FFD166;color:#141414;text-align:center;font:800 22px "Barlow Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;padding:9px}
+.wr-chromo.cursed .wr-ch-foot,.wr-chromo.cursed .wr-ch-stats b{background:none;color:#BDBDBD}
+.wr-chromo.cursed .wr-ch-foot{background:#2A2A2A}
+.wr-shine{position:absolute;top:-20%;left:-80%;width:40%;height:140%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:rotate(14deg);animation:wrShine 3.2s ease-in-out infinite;pointer-events:none}
+@keyframes wrShine{0%{left:-80%}60%,100%{left:140%}}
+@keyframes wrTilt{from{transform:perspective(1400px) rotateY(-9deg) rotateX(3deg)}to{transform:perspective(1400px) rotateY(9deg) rotateX(-2deg)}}
+
+/* jugador fiel: asistencia */
+.wr-att{display:grid;grid-template-columns:repeat(9,1fr);gap:14px;margin-top:50px}
+.wr-att div{aspect-ratio:1;border-radius:18px;border:5px solid currentColor;display:flex;align-items:center;justify-content:center;opacity:.35}
+.wr-att div.on{background:var(--ac);border-color:var(--ac);color:var(--bg);opacity:1;animation:wrPop .5s cubic-bezier(.2,1.4,.4,1) both;animation-delay:var(--d)}
+.wr-att b{font:800 34px "Barlow Condensed",sans-serif}
+
+/* banca */
+.wr-meter{display:flex;height:120px;border-radius:24px;overflow:hidden;margin:46px 0 10px;background:rgba(255,255,255,.12)}
+.wr-meter div{display:flex;align-items:center;padding:0 22px;font:800 34px "Barlow Condensed",sans-serif;text-transform:uppercase;white-space:nowrap;overflow:hidden;animation:wrGrowX 1.2s cubic-bezier(.2,.8,.2,1) both;transform-origin:left}
+.wr-meter .a{background:var(--fg);color:var(--bg)}
+.wr-meter .b{background:var(--ac);color:var(--bg);animation-delay:.6s}
+@keyframes wrGrowX{from{transform:scaleX(0)}}
+
+/* movidas: boletos */
+.wr-ticket{display:flex;align-items:stretch;margin-top:40px;background:var(--fg);color:var(--bg);border-radius:26px;overflow:hidden;position:relative;animation:wrIn .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i)*250ms + 300ms)}
+.wr-ticket>div{flex:1;padding:30px 34px;border-right:6px dashed var(--bg);min-width:0}
+.wr-ticket span{display:block;font:800 28px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.12em;opacity:.7}
+.wr-ticket b{display:block;font:800 52px/1.05 "Barlow Condensed",sans-serif;text-transform:uppercase;margin:8px 0}
+.wr-ticket em{display:block;font-style:normal;font-size:32px;opacity:.85}
+.wr-ticket strong{display:flex;align-items:center;justify-content:center;width:240px;font:800 74px "Barlow Condensed",sans-serif;background:var(--ac);color:var(--fg)}
+.wr-ticket.bad strong{background:#E4572E;color:#fff}
+
+/* tú contra ellos */
+.wr-duel{display:flex;align-items:center;gap:20px;margin:10px 0 40px}
+.wr-duel>div{flex:1;text-align:center;min-width:0}
+.wr-duel span{display:block;font:800 30px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.12em;opacity:.8}
+.wr-duel i{display:flex;align-items:center;justify-content:center;width:220px;height:220px;margin:18px auto;border-radius:50%;background:var(--ac);color:var(--bg);font:800 96px "Barlow Condensed",sans-serif;font-style:normal;animation:wrPop .6s cubic-bezier(.2,1.4,.4,1) both}
+.wr-duel>div:last-child i{background:var(--fg);animation-delay:.25s}
+.wr-duel b{display:block;font:800 52px/1 "Barlow Condensed",sans-serif;text-transform:uppercase}
+.wr-duel em{display:block;font-style:normal;font-size:32px;margin-top:8px}
+.wr-duel strong{font:800 90px "Barlow Condensed",sans-serif;animation:wrPop .6s .5s both}
+.wr-h2h{display:flex;flex-direction:column;gap:10px}
+.wr-h2h>div{display:grid;grid-template-columns:240px 1fr 110px 1fr;align-items:center;gap:14px;font:700 30px "Barlow Condensed",sans-serif;text-transform:uppercase;animation:wrIn .6s both;animation-delay:calc(var(--i)*80ms + 500ms)}
+.wr-h2h span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wr-h2h b{text-align:center;font-weight:800;font-size:36px}
+.wr-h2h .l{display:flex;justify-content:flex-end}.wr-h2h .l i{display:block;height:26px;border-radius:13px;background:var(--fg);opacity:.5}
+.wr-h2h .w i{display:block;height:26px;border-radius:13px;background:var(--ac)}
+
+/* personalidad */
+.wr-seal{display:block;margin:10px auto 20px;animation:wrPop .8s .3s cubic-bezier(.2,1.4,.4,1) both}
+.wr-sumhead{display:flex;align-items:center;gap:30px;margin:10px 0 0}
+.wr-sumhead .wr-seal{margin:0}
+.wr-sumhead span{display:block;font:800 30px "Barlow Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+.wr-sumhead b{display:block;font:800 76px/1 "Barlow Condensed",sans-serif;text-transform:uppercase;color:var(--ac)}
+.summary .wr-tiles b{font-size:62px}
+.summary .wr-kick{margin-bottom:22px}
+.wr-pills{display:flex;flex-wrap:wrap;gap:14px;margin:20px 0}
+.wr-pills span{background:var(--ac);color:var(--bg);font:800 34px "Barlow Condensed",sans-serif;text-transform:uppercase;padding:10px 24px;border-radius:999px;animation:wrPop .5s both;animation-delay:calc(var(--i)*150ms + 400ms)}
+
+/* liga */
+.wr-trophy{display:block;margin:0 0 20px;animation:wrPop .8s .2s cubic-bezier(.2,1.4,.4,1) both}
+.wr-score{display:flex;flex-direction:column;gap:18px;margin:30px 0}
+.wr-score>div{display:flex;justify-content:space-between;align-items:center;gap:20px;background:rgba(255,255,255,.08);border-radius:26px;padding:26px 36px;animation:wrIn .6s both}
+.wr-score>div:last-child{animation-delay:.25s}
+.wr-score b{font:800 52px/1 "Barlow Condensed",sans-serif;text-transform:uppercase;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wr-score strong{font:800 140px/1 "Barlow Condensed",sans-serif}
+.wr-score strong.ac{color:var(--ac)}
+.wr-rv{margin:22px 0;background:var(--fg);color:var(--bg);border-radius:26px;padding:24px 34px}
+.wr-rv span{display:block;font:800 32px "Barlow Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
+.wr-rv>div{display:flex;align-items:center;gap:20px;font-family:"Barlow Condensed",sans-serif;text-transform:uppercase}
+.wr-rv b{flex:1;font-size:46px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wr-rv b:last-child{text-align:right}
+.wr-rv strong{font-size:110px;font-weight:800;line-height:1}
+.wr-rv em{font-size:60px;font-style:normal}
+.wr-list>div{display:flex;justify-content:space-between;align-items:baseline;gap:20px;border-bottom:3px solid rgba(244,241,232,.18);padding:18px 0;font-size:40px;animation:wrIn .5s both;animation-delay:calc(var(--i)*90ms + 300ms)}
+.wr-list b{font:800 46px "Barlow Condensed",sans-serif;text-transform:uppercase;text-align:right;color:var(--ac)}
+
+/* --- animaciones --- */
+.wr-body>*{animation:wrIn .75s cubic-bezier(.2,.8,.2,1) both}
+.wr-body>*:nth-child(2){animation-delay:.12s}.wr-body>*:nth-child(3){animation-delay:.3s}.wr-body>*:nth-child(4){animation-delay:.48s}.wr-body>*:nth-child(5){animation-delay:.66s}.wr-body>*:nth-child(6){animation-delay:.84s}.wr-body>*:nth-child(7){animation-delay:1s}
+.wr-title .wr-w{animation:wrWord .7s cubic-bezier(.2,1.2,.3,1) both;animation-delay:calc(var(--d) + .15s)}
+.wr-big{animation:wrPop .8s cubic-bezier(.2,1.4,.4,1) both!important}
+.wr-tiles div{animation:wrIn .6s both;animation-delay:calc(var(--i)*110ms + .5s)}
+.wr-grow{transform-box:fill-box;transform-origin:bottom;animation:wrGrowY .8s cubic-bezier(.2,.8,.2,1) both}
+.wr-pop{transform-box:fill-box;transform-origin:center;animation:wrPop .5s cubic-bezier(.2,1.4,.4,1) both}
+.wr-fade{animation:wrFade .8s both}
+.wr-draw{stroke-dasharray:5000;animation:wrDraw 1.8s ease-out both}
+.wr-dash{animation:wrDash 1.4s .4s cubic-bezier(.2,.8,.2,1) both}
+.wr-needle{transform-box:view-box;transform-origin:300px 300px;animation:wrNeedle 1.6s .4s cubic-bezier(.3,1.5,.5,1) both}
+.wr-f1{animation:wrFloat1 7s ease-in-out infinite alternate}
+.wr-f2{animation:wrFloat2 9s ease-in-out infinite alternate}
+.wr-f3{animation:wrFloat1 5s ease-in-out infinite alternate-reverse}
+.wr-slide{animation:wrSlide 6s linear infinite}
+.wr-pulse{animation:wrPulse 4s ease-in-out infinite}
+.wr-spin{animation:wrSpin 40s linear infinite}
+.wr-wave{animation:wrWave 6s linear infinite}
+.wr-rot{animation:wrRot 9s ease-in-out infinite alternate}
+.wr-tw{animation:wrTw 2.4s ease-in-out infinite}
+@keyframes wrIn{from{opacity:0;transform:translateY(60px)}}
+@keyframes wrWord{from{opacity:0;transform:translateY(80%) rotate(4deg)}}
+@keyframes wrPop{from{opacity:0;transform:scale(.4)}}
+@keyframes wrFade{from{opacity:0}}
+@keyframes wrGrowY{from{transform:scaleY(0)}}
+@keyframes wrDraw{from{stroke-dashoffset:5000}to{stroke-dashoffset:0}}
+@keyframes wrDash{from{stroke-dashoffset:var(--c)}}
+@keyframes wrNeedle{from{transform:rotate(-90deg)}}
+@keyframes wrFloat1{to{transform:translate(-60px,50px) scale(1.08)}}
+@keyframes wrFloat2{to{transform:translate(70px,-60px) scale(.94)}}
+@keyframes wrSlide{to{transform:translateX(380px)}}
+@keyframes wrPulse{50%{transform:scale(1.06)}}
+@keyframes wrSpin{to{transform:rotate(360deg)}}
+@keyframes wrWave{to{transform:translateX(280px)}}
+@keyframes wrRot{to{transform:rotate(90deg) scale(1.1)}}
+@keyframes wrTw{50%{opacity:.05}}
+/* exportar como imagen: estado final, sin animación */
+.wr-export *,.wr-export *::after{animation:none!important;transition:none!important}
+.wr-export .wr-reveal.hid{visibility:visible}
+.wr-export .wr-chromo{transform:none}
+.wr-export .wr-shine{display:none}
+@media (prefers-reduced-motion:reduce){.wr-ov *{animation-duration:.01s!important;animation-iteration-count:1!important}}
