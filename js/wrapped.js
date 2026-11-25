@@ -520,7 +520,7 @@
     const load = () => {
       const s = SONGS[M.cur]; if (!s) return;
       const id = s.ids[M.idx]; if (!id) { label(M.cur, "No disponible aquí"); M.B.setMood("hype"); M.B.fade(0.55); return; }
-      try { M.pl.setVolume(0); M.pl.loadVideoById({ videoId: id, startSeconds: s.s || 0 }); } catch (e) {}
+      try { M.pl.unMute(); M.pl.setVolume(0); M.pl.loadVideoById({ videoId: id, startSeconds: s.s || 0 }); } catch (e) {}
       label(M.cur);
       setTimeout(() => ramp(85, 900), 400);
       setTimeout(() => { try { if (M.on && M.cur && isYT(M.cur) && M.pl.getPlayerState() !== 1 && M.pl.getPlayerState() !== 3) hint.classList.add("on"); } catch (e) {} }, 3500);
@@ -602,7 +602,7 @@
     document.body.appendChild(ov);
     document.body.style.overflow = "hidden";
     const scale = ov.querySelector(".wr-scale"), stage = ov.querySelector(".wr-stage"), cv = ov.querySelector(".wr-conf");
-    const M = Music(ov);
+    const M = Music(ov); W._M = M;
     const fit = () => { const s = Math.min(stage.clientWidth / 1080, stage.clientHeight / 1920); scale.style.transform = `scale(${s})`; scale.style.width = "1080px"; scale.style.height = "1920px"; scale.style.marginLeft = (stage.clientWidth - 1080 * s) / 2 + "px"; };
     const boom = () => { const c = cards[i]; const st = getComputedStyle(scale.firstElementChild); confetti(cv, [st.getPropertyValue("--ac").trim() || "#C8F169", st.getPropertyValue("--fg").trim() || "#fff", "#FF5A36", "#FFD166", "#7CF2C2", "#FF8BA7"]); };
     const show = () => {
