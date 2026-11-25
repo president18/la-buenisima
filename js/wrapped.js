@@ -47,7 +47,7 @@
     vsliga: { t: "Tú contra Todos", a: BEAT_A, beat: "battle" },
     mvp: { t: "Salón de la Fama", a: BEAT_A, beat: "epic" },
     fiel: { t: "Siempre Titular", a: BEAT_A, beat: "chill" },
-    ladrillo: { t: "Ladrillazo", a: BEAT_A, beat: "oompa" },
+    ladrillo: { t: "Ladrillazo", a: BEAT_A, beat: "ladrillo" },
     banca: { t: "La Banca Llora", a: BEAT_A, beat: "sad" },
     movidas: { t: "Wall Street", a: BEAT_A, beat: "funk" },
     versus: { t: "Némesis", a: BEAT_A, beat: "battle" },
@@ -412,90 +412,251 @@
   };
 
 
-  /* ---------------- beats originales (Web Audio) ---------------- */
-  // Cada "mood" es un loop de 4 compases. prog: [semitonos desde la raíz, "M" mayor | "m" menor | "7" dominante]
+
+  /* ---------------- beats originales (Web Audio) ----------------
+     Motor con reverb, delay, sidechain, piano eléctrico FM, supersaw, 808,
+     hats metálicos y clap. Cada estilo es un loop de 4 compases (16 pasos). */
+  const _ = null;
   const MOODS = {
-    hype: { bpm: 124, root: 45, prog: [[0, "m"], [-4, "M"], [3, "M"], [-2, "M"]], k: "x...x...x...x...", s: "....x.......x...", h: "..x...x...x...x.", hh: "x.x.x.x.x.x.x.x.", b: "..0...0...0...0.", arp: "0.1.2.1.0.1.2.1.", stab: "x.......x.......", cut: 1800 },
-    rusa: { bpm: 116, root: 48, prog: [[0, "M"], [5, "M"], [-3, "m"], [7, "M"]], k: "x.......x.......", s: "....x.......x...", h: "x.x.x.x.x.x.x.x.", b: "0.....0.0.....0.", arp: "0123210123432101", cut: 2400 },
-    suspense: { bpm: 100, root: 43, prog: [[0, "m"], [0, "m"], [1, "M"], [1, "M"]], k: "x..x............", s: "................", h: "x...x...x...x...", b: "0...............", arp: "2.2.2.2.2.2.2.2.", pad: 1, cut: 900, rise: 1 },
-    battle: { bpm: 140, root: 38, prog: [[0, "m"], [0, "m"], [-2, "M"], [1, "M"]], k: "x.x...x.x.x...x.", s: "....x.......x..x", h: "xxxxxxxxxxxxxxxx", b: "0.0.0.0.0.0.0.0.", stab: "x..x..x.........", cut: 1500 },
-    epic: { bpm: 84, root: 48, prog: [[0, "M"], [7, "M"], [9, "m"], [5, "M"]], k: "x.........x.....", s: "........x.......", h: "..x...x...x...x.", b: "0.......0.......", arp: "0.1.2.3.2.1.0.1.", pad: 1, cut: 2200 },
-    chill: { bpm: 92, root: 50, prog: [[0, "M"], [-3, "m"], [5, "M"], [7, "M"]], k: "x......x..x.....", s: "....x.......x...", h: "x.x.x.x.x.x.x.x.", b: "0......0..0.....", pad: 1, cut: 1100, swing: 0.18 },
-    sad: { bpm: 70, root: 45, prog: [[0, "m"], [-4, "M"], [3, "M"], [-2, "M"]], k: "x.........x.....", s: "", h: "", b: "0...............", arp: "0..1..2..1..0...", pad: 1, cut: 800 },
-    funk: { bpm: 108, root: 40, prog: [[0, "7"], [0, "7"], [5, "7"], [7, "7"]], k: "x..x..x...x..x..", s: "....x.......x...", h: "xxxxxxxxxxxxxxxx", b: "0..0.0..0.3.5..7", stab: "..x...x...x...x.", cut: 2000, swing: 0.1 },
-    lounge: { bpm: 118, root: 46, prog: [[0, "M"], [9, "m"], [2, "m"], [7, "7"]], k: "x.......x.......", s: "....x.......x...", h: "x..xx..xx..xx..x", b: "0...4...7...4...", stab: "....x.......x...", cut: 1600, swing: 0.22 },
-    oompa: { bpm: 96, root: 41, prog: [[0, "M"], [7, "7"], [0, "M"], [7, "7"]], k: "x.......x.......", s: "....x.......x...", h: "", b: "0.......7.......", stab: "....x.......x...", cut: 900, tuba: 1 },
-    sprint: { bpm: 150, root: 42, prog: [[0, "m"], [-4, "M"], [-2, "M"], [-5, "M"]], k: "x...x...x...x...", s: "....x.......x...", h: "..x...x...x...x.", hh: "xxxxxxxxxxxxxxxx", b: "0.0.0.0.0.0.0.0.", arp: "0.2.1.2.0.2.1.2.", cut: 2600 },
+    // Trap: 808, hats con redobles, clap, campanita
+    hype: { bpm: 140, duck: 1, crackle: 0,
+      bars: [{ c: [60, 63, 67], r: 36 }, { c: [60, 63, 68], r: 32 }, { c: [58, 63, 67], r: 39 }, { c: [58, 62, 65], r: 34 }],
+      kick: "x......x..x.....", clap: "........x.......", hat: "x.x.x.x.x.x.x.x.", roll: 1, b808: "x......x..x.....",
+      pad: "super", padCut: 1400, padV: 0.6,
+      lead: { type: "bell", v: 0.9, notes: [[75, _, _, 72, _, _, 70, _, 72, _, _, _, 67, _, 70, _], [72, _, _, 75, _, _, 77, _, 79, _, 77, _, 75, _, 72, _]] } },
+    // Synthwave épico
+    epic: { bpm: 104, duck: 1,
+      bars: [{ c: [57, 60, 64], r: 45 }, { c: [57, 60, 65], r: 41 }, { c: [55, 60, 64], r: 48 }, { c: [55, 59, 62], r: 43 }],
+      kick: "x...x...x...x...", snare: "....x.......x...", hat: "..x...x...x...x.", bass: { type: "saw", pat: "0.1.0.1.0.1.0.1." },
+      pad: "super", padCut: 2200, padV: 0.8, arp: { pat: [0, 1, 2, 1, 0, 1, 2, 1, 0, 1, 2, 1, 0, 1, 2, 3], oct: 12, v: 0.55 },
+      lead: { type: "pluck", v: 0.7, notes: [[76, _, _, _, _, _, 74, _, 72, _, _, _, 71, _, _, _], [72, _, _, _, 74, _, _, _, 76, _, _, _, 79, _, 76, _]] } },
+    // Synthpop que sube y baja
+    rusa: { bpm: 122, duck: 1,
+      bars: [{ c: [60, 64, 67], r: 48 }, { c: [59, 62, 67], r: 43 }, { c: [60, 64, 69], r: 45 }, { c: [60, 65, 69], r: 41 }],
+      kick: "x...x...x...x...", clap: "....x.......x...", hat: "xxxxxxxxxxxxxxxx", hatV: 0.45, ohat: "..x...x...x...x.", bass: { type: "saw", pat: "0..0..0.0..0..0." },
+      pad: "super", padCut: 1800, padV: 0.55, arp: { pat: [0, 1, 2, 3, 4, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5], oct: 12, v: 0.6, climb: 1 } },
+    // Lo-fi para relajarse
+    chill: { bpm: 80, swing: 0.2, crackle: 1,
+      bars: [{ c: [53, 57, 60, 64], r: 41 }, { c: [52, 55, 59, 62], r: 40 }, { c: [50, 53, 57, 60], r: 38 }, { c: [48, 52, 55, 59], r: 36 }],
+      kick: "x.......x.x.....", snare: "....x.......x...", snareSoft: 1, hat: "x.x.x.x.x.x.x.x.", hatV: 0.5, bass: { type: "sine", pat: "0.........0....." },
+      keys: "x......x..x.....", epV: 1.3,
+      lead: { type: "ep", v: 0.8, notes: [[72, _, _, _, 69, _, _, 67, _, _, 64, _, _, _, _, _], [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _], [65, _, _, _, 64, _, _, 62, _, _, 60, _, _, _, _, _], [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]] } },
+    // Lo-fi con trombón triste
+    ladrillo: { bpm: 80, swing: 0.2, crackle: 1, trombone: 1,
+      bars: [{ c: [52, 55, 59, 60], r: 36 }, { c: [52, 55, 57, 60], r: 45 }, { c: [53, 57, 60, 62], r: 38 }, { c: [53, 55, 59, 62], r: 43 }],
+      kick: "x.......x.x.....", snare: "....x.......x...", snareSoft: 1, hat: "x.x.x.x.x.x.x.x.", hatV: 0.5, bass: { type: "sine", pat: "0.........0....." }, keys: "x......x........" },
+    // Casino / lounge con bajo caminante
+    lounge: { bpm: 112, swing: 0.28,
+      bars: [{ c: [53, 57, 60, 64], walk: [38, 41, 45, 48] }, { c: [53, 59, 62, 65], walk: [43, 47, 50, 53] }, { c: [52, 55, 59, 62], walk: [36, 40, 43, 45] }, { c: [55, 61, 64, 67], walk: [45, 44, 43, 40] }],
+      kick: "x.......x.......", kickV: 0.5, rim: "....x.......x...", hat: "x...x.x.x...x.x.", hatV: 0.55, keys: "x.....x...x.....",
+      lead: { type: "bell", v: 0.5, notes: [[_, _, _, _, _, _, _, _, 77, _, 76, _, 74, _, 72, _], [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]] } },
+    // Suspenso: reloj, latido y tensión que sube
+    suspense: { bpm: 120, riser: 1,
+      bars: [{ c: [48, 51, 55], r: 36 }, { c: [48, 51, 55], r: 36 }, { c: [49, 52, 56], r: 37 }, { c: [48, 51, 54], r: 36 }],
+      kick: "x..x............", kickV: 0.7, tick: "x...x...x...x...", bass: { type: "pulse", pat: "xxxxxxxxxxxxxxxx" }, pad: "dark", padCut: 700, padV: 0.7 },
+    // Triste: piano eléctrico con mucha reverb
+    sad: { bpm: 66,
+      bars: [{ c: [57, 60, 64, 69], r: 45 }, { c: [53, 57, 60, 65], r: 41 }, { c: [52, 55, 60, 64], r: 36 }, { c: [50, 55, 59, 62], r: 43 }],
+      rim: "............x...", arpEp: [0, _, 1, _, 2, _, 3, _, 2, _, 1, _, 2, _, 1, _], keysLow: 1, epV: 2.4, pad: "super", padCut: 900, padV: 0.5 },
+    // Funk / disco
+    funk: { bpm: 112, duck: 0,
+      bars: [{ c: [64, 67, 71], r: 40 }, { c: [64, 67, 71], r: 40 }, { c: [61, 64, 67], r: 45 }, { c: [61, 64, 67], r: 45 }],
+      kick: "x.....x...x.....", clap: "....x.......x...", hat: "xxxxxxxxxxxxxxxx", hatV: 0.4, ohat: "..x...x...x...x.",
+      bass: { type: "funk", notes: [0, _, 12, _, _, 0, _, 0, _, 12, _, _, 10, _, 12, _] }, clav: "..x..x.x..x..x.x" },
+    // Batalla: épico con tambores y bajo distorsionado
+    battle: { bpm: 150, duck: 0,
+      bars: [{ c: [62, 65, 69], r: 38 }, { c: [62, 65, 70], r: 34 }, { c: [60, 64, 67], r: 36 }, { c: [61, 64, 69], r: 33 }],
+      kick: "x.x...x.x.x...x.", snare: "....x.......x...", hat: "x.x.x.x.x.x.x.x.", hatV: 0.6, bass: { type: "reese", pat: "x.x.x.x.x.x.x.x." },
+      brass: "x..x..x.........", tomFill: 1 },
+    // Sprint: drum & bass
+    sprint: { bpm: 172, duck: 1,
+      bars: [{ c: [56, 60, 65], r: 41 }, { c: [56, 61, 65], r: 37 }, { c: [56, 60, 63], r: 44 }, { c: [55, 58, 63], r: 39 }],
+      kick: "x.........x.....", snare: "....x.......x...", hat: "..x...x...x...x.", hatV: 0.7, ohat: "......x.......x.", bass: { type: "reese", pat: "x..............." , long: 1 },
+      pad: "super", padCut: 2000, padV: 0.6, arp: { pat: [0, 1, 2, 1, 0, 1, 2, 1, 0, 1, 2, 1, 0, 1, 2, 1], oct: 24, v: 0.4 } },
   };
   const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
-  function chordOf(root, [off, q]) { const r = root + off; return q === "m" ? [r, r + 3, r + 7, r + 12] : q === "7" ? [r, r + 4, r + 7, r + 10] : [r, r + 4, r + 7, r + 12]; }
+  W._Beat = () => Beat();
 
   function Beat() {
     const AC = window.AudioContext || window.webkitAudioContext;
-    const B = { ctx: null, mood: null, next: null, on: false, step: 0, bar: 0, t: 0, timer: null };
-    let master, comp, noise;
+    const B = { ctx: null, mood: null, next: null, step: 0, bar: 0, t: 0, timer: null, sfxOn: true };
+    let X, master, noise, ch = {}, delay;
     B.init = () => {
       if (B.ctx || !AC) return !!B.ctx;
-      B.ctx = new AC();
-      comp = B.ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4;
-      master = B.ctx.createGain(); master.gain.value = 0;
-      master.connect(comp); comp.connect(B.ctx.destination);
-      noise = B.ctx.createBuffer(1, B.ctx.sampleRate, B.ctx.sampleRate); const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      X = B.ctx = new AC();
+      const lim = X.createDynamicsCompressor(); lim.threshold.value = -6; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.1;
+      const glue = X.createDynamicsCompressor(); glue.threshold.value = -18; glue.ratio.value = 3; glue.attack.value = 0.01; glue.release.value = 0.2;
+      master = X.createGain(); master.gain.value = 0;
+      master.connect(glue); glue.connect(lim); lim.connect(X.destination);
+      noise = X.createBuffer(1, X.sampleRate * 2, X.sampleRate); const nd = noise.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+      // reverb
+      const len = X.sampleRate * 2.6, ir = X.createBuffer(2, len, X.sampleRate);
+      for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.2); }
+      const rev = X.createConvolver(); rev.buffer = ir; const revG = X.createGain(); revG.gain.value = 0.9; rev.connect(revG); revG.connect(master);
+      // delay
+      delay = X.createDelay(2); const fb = X.createGain(); fb.gain.value = 0.33; const dlp = X.createBiquadFilter(); dlp.type = "lowpass"; dlp.frequency.value = 2800;
+      delay.connect(dlp); dlp.connect(fb); fb.connect(delay); dlp.connect(master);
+      const strip = (vol, r, d) => { const g = X.createGain(); g.gain.value = vol; g.connect(master); if (r) { const s = X.createGain(); s.gain.value = r; g.connect(s); s.connect(rev); } if (d) { const s = X.createGain(); s.gain.value = d; g.connect(s); s.connect(delay); } return g; };
+      ch.drums = strip(0.9, 0.08); ch.snare = strip(0.8, 0.28); ch.bass = strip(0.85, 0); ch.keys = strip(0.8, 0.32, 0.12); ch.lead = strip(0.55, 0.25, 0.3); ch.fx = strip(0.7, 0.35);
+      ch.duck = X.createGain(); ch.duck.connect(master); ch.pad = strip(0.5, 0.4); ch.pad.disconnect(); ch.pad.connect(ch.duck);
+      const ps = X.createGain(); ps.gain.value = 0.4; ch.pad.connect(ps); ps.connect(rev);
+      ch.sfx = strip(0.8, 0.3);
+      const sat = X.createWaveShaper(); const cv = new Float32Array(1024); for (let i = 0; i < 1024; i++) { const x = (i / 512) - 1; cv[i] = Math.tanh(x * 2.2); } sat.curve = cv; B.sat = sat;
       return true;
     };
-    B.resume = () => { if (B.ctx && B.ctx.state !== "running") B.ctx.resume(); };
-    const env = (g, t, a, peak, dec) => { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + dec); };
-    const osc = (type, f, t, dur, peak, dest, a = 0.005, cut) => {
-      const o = B.ctx.createOscillator(), g = B.ctx.createGain(); o.type = type; o.frequency.setValueAtTime(f, t);
-      let node = o; if (cut) { const fl = B.ctx.createBiquadFilter(); fl.type = "lowpass"; fl.frequency.value = cut; fl.Q.value = 3; o.connect(fl); node = fl; }
-      node.connect(g); g.connect(dest || master); env(g, t, a, peak, dur); o.start(t); o.stop(t + a + dur + 0.05); return o;
+    B.resume = () => { if (X && X.state !== "running") X.resume(); };
+    const env = (g, t, a, peak, dec, hold = 0) => { g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(peak, t + a); if (hold) g.gain.setValueAtTime(peak, t + a + hold); g.gain.exponentialRampToValueAtTime(0.0001, t + a + hold + dec); };
+    const O = (type, f, t) => { const o = X.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); return o; };
+    const F = (type, f, q = 0.7) => { const fl = X.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; return fl; };
+    const G = () => X.createGain();
+    const N = (t, dur) => { const s = X.createBufferSource(); s.buffer = noise; s.start(t, Math.random()); s.stop(t + dur + 0.05); return s; };
+    const chain = (...n) => { for (let i = 0; i < n.length - 1; i++) n[i].connect(n[i + 1]); return n[n.length - 1]; };
+
+    /* batería */
+    const kick = (t, v = 1) => {
+      const o = O("sine", 165, t), g = G(); o.frequency.exponentialRampToValueAtTime(48, t + 0.09); chain(o, g, ch.drums); env(g, t, 0.002, 0.95 * v, 0.42); o.start(t); o.stop(t + 0.5);
+      const c = N(t, 0.02), cg = G(); chain(c, F("highpass", 2500), cg, ch.drums); env(cg, t, 0.001, 0.25 * v, 0.012);
+      if (B.duck) { const d = ch.duck.gain; d.cancelScheduledValues(t); d.setValueAtTime(0.25, t); d.linearRampToValueAtTime(1, t + 0.28); }
     };
-    const nz = (t, dur, peak, type, f, dest) => {
-      const s = B.ctx.createBufferSource(), fl = B.ctx.createBiquadFilter(), g = B.ctx.createGain(); s.buffer = noise; fl.type = type; fl.frequency.value = f;
-      s.connect(fl); fl.connect(g); g.connect(dest || master); env(g, t, 0.002, peak, dur); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.05); return fl;
+    const k808 = (t, f, dur) => {
+      const o = O("sine", f * 1.6, t), g = G(); o.frequency.exponentialRampToValueAtTime(f, t + 0.06);
+      const sh = X.createWaveShaper(); sh.curve = B.sat.curve; chain(o, sh, g, ch.bass); env(g, t, 0.004, 0.5, dur); o.start(t); o.stop(t + dur + 0.1);
+      kick(t, 0.55);
     };
-    const kick = (t) => { const o = B.ctx.createOscillator(), g = B.ctx.createGain(); o.frequency.setValueAtTime(160, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.14); o.connect(g); g.connect(master); env(g, t, 0.003, 0.9, 0.32); o.start(t); o.stop(t + 0.4); };
-    const snare = (t) => { nz(t, 0.16, 0.38, "highpass", 1400); osc("triangle", 190, t, 0.08, 0.2); };
-    const hat = (t, v = 0.1) => nz(t, 0.035, v, "highpass", 7500);
-    function tick(m, t, sd) {
-      const s = B.step % 16, ch = chordOf(m.root, m.prog[B.bar % m.prog.length]);
-      const at = (p) => p && p[s] && p[s] !== ".";
-      if (at(m.k)) kick(t);
-      if (at(m.s)) snare(t);
-      if (at(m.h)) hat(t, 0.12);
-      if (at(m.hh)) hat(t, 0.05);
-      if (at(m.b)) { const n = ch[0] - 12 + (Number(m.b[s]) || 0); if (m.tuba) osc("square", mtof(n), t, sd * 3, 0.32, null, 0.01, m.cut); else osc("sawtooth", mtof(n), t, sd * 1.6, 0.3, null, 0.005, 520); }
-      if (at(m.stab)) ch.slice(0, 3).forEach((n) => osc(m.tuba ? "triangle" : "square", mtof(n + 12), t, sd * (m.tuba ? 1.5 : 0.9), 0.05, null, 0.004, m.cut));
-      if (at(m.arp)) { const idx = Number(m.arp[s]) || 0; osc("triangle", mtof(ch[idx % ch.length] + 24), t, sd * 1.2, 0.07, null, 0.004); }
-      if (m.pad && s === 0) ch.slice(0, 3).forEach((n) => { [0, 7].forEach((det) => { const o = osc("sawtooth", mtof(n + 12), t, sd * 15, 0.022, null, 0.4, m.rise ? 500 + (B.bar % 4) * 350 : m.cut); o.detune.value = det; }); });
+    const snare = (t, v = 1) => {
+      const n = N(t, 0.25), g = G(); chain(n, F("bandpass", 1900, 0.7), g, ch.snare); env(g, t, 0.002, 0.55 * v, 0.2);
+      const o = O("triangle", 200, t), og = G(); o.frequency.exponentialRampToValueAtTime(150, t + 0.08); chain(o, og, ch.snare); env(og, t, 0.002, 0.35 * v, 0.1); o.start(t); o.stop(t + 0.2);
+    };
+    const clap = (t) => {
+      const n = N(t, 0.3), g = G(); chain(n, F("bandpass", 1250, 1.1), g, ch.snare);
+      g.gain.setValueAtTime(0.0001, t); [0, 0.011, 0.022].forEach((d) => { g.gain.setValueAtTime(0.55, t + d); g.gain.exponentialRampToValueAtTime(0.08, t + d + 0.009); });
+      g.gain.setValueAtTime(0.5, t + 0.033); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+    };
+    const rim = (t) => { const o = O("triangle", 1650, t), g = G(); chain(o, F("bandpass", 1700, 3), g, ch.drums); env(g, t, 0.001, 0.35, 0.04); o.start(t); o.stop(t + 0.08); };
+    const HR = [205.3, 304.4, 369.6, 522.7, 540, 800];
+    const hat = (t, open, v = 1) => {
+      const g = G(), bp = F("bandpass", 10000, 0.8), hp = F("highpass", 7200); chain(bp, hp, g, ch.drums);
+      HR.forEach((f) => { const o = O("square", f, t); o.connect(bp); o.start(t); o.stop(t + (open ? 0.4 : 0.08)); });
+      env(g, t, 0.001, (open ? 0.16 : 0.13) * v, open ? 0.3 : 0.045);
+    };
+    const tick = (t, hi) => { const o = O("sine", hi ? 2300 : 1700, t), g = G(); chain(o, g, ch.drums); env(g, t, 0.001, 0.22, 0.03); o.start(t); o.stop(t + 0.06); };
+    const tom = (t, f) => { const o = O("sine", f, t), g = G(); o.frequency.exponentialRampToValueAtTime(f * 0.55, t + 0.3); chain(o, g, ch.snare); env(g, t, 0.002, 0.7, 0.35); o.start(t); o.stop(t + 0.45); };
+    const crackle = (t) => { const n = N(t, 0.01), g = G(); chain(n, F("highpass", 3000), g, ch.fx); env(g, t, 0.0005, 0.04 + Math.random() * 0.05, 0.004); };
+
+    /* sintetizadores */
+    const supersaw = (t, notes, dur, cut, v) => {
+      const fl = F("lowpass", cut, 0.4), g = G(); chain(fl, g, ch.pad); env(g, t, 0.35, 0.11 * v, 0.6, Math.max(0, dur - 0.6));
+      notes.forEach((n) => [-14, -5, 5, 14].forEach((d) => { const o = O("sawtooth", mtof(n), t); o.detune.value = d; o.connect(fl); o.start(t); o.stop(t + dur + 0.8); }));
+    };
+    const darkpad = (t, notes, dur, cut, v) => {
+      const fl = F("lowpass", cut, 2), g = G(); fl.frequency.setValueAtTime(cut, t); fl.frequency.linearRampToValueAtTime(cut * 2.2, t + dur); chain(fl, g, ch.pad); env(g, t, 0.6, 0.12 * v, 0.6, Math.max(0, dur - 0.9));
+      notes.forEach((n) => [-8, 8].forEach((d) => { const o = O("sawtooth", mtof(n - 12), t); o.detune.value = d; o.connect(fl); o.start(t); o.stop(t + dur + 0.8); }));
+    };
+    const ep = (t, n, dur, v = 1, dest) => { // piano eléctrico FM
+      const f = mtof(n), car = O("sine", f, t), mod = O("sine", f, t), mg = G(), tine = O("sine", f * 14, t), tg = G(), g = G();
+      mg.gain.setValueAtTime(f * 2.2, t); mg.gain.exponentialRampToValueAtTime(f * 0.25, t + 0.7);
+      tg.gain.setValueAtTime(f * 0.9, t); tg.gain.exponentialRampToValueAtTime(1, t + 0.06);
+      mod.connect(mg); mg.connect(car.frequency); tine.connect(tg); tg.connect(car.frequency);
+      chain(car, g, dest || ch.keys); env(g, t, 0.004, 0.16 * v, dur);
+      [car, mod, tine].forEach((o) => { o.start(t); o.stop(t + dur + 0.1); });
+    };
+    const bell = (t, n, v = 1) => {
+      const f = mtof(n), car = O("sine", f, t), mod = O("sine", f * 3.5, t), mg = G(), g = G();
+      mg.gain.setValueAtTime(f * 3, t); mg.gain.exponentialRampToValueAtTime(f * 0.1, t + 0.9);
+      mod.connect(mg); mg.connect(car.frequency); chain(car, g, ch.lead); env(g, t, 0.003, 0.22 * v, 1.3);
+      [car, mod].forEach((o) => { o.start(t); o.stop(t + 1.5); });
+    };
+    const pluck = (t, n, v = 1, dur = 0.35, dest) => {
+      const fl = F("lowpass", 4200, 3), g = G(); fl.frequency.setValueAtTime(4200, t); fl.frequency.exponentialRampToValueAtTime(380, t + dur);
+      chain(fl, g, dest || ch.lead); env(g, t, 0.003, 0.17 * v, dur);
+      [-7, 7].forEach((d) => { const o = O("sawtooth", mtof(n), t); o.detune.value = d; o.connect(fl); o.start(t); o.stop(t + dur + 0.1); });
+    };
+    const clav = (t, notes) => {
+      notes.forEach((n) => { const o = O("square", mtof(n), t), fl = F("bandpass", 2600, 4), g = G(); fl.frequency.setValueAtTime(2600, t); fl.frequency.exponentialRampToValueAtTime(700, t + 0.14); chain(o, fl, g, ch.lead); env(g, t, 0.002, 0.14, 0.13); o.start(t); o.stop(t + 0.2); });
+    };
+    const brass = (t, notes, dur) => {
+      const fl = F("lowpass", 400, 2), g = G(); fl.frequency.setValueAtTime(400, t); fl.frequency.linearRampToValueAtTime(2600, t + 0.07); fl.frequency.exponentialRampToValueAtTime(900, t + dur);
+      chain(fl, g, ch.lead); env(g, t, 0.03, 0.16, dur);
+      notes.forEach((n) => [-6, 6].forEach((d) => { const o = O("sawtooth", mtof(n), t); o.detune.value = d; o.connect(fl); o.start(t); o.stop(t + dur + 0.1); }));
+    };
+    const bassNote = (t, n, dur, type) => {
+      const f = mtof(n);
+      if (type === "sine") { const o = O("sine", f, t), o2 = O("triangle", f, t), g = G(); chain(o, g, ch.bass); o2.connect(g); env(g, t, 0.01, 0.55, dur); [o, o2].forEach((x) => { x.start(t); x.stop(t + dur + 0.1); }); return; }
+      if (type === "reese") { const fl = F("lowpass", 700, 1.5), g = G(), sh = X.createWaveShaper(); sh.curve = B.sat.curve; chain(fl, sh, g, ch.bass); env(g, t, 0.01, 0.32, dur * 0.9, dur * 0.1); [-16, 16].forEach((d) => { const o = O("sawtooth", f, t); o.detune.value = d; o.connect(fl); o.start(t); o.stop(t + dur + 0.1); }); const s = O("sine", f / 2, t), sg = G(); chain(s, sg, ch.bass); env(sg, t, 0.01, 0.35, dur); s.start(t); s.stop(t + dur + 0.1); return; }
+      const fl = F("lowpass", type === "pulse" ? 300 + (B.bar % 4) * 260 : 1300, type === "funk" ? 6 : 3), g = G(); fl.frequency.setValueAtTime(fl.frequency.value, t); fl.frequency.exponentialRampToValueAtTime(type === "funk" ? 350 : 260, t + dur);
+      chain(fl, g, ch.bass); env(g, t, 0.004, 0.42, dur);
+      const o = O("sawtooth", f, t), s = O("sine", f, t); o.connect(fl); s.connect(g); o.start(t); o.stop(t + dur + 0.1); s.start(t); s.stop(t + dur + 0.1);
+    };
+    const trombone = (t, sd) => { // "wah wah wah waaah"
+      [[58, 3], [57, 3], [56, 3], [55, 10]].reduce((tt, [n, len]) => {
+        const dur = len * sd * 1.6, o = O("sawtooth", mtof(n), tt), fl = F("lowpass", 500, 5), g = G(), lfo = O("sine", 5.5, tt), lg = G();
+        fl.frequency.setValueAtTime(400, tt); fl.frequency.linearRampToValueAtTime(1500, tt + Math.min(0.15, dur / 2)); fl.frequency.linearRampToValueAtTime(600, tt + dur);
+        lg.gain.value = len > 5 ? 14 : 0; lfo.connect(lg); lg.connect(o.detune);
+        chain(o, fl, g, ch.lead); env(g, tt, 0.04, 0.3, 0.12, dur - 0.16);
+        [o, lfo].forEach((x) => { x.start(tt); x.stop(tt + dur + 0.2); });
+        return tt + dur;
+      }, t);
+    };
+    const riser = (t, dur) => { const n = N(t, dur), fl = F("bandpass", 300, 2), g = G(); fl.frequency.exponentialRampToValueAtTime(7000, t + dur); chain(n, fl, g, ch.fx); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.35, t + dur * 0.95); g.gain.linearRampToValueAtTime(0, t + dur); };
+
+    function tick16(m, t, sd) {
+      const s = B.step % 16, bi = B.bar % m.bars.length, bar = m.bars[bi], at = (p) => p && p[s] && p[s] !== ".";
+      B.duck = !!m.duck;
+      if (at(m.kick)) kick(t, m.kickV || 1);
+      if (at(m.b808)) { let len = 1; while (len < 16 && !(m.b808[s + len] === "x") && s + len < 16) len++; k808(t, mtof(bar.r), len * sd * 0.95); }
+      if (at(m.snare)) snare(t, m.snareSoft ? 0.55 : 1);
+      if (at(m.clap)) clap(t);
+      if (at(m.rim)) rim(t);
+      if (at(m.hat)) { hat(t, false, m.hatV || 1); if (m.roll && bi % 2 === 1 && s >= 12) hat(t + sd / 2, false, 0.7); }
+      if (at(m.ohat)) hat(t, true, 0.8);
+      if (at(m.tick)) tick(t, s % 8 === 0);
+      if (m.crackle && Math.random() < 0.35) crackle(t + Math.random() * sd);
+      if (m.tomFill && bi === 3 && s >= 12) tom(t, [180, 150, 120, 95][s - 12]);
+      if (m.riser && bi === 3 && s === 0) riser(t, sd * 16);
+      if (m.trombone && B.bar % 8 === 0 && s === 0) trombone(t, sd);
+      // bajo
+      if (m.bass) {
+        const bs = m.bass;
+        if (bs.notes) { const off = bs.notes[s]; if (off != null) bassNote(t, bar.r + off, sd * 1.5, "funk"); }
+        else if (bs.pat && at(bs.pat)) { const off = bs.pat[s] === "1" ? 12 : 0; bassNote(t, bar.r + off, bs.long ? sd * 15 : bs.type === "pulse" ? sd * 0.9 : sd * 1.8, bs.type); }
+      }
+      if (bar.walk && s % 4 === 0) bassNote(t, bar.walk[s / 4], sd * 3.6, "sine");
+      // armonía
+      if (m.pad && s === 0) (m.pad === "dark" ? darkpad : supersaw)(t, bar.c, sd * 16, m.padCut, m.padV || 1);
+      if (at(m.keys)) bar.c.forEach((n, k) => ep(t + k * 0.012, n, s === 0 ? sd * 8 : sd * 5, 0.75 * (m.epV || 1)));
+      if (m.keysLow && s === 0) ep(t, bar.r, sd * 14, 0.9 * (m.epV || 1));
+      if (m.arpEp) { const k = m.arpEp[s]; if (k != null) ep(t, bar.c[k % bar.c.length] + 12, sd * 6, 0.8 * (m.epV || 1)); }
+      if (m.arp) { const a = m.arp, k = a.pat[s]; const pool = a.climb ? [...bar.c, ...bar.c.map((x) => x + 12)] : bar.c; if (k != null && pool[k % pool.length] != null) pluck(t, pool[k % pool.length] + (a.climb ? 0 : a.oct), a.v, 0.16); }
+      if (at(m.clav)) clav(t, bar.c);
+      if (at(m.brass)) brass(t, bar.c.map((x) => x - 12), sd * 2);
+      if (m.lead) { const ph = m.lead.notes[B.bar % m.lead.notes.length], n = ph && ph[s]; if (n != null) { const L = m.lead; if (L.type === "bell") bell(t, n, L.v); else if (L.type === "ep") ep(t, n, sd * 6, L.v, ch.lead); else pluck(t, n, L.v, 0.45); } }
     }
     function loop() {
-      if (!B.ctx) return;
-      while (B.t < B.ctx.currentTime + 0.12) {
+      if (!X) return;
+      while (B.t < X.currentTime + 0.15) {
         if (B.step % 16 === 0 && B.next) { B.mood = B.next; B.next = null; B.bar = 0; }
         const m = MOODS[B.mood]; if (!m) { B.t += 0.1; continue; }
         const sd = 60 / m.bpm / 4, sw = m.swing && B.step % 2 ? sd * m.swing : 0;
-        tick(m, B.t + sw, sd);
+        try { tick16(m, Math.max(B.t + sw, X.currentTime + 0.005), sd); } catch (e) {}
         B.t += sd; B.step++; if (B.step % 16 === 0) B.bar++;
       }
     }
     B.setMood = (mood) => {
-      if (!B.ctx) return;
-      if (!B.timer) { B.mood = mood; B.step = 0; B.bar = 0; B.t = B.ctx.currentTime + 0.05; B.timer = setInterval(loop, 25); }
-      else if (mood !== B.mood) { B.next = mood; if (B.step % 16 > 2) { B.step = Math.ceil(B.step / 16) * 16; } }
+      if (!X) return;
+      if (!B.timer) { B.mood = mood; B.step = 0; B.bar = 0; B.t = X.currentTime + 0.06; B.timer = setInterval(loop, 25); }
+      else if (mood !== B.mood) { B.next = mood; B.step = Math.ceil(B.step / 16) * 16; B.t = Math.max(B.t, X.currentTime + 0.04); }
     };
-    B.fade = (to, sec = 0.4) => { if (!B.ctx) return; const g = master.gain, n = B.ctx.currentTime; g.cancelScheduledValues(n); g.setValueAtTime(g.value, n); g.linearRampToValueAtTime(to, n + sec); };
+    B.fade = (to, sec = 0.4) => { if (!X) return; const g = master.gain, n = X.currentTime; g.cancelScheduledValues(n); g.setValueAtTime(g.value, n); g.linearRampToValueAtTime(to, n + sec); };
     B.stop = () => { clearInterval(B.timer); B.timer = null; B.fade(0, 0.2); };
-    // efectos
     B.sfx = (kind) => {
-      if (!B.ctx || !B.sfxOn) return; const t = B.ctx.currentTime + 0.01, d = B.sfxBus || (B.sfxBus = (() => { const g = B.ctx.createGain(); g.gain.value = 0.6; g.connect(comp); return g; })());
-      if (kind === "whoosh") { const f = nz(t, 0.35, 0.25, "bandpass", 500, d); f.frequency.exponentialRampToValueAtTime(4000, t + 0.3); f.Q.value = 1.5; }
-      if (kind === "ding") { osc("sine", 1318, t, 0.5, 0.25, d); osc("sine", 1760, t + 0.12, 0.7, 0.25, d); }
-      if (kind === "buzz") osc("sawtooth", 98, t, 0.35, 0.25, d, 0.01, 700);
-      if (kind === "pop") { nz(t, 0.08, 0.4, "highpass", 900, d); osc("sine", 660, t, 0.15, 0.2, d); osc("sine", 990, t + 0.06, 0.2, 0.15, d); }
+      if (!X || !B.sfxOn) return; const t = X.currentTime + 0.01;
+      if (kind === "whoosh") { const n = N(t, 0.45), fl = F("bandpass", 350, 1.8), g = G(); fl.frequency.exponentialRampToValueAtTime(5000, t + 0.35); chain(n, fl, g, ch.sfx); env(g, t, 0.18, 0.28, 0.2); }
+      if (kind === "ding") { [84, 88, 91].forEach((n, i) => { const f = mtof(n), c = O("sine", f, t + i * 0.08), m = O("sine", f * 3.5, t + i * 0.08), mg = G(), g = G(); mg.gain.value = f * 1.5; m.connect(mg); mg.connect(c.frequency); chain(c, g, ch.sfx); env(g, t + i * 0.08, 0.003, 0.25, 0.9); [c, m].forEach((o) => { o.start(t + i * 0.08); o.stop(t + 1.2); }); }); }
+      if (kind === "buzz") { [0, 0.18].forEach((d) => { const o = O("sawtooth", 92, t + d), fl = F("lowpass", 900), g = G(); chain(o, fl, g, ch.sfx); env(g, t + d, 0.005, 0.22, 0.14); o.start(t + d); o.stop(t + d + 0.2); }); }
+      if (kind === "pop") { const n = N(t, 0.1), g = G(); chain(n, F("highpass", 1200), g, ch.sfx); env(g, t, 0.001, 0.35, 0.07); [76, 83, 88].forEach((x, i) => { const o = O("triangle", mtof(x), t + i * 0.05), og = G(); chain(o, og, ch.sfx); env(og, t + i * 0.05, 0.002, 0.15, 0.25); o.start(t + i * 0.05); o.stop(t + 0.5); }); }
     };
-    B.sfxOn = true;
-    B.close = () => { B.stop(); try { B.ctx && B.ctx.close(); } catch (e) {} B.ctx = null; };
+    B.close = () => { B.stop(); try { X && X.close(); } catch (e) {} X = B.ctx = null; };
+    B._MOODS = MOODS;
     return B;
   }
 
