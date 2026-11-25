@@ -383,3 +383,45 @@ tr.me td.sticky-col{background:var(--tint)}
 .wr-count b{display:block;font-family:var(--fh);font-size:52px;line-height:1}
 .wr-count span{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--tx2)}
 .wr-entry{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+/* ============ ACCESO ============ */
+#lbGate{position:fixed;inset:0;z-index:500;background:var(--bg);color:var(--tx);display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:max(28px,env(safe-area-inset-top)) 18px 30px;transition:opacity .35s}
+#lbGate.out{opacity:0}
+.gt-box{width:100%;max-width:420px;text-align:center;margin:auto 0}
+.gt-logo{width:104px;height:104px;border-radius:50%;object-fit:cover;border:3px solid var(--tx);margin:0 auto 14px;display:block}
+.gt-kick{font-family:var(--fh);font-weight:700;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--forest)}
+.gt-title{font-family:var(--fh);font-weight:800;font-size:52px;line-height:.95;text-transform:uppercase;margin:6px 0 18px;letter-spacing:-.01em}
+.gt-step p{font-size:15px;line-height:1.45;color:var(--tx2);margin:0 0 14px}
+.gt-step p b{color:var(--tx)}
+.gt-field{display:flex;gap:8px;margin-bottom:8px}
+.gt-field input{flex:1;min-width:0;padding:14px 14px;font:500 17px var(--fb,inherit);border:1.5px solid var(--tx);border-radius:4px;background:var(--card,transparent);color:var(--tx)}
+.gt-field input:focus{outline:2px solid var(--forest);outline-offset:1px}
+.gt-field button{border:1.5px solid var(--tx);background:transparent;color:var(--tx);border-radius:4px;padding:0 14px;font-family:var(--fh);font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer}
+.gt-err{display:none;color:var(--bad)!important;font-size:14px!important;margin:4px 0 8px!important}
+.gt-err.on{display:block}
+.gt-go{width:100%;justify-content:center;padding:13px;font-size:16px;margin-top:6px}
+.gt-go:disabled{opacity:.4;cursor:default}
+.gt-people{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;text-align:left}
+.gt-people button{border:1.5px solid var(--line2);background:transparent;color:var(--tx);border-radius:4px;padding:10px 12px;cursor:pointer;min-width:0}
+.gt-people button b{display:block;font-family:var(--fh);font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gt-people button span{display:block;font-size:12px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gt-people button.on{background:var(--tx);border-color:var(--tx);color:var(--bg)}
+.gt-people button.on span{color:var(--bg);opacity:.75}
+
+/* ============ RECORRIDO ============ */
+#tour{position:fixed;inset:0;z-index:450;transition:opacity .25s}
+#tour.out{opacity:0}
+.tr-hole{position:fixed;border-radius:6px;box-shadow:0 0 0 9999px rgba(18,16,13,.74);outline:2px solid #C8F169;outline-offset:2px;transition:left .35s ease,top .35s ease,width .35s ease,height .35s ease;pointer-events:none}
+.tr-card{position:fixed;background:var(--bg);color:var(--tx);border:1.5px solid var(--tx);border-radius:6px;padding:14px 16px 14px;box-shadow:0 18px 40px rgba(0,0,0,.35);transition:left .3s ease,top .3s ease}
+.tr-card.in{animation:trIn .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes trIn{from{opacity:0;transform:translateY(10px)}}
+.tr-head{display:flex;justify-content:space-between;align-items:center;font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--forest)}
+.tr-skip{border:0;background:none;color:var(--tx3);font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer;padding:4px 0 4px 10px}
+.tr-title{font-family:var(--fh);font-weight:800;font-size:26px;line-height:1;text-transform:uppercase;margin:8px 0 6px}
+.tr-text{font-size:15px;line-height:1.45;color:var(--tx2);margin:0 0 12px}
+.tr-dots{display:flex;gap:4px;margin-bottom:12px}
+.tr-dots i{flex:1;height:3px;border-radius:2px;background:var(--line)}
+.tr-dots i.done{background:var(--tx3)}.tr-dots i.on{background:var(--forest)}
+.tr-btns{display:flex;justify-content:space-between;gap:8px}
+.tr-btns .btn{padding:9px 16px}
+#lbGate [hidden]{display:none!important}

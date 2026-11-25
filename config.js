@@ -49,6 +49,13 @@ window.LB_CONFIG = {
   // Campeones de temporadas pasadas que NO están en Sleeper (opcional).
   // Ej: [{ season: "2025", champion: "Napugi", runnerUp: "Pony28", note: "" }]
   pastChampions: [],
+
+  // Registro de accesos (Google Sheets + Apps Script, ver tools/registro-accesos.gs).
+  // accessLogUrl: el link de la "Aplicación web" que termina en /exec. Vacío = las visitas esperan en cada aparato.
+  accessLogUrl: "",
+  accessLogKey: "6e9f37aa77693efca5619ea9",
+  // Personas extra en la lista de "¿Quién eres?" (co-dueños sin apodo). Los de "nicknames" ya salen solos.
+  accessExtra: [{ user: "joshsnaider1", name: "Josh" }],
   // Wrapped de fin de temporada: se abre en esta fecha (2 días después de la final, semana 17).
   wrappedUnlock: "2027-01-06T00:00:00-06:00",
   // Link privado de cada manager: sitio/#wrapped-CODIGO  (código -> usuario de Sleeper)

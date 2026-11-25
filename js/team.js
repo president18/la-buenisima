@@ -312,8 +312,9 @@
     document.querySelectorAll("[data-wp]").forEach((b) => (b.onclick = () => { const r = Number(b.dataset.wp); LB.wrapped.open(D, LB.wrapped.teamCards(D, r), UI.tName(D, r)); }));
   }
   function render() {
-    $("#main").innerHTML = [resumen(), lineup(), posStrength(), freeAgents(), trades(), myHistory(), wrappedPreview()].map((h) => `<section style="padding-top:8px">${h}</section>`).join("");
+    $("#main").innerHTML = [resumen(), LB.accessLog ? LB.accessLog.html() : "", lineup(), posStrength(), freeAgents(), trades(), myHistory(), wrappedPreview()].filter(Boolean).map((h) => `<section style="padding-top:8px">${h}</section>`).join("");
     bindWrapped();
+    if (LB.accessLog) LB.accessLog.load();
     if (STATE.afterRender) STATE.afterRender();
   }
 
