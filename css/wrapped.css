@@ -246,3 +246,4 @@
 @media (prefers-reduced-motion:reduce){.wr-ov *{animation-duration:.01s!important;animation-iteration-count:1!important}}
 /* el modal de imagen y los avisos van encima del visor */
 .modal{z-index:400}.toast{z-index:450}
+.wr-pin{margin-top:18px}.wr-pin summary{cursor:pointer}

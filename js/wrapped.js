@@ -802,10 +802,26 @@
     const code = m ? m[1] : null;
     const rid = code ? W.ridForCode(D, code) : null;
     const fecha = unlock.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    const PIN_HASH = "6aaf1778";
+    const pinHash = (v) => (LB.util.hashStr("lb-" + v) >>> 0).toString(16).padStart(8, "0").slice(0, 8);
+    let commish = false; try { commish = sessionStorage.getItem("lb-pin") === PIN_HASH; } catch (e) {}
+    if (!open && commish && !rid) {
+      el.innerHTML = `<div class="h2">Wrapped ${esc(D.season)} · vista del comisionado</div><p class="sub">Solo tú lo ves. Para la liga se abre el <b>${esc(fecha)}</b>. Datos hasta la semana ${D.lastScored}. Súbele al volumen.</p>
+        <div class="wr-entry"><button class="btn pri" id="wrLeague">Wrapped de la liga</button><button class="btn" id="wrLock">Salir de la vista previa</button></div>
+        <div class="card" style="margin-top:16px"><div class="h3">Wrapped de cada equipo</div><div class="wr-entry" style="margin-top:8px">${D.standings.map((x) => `<button class="btn" data-wr="${x.rid}">${T(D, x.rid)}</button>`).join("")}</div></div>`;
+      el.querySelector("#wrLeague").onclick = () => W.open(D, W.leagueCards(D), "liga");
+      el.querySelectorAll("[data-wr]").forEach((b) => (b.onclick = () => { const r = Number(b.dataset.wr); W.open(D, W.teamCards(D, r), UI.tName(D, r)); }));
+      el.querySelector("#wrLock").onclick = () => { try { sessionStorage.removeItem("lb-pin"); } catch (e) {} W.render(D, el, opts); };
+      return;
+    }
     if (!open) {
-      el.innerHTML = `<div class="wr-lock"><img src="${esc(CFG.logo || "")}" alt=""><div class="h2">Wrapped ${esc(D.season)}</div><p class="sub">Tu temporada, contada como nunca. Con música. Se abre el <b>${esc(fecha)}</b>, dos días después de la final.</p><div class="wr-count" id="wrCount"></div><p class="small muted">Cada manager recibe su link privado. El Wrapped de la liga se abre para todos el mismo día.</p></div>`;
+      el.innerHTML = `<div class="wr-lock"><img src="${esc(CFG.logo || "")}" alt=""><div class="h2">Wrapped ${esc(D.season)}</div><p class="sub">Tu temporada, contada como nunca. Con música. Se abre el <b>${esc(fecha)}</b>, dos días después de la final.</p><div class="wr-count" id="wrCount"></div><p class="small muted">Cada manager recibe su link privado. El Wrapped de la liga se abre para todos el mismo día.</p>
+        <details class="wr-pin"><summary class="small muted">Acceso del comisionado</summary><div class="wr-entry" style="justify-content:center;margin-top:10px"><input id="wrPin" type="password" inputmode="numeric" autocomplete="off" placeholder="Contraseña" style="padding:9px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--tx);font:inherit;width:140px"><button class="btn pri" id="wrPinBtn">Entrar</button></div><p class="small" id="wrPinErr" style="display:none;color:var(--coral)">Contraseña incorrecta.</p></details></div>`;
       const tick = () => { const ms = unlock - Date.now(); if (ms <= 0) return W.render(D, el); const d = Math.floor(ms / 864e5), h = Math.floor((ms % 864e5) / 36e5), mi = Math.floor((ms % 36e5) / 6e4); const c = document.getElementById("wrCount"); if (c) c.innerHTML = `<div><b>${d}</b><span>días</span></div><div><b>${h}</b><span>horas</span></div><div><b>${mi}</b><span>min</span></div>`; };
       tick(); clearInterval(W._t); W._t = setInterval(tick, 30000);
+      const go = () => { if (pinHash(el.querySelector("#wrPin").value.trim()) === PIN_HASH) { try { sessionStorage.setItem("lb-pin", PIN_HASH); } catch (e) {} W.render(D, el, opts); } else el.querySelector("#wrPinErr").style.display = "block"; };
+      el.querySelector("#wrPinBtn").onclick = go;
+      el.querySelector("#wrPin").onkeydown = (e) => { if (e.key === "Enter") go(); };
       return;
     }
     el.innerHTML = `<div class="h2">Wrapped ${esc(D.season)}</div><p class="sub">${opts.preview ? "Vista previa privada con los datos hasta la semana " + D.lastScored + "." : "La temporada se acabó. Así nos fue."} Súbele al volumen.</p>
