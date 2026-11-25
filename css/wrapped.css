@@ -173,6 +173,7 @@
 .wr-sumhead span{display:block;font:800 30px "Barlow Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
 .wr-sumhead b{display:block;font:800 76px/1 "Barlow Condensed",sans-serif;text-transform:uppercase;color:var(--ac)}
 .summary .wr-tiles b{font-size:62px}
+.wr-tiles b.sm{font-size:46px!important;line-height:1.35}
 .summary .wr-kick{margin-bottom:22px}
 .wr-pills{display:flex;flex-wrap:wrap;gap:14px;margin:20px 0}
 .wr-pills span{background:var(--ac);color:var(--bg);font:800 34px "Barlow Condensed",sans-serif;text-transform:uppercase;padding:10px 24px;border-radius:999px;animation:wrPop .5s both;animation-delay:calc(var(--i)*150ms + 400ms)}

@@ -194,7 +194,7 @@
   const kick = (t) => `<div class="wr-kick"><span>${t}</span></div>`;
   const big = (n, cls = "", suf = "") => `<div class="wr-big ${cls}"><span data-count="${typeof n === "number" ? n : ""}">${typeof n === "number" ? fmt(n) : n}</span>${suf}</div>`;
   const line = (t, cls = "") => `<div class="wr-line ${cls}">${t}</div>`;
-  const tiles = (arr, cols = 3) => `<div class="wr-tiles" style="grid-template-columns:repeat(${cols},1fr)">${arr.map(([v, l, hl], i) => `<div class="${hl ? "hl" : ""}" style="--i:${i}"><b>${v}</b><span>${l}</span></div>`).join("")}</div>`;
+  const tiles = (arr, cols = 3) => `<div class="wr-tiles" style="grid-template-columns:repeat(${cols},1fr)">${arr.map(([v, l, hl], i) => `<div class="${hl ? "hl" : ""}" style="--i:${i}"><b${String(v).replace(/<[^>]+>|&[a-z#0-9]+;/g, "x").length > 8 * (3 / cols) ? ' class="sm"' : ""}>${v}</b><span>${l}</span></div>`).join("")}</div>`;
 
   function card(o, inner, D, foot) {
     const p = PAL[o.pal] || PAL.forest;
@@ -214,9 +214,9 @@
     const y = (v) => h - 60 - (v / mx) * (h - 110);
     const avgD = ws.map((x, i) => `${i ? "L" : "M"}${(60 + i * (bw + gap) + bw / 2).toFixed(1)},${y(avgWk[x.w] || 0).toFixed(1)}`).join("");
     return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" class="wr-chart">
-      ${ws.map((x, i) => { const X = 60 + i * (bw + gap), Y = y(x.pf), hi = x.w === bestW; return `<rect class="wr-grow" style="animation-delay:${200 + i * 70}ms" x="${X.toFixed(1)}" y="${Y.toFixed(1)}" width="${bw.toFixed(1)}" height="${(h - 60 - Y).toFixed(1)}" rx="8" fill="${hi ? p.ac : p.fg}" opacity="${hi ? 1 : x.res === "W" ? 0.55 : 0.28}"/>${hi ? `<text x="${(X + bw / 2).toFixed(1)}" y="${(Y - 16).toFixed(1)}" text-anchor="middle" font-size="34" font-weight="800" fill="${p.ac}" font-family="Barlow Condensed">${f1(x.pf)}</text>` : ""}<text x="${(X + bw / 2).toFixed(1)}" y="${h - 22}" text-anchor="middle" font-size="22" fill="${p.fg}" opacity=".7" font-family="Barlow Condensed">${x.w}</text>`; }).join("")}
+      ${ws.map((x, i) => { const X = 60 + i * (bw + gap), Y = y(x.pf), hi = x.w === bestW; return `<rect class="wr-grow" style="animation-delay:${200 + i * 70}ms" x="${X.toFixed(1)}" y="${Y.toFixed(1)}" width="${bw.toFixed(1)}" height="${(h - 60 - Y).toFixed(1)}" rx="8" fill="${hi ? p.ac : p.fg}" opacity="${hi ? 1 : x.res === "W" ? 0.55 : 0.28}"/>${hi ? `<text x="${(X + bw / 2).toFixed(1)}" y="${(Y - 16).toFixed(1)}" text-anchor="middle" font-size="34" font-weight="800" fill="${p.ac}" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif">${f1(x.pf)}</text>` : ""}<text x="${(X + bw / 2).toFixed(1)}" y="${h - 22}" text-anchor="middle" font-size="22" fill="${p.fg}" opacity=".7" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif">${x.w}</text>`; }).join("")}
       <path d="${avgD}" fill="none" stroke="${p.fg}" stroke-width="4" stroke-dasharray="10 10" opacity=".9" class="wr-fade" style="animation-delay:1.3s"/>
-      <text x="0" y="${y(LB.util.avg(Object.values(avgWk))) + 8}" font-size="22" fill="${p.fg}" opacity=".8" font-family="Barlow Condensed" class="wr-fade" style="animation-delay:1.3s">LIGA</text></svg>
+      <text x="0" y="${y(LB.util.avg(Object.values(avgWk))) + 8}" font-size="22" fill="${p.fg}" opacity=".8" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif" class="wr-fade" style="animation-delay:1.3s">LIGA</text></svg>
       <div class="wr-legend"><i style="background:${p.fg};opacity:.55"></i>Ganaste <i style="background:${p.fg};opacity:.28"></i>Perdiste <i class="dash" style="border-color:${p.fg}"></i>Promedio de la liga</div>`;
   }
   function rankChart(ranks, n, p) {
@@ -227,13 +227,13 @@
     const hiI = ranks.reduce((b, q, i) => (q.rank < ranks[b].rank ? i : b), 0), loI = ranks.reduce((b, q, i) => (q.rank > ranks[b].rank ? i : b), 0);
     return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" class="wr-chart">
       ${[...Array(n)].map((_, k) => `<line x1="60" x2="${w}" y1="${y(k + 1)}" y2="${y(k + 1)}" stroke="${p.fg}" opacity="${k === 3 ? 0.5 : 0.1}" stroke-width="2" ${k === 3 ? 'stroke-dasharray="8 8"' : ""}/>`).join("")}
-      <text x="0" y="${y(1) + 10}" font-size="30" font-weight="800" fill="${p.fg}" font-family="Barlow Condensed">1°</text><text x="0" y="${y(n) + 10}" font-size="30" font-weight="800" fill="${p.fg}" font-family="Barlow Condensed">${n}°</text>
-      <text x="${w}" y="${y(4) - 12}" font-size="22" fill="${p.fg}" opacity=".7" text-anchor="end" font-family="Barlow Condensed">ZONA DE PLAYOFFS</text>
+      <text x="0" y="${y(1) + 10}" font-size="30" font-weight="800" fill="${p.fg}" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif">1°</text><text x="0" y="${y(n) + 10}" font-size="30" font-weight="800" fill="${p.fg}" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif">${n}°</text>
+      <text x="${w}" y="${y(4) - 12}" font-size="22" fill="${p.fg}" opacity=".7" text-anchor="end" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif">ZONA DE PLAYOFFS</text>
       <path d="${area}" fill="${p.ac}" opacity=".18" class="wr-fade" style="animation-delay:1s"/>
       <path d="${d}" fill="none" stroke="${p.ac}" stroke-width="12" stroke-linejoin="round" stroke-linecap="round" class="wr-draw"/>
       ${ranks.map((q, i) => `<circle class="wr-pop" style="animation-delay:${300 + i * 90}ms" cx="${x(i)}" cy="${y(q.rank)}" r="${i === hiI || i === loI ? 20 : 9}" fill="${i === hiI || i === loI ? p.ac : p.fg}" stroke="${p.bg}" stroke-width="5"/>`).join("")}
-      <text x="${x(hiI)}" y="${y(ranks[hiI].rank) - 34}" text-anchor="middle" font-size="30" font-weight="800" fill="${p.fg}" font-family="Barlow Condensed">${ranks[hiI].rank}° · S${ranks[hiI].w}</text>
-      ${loI !== hiI ? `<text x="${x(loI)}" y="${y(ranks[loI].rank) + 56}" text-anchor="middle" font-size="30" font-weight="800" fill="${p.fg}" font-family="Barlow Condensed">${ranks[loI].rank}° · S${ranks[loI].w}</text>` : ""}</svg>`;
+      <text x="${x(hiI)}" y="${y(ranks[hiI].rank) - 34}" text-anchor="middle" font-size="30" font-weight="800" fill="${p.fg}" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif">${ranks[hiI].rank}° · S${ranks[hiI].w}</text>
+      ${loI !== hiI ? `<text x="${x(loI)}" y="${y(ranks[loI].rank) + 56}" text-anchor="middle" font-size="30" font-weight="800" fill="${p.fg}" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif">${ranks[loI].rank}° · S${ranks[loI].w}</text>` : ""}</svg>`;
   }
   function vsRows(D, r, vs, p) {
     return `<div class="wr-vs">${vs.map((m, i) => {
@@ -246,7 +246,7 @@
   }
   function donut(share, p, label) {
     const R = 150, C = 2 * Math.PI * R, off = C * (1 - clamp(share, 0, 1));
-    return `<svg viewBox="0 0 360 360" width="360" height="360" class="wr-donut"><circle cx="180" cy="180" r="${R}" fill="none" stroke="${p.fg}" stroke-opacity=".18" stroke-width="40"/><circle cx="180" cy="180" r="${R}" fill="none" stroke="${p.ac}" stroke-width="40" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" style="--c:${C.toFixed(1)};stroke-dashoffset:${off.toFixed(1)}" class="wr-dash" transform="rotate(-90 180 180)"/><text x="180" y="196" text-anchor="middle" font-size="64" font-weight="800" fill="${p.fg}" font-family="Barlow Condensed">${pct(share)}</text><text x="180" y="240" text-anchor="middle" font-size="24" fill="${p.fg}" opacity=".75" font-family="Barlow Condensed">${label}</text></svg>`;
+    return `<svg viewBox="0 0 360 360" width="360" height="360" class="wr-donut"><circle cx="180" cy="180" r="${R}" fill="none" stroke="${p.fg}" stroke-opacity=".18" stroke-width="40"/><circle cx="180" cy="180" r="${R}" fill="none" stroke="${p.ac}" stroke-width="40" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" style="--c:${C.toFixed(1)};stroke-dashoffset:${off.toFixed(1)}" class="wr-dash" transform="rotate(-90 180 180)"/><text x="180" y="196" text-anchor="middle" font-size="64" font-weight="800" fill="${p.fg}" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif">${pct(share)}</text><text x="180" y="240" text-anchor="middle" font-size="24" fill="${p.fg}" opacity=".75" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif">${label}</text></svg>`;
   }
   function attendance(D, r, pid, p) {
     const ws = D.playedWeeks;
@@ -259,7 +259,7 @@
   function gauge(luck, p) {
     const a = clamp(luck / 3, -1, 1) * 80;
     return `<svg viewBox="0 0 600 340" width="760" height="430" class="wr-chart"><path d="M60,300 A240,240 0 0 1 540,300" fill="none" stroke="${p.fg}" stroke-opacity=".2" stroke-width="54"/><path d="M60,300 A240,240 0 0 1 300,60" fill="none" stroke="${p.fg}" stroke-opacity=".45" stroke-width="54"/><path d="M300,60 A240,240 0 0 1 540,300" fill="none" stroke="${p.ac}" stroke-width="54"/>
-      <text x="40" y="336" font-size="26" fill="${p.fg}" font-family="Barlow Condensed" font-weight="700">SALADO</text><text x="560" y="336" font-size="26" fill="${p.fg}" text-anchor="end" font-family="Barlow Condensed" font-weight="700">SUERTUDO</text>
+      <text x="40" y="336" font-size="26" fill="${p.fg}" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif" font-weight="700">SALADO</text><text x="560" y="336" font-size="26" fill="${p.fg}" text-anchor="end" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif" font-weight="700">SUERTUDO</text>
       <g class="wr-needle" style="--a:${a.toFixed(1)}deg;transform:rotate(${a.toFixed(1)}deg)"><line x1="300" y1="300" x2="300" y2="92" stroke="${p.fg}" stroke-width="14" stroke-linecap="round"/></g><circle cx="300" cy="300" r="26" fill="${p.fg}"/></svg>`;
   }
   function spark(ws, p, w = 920, h = 180) {
@@ -281,7 +281,7 @@
         <div class="wr-ch-top"><b>${esc(pl.pos || "")}</b><span>${esc(pl.team || "")}</span><em>${o.badge || "MVP"}</em></div>
         <div class="wr-ch-art"><svg viewBox="0 0 600 600" preserveAspectRatio="xMidYMid slice">${[...Array(16)].map((_, i) => { const a = (i * 22.5 * Math.PI) / 180, b = ((i * 22.5 + 11) * Math.PI) / 180; return `<polygon points="300,300 ${300 + 700 * Math.cos(a)},${300 + 700 * Math.sin(a)} ${300 + 700 * Math.cos(b)},${300 + 700 * Math.sin(b)}" fill="#fff" opacity=".12"/>`; }).join("")}
           <g transform="rotate(-28 300 300)"><ellipse cx="300" cy="300" rx="210" ry="128" fill="#6B3E26" stroke="#2A1A10" stroke-width="10"/><path d="M118,300 Q300,250 482,300" fill="none" stroke="#fff" stroke-width="10" opacity=".85"/><line x1="230" y1="300" x2="370" y2="300" stroke="#fff" stroke-width="12"/>${[250, 280, 310, 340].map((x) => `<line x1="${x}" y1="284" x2="${x}" y2="316" stroke="#fff" stroke-width="9"/>`).join("")}</g>
-          <text x="300" y="560" text-anchor="middle" font-size="150" font-weight="800" fill="#fff" opacity=".92" font-family="Barlow Condensed">${esc(initials(pl.name))}</text></svg>${cracks}</div>
+          <text x="300" y="560" text-anchor="middle" font-size="150" font-weight="800" fill="#fff" opacity=".92" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif">${esc(initials(pl.name))}</text></svg>${cracks}</div>
         <div class="wr-ch-name">${esc(pl.name)}</div>
         <div class="wr-ch-stats">${rows.map(([l, v]) => `<div><span>${l}</span><b>${v}</b></div>`).join("")}</div>
         <div class="wr-ch-foot">${o.foot || `Edición La Buenísima ${esc(D.season)}`}</div>
@@ -293,8 +293,8 @@
     const txt = `LA BUENÍSIMA · WRAPPED · ${name.toUpperCase()} · `;
     return `<svg viewBox="0 0 520 520" width="${size}" height="${size}" class="wr-seal"><defs><path id="wrsc" d="M260,260 m-200,0 a200,200 0 1,1 400,0 a200,200 0 1,1 -400,0"/></defs>
       <circle cx="260" cy="260" r="250" fill="${p.ac}"/><circle cx="260" cy="260" r="150" fill="${p.bg}"/>
-      <g class="wr-spin" style="transform-origin:260px 260px;animation-duration:18s"><text font-size="34" font-weight="800" letter-spacing="6" fill="${p.bg}" font-family="Barlow Condensed"><textPath href="#wrsc">${esc(txt + txt).slice(0, 120)}</textPath></text></g>
-      <text x="260" y="296" text-anchor="middle" font-size="110" font-weight="800" fill="${p.ac}" font-family="Barlow Condensed">${esc(initials(name.replace(/^(El|La|Los)\s+/i, "")))}</text></svg>`;
+      <g class="wr-spin" style="transform-origin:260px 260px;animation-duration:18s"><text font-size="34" font-weight="800" letter-spacing="6" fill="${p.bg}" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif"><textPath href="#wrsc">${esc(txt + txt).slice(0, 120)}</textPath></text></g>
+      <text x="260" y="296" text-anchor="middle" font-size="110" font-weight="800" fill="${p.ac}" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif">${esc(initials(name.replace(/^(El|La|Los)\s+/i, "")))}</text></svg>`;
   }
 
   /* ---------------- tarjetas del equipo ---------------- */
@@ -380,7 +380,7 @@
       const w = 960, h = 1050, x = (i) => 30 + (i * (w - 300)) / (weeks.length - 1), y = (k) => 40 + ((k - 1) * (h - 80)) / (D.numTeams - 1);
       const tables = weeks.map((wk) => D.standingsAt(wk));
       const lead = D.standings[0].rid;
-      const lines = D.rids.map((r, n) => { const pts = tables.map((t) => (t.find((s) => s.rid === r) || {}).rank); const d = pts.map((k, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(k).toFixed(1)}`).join(""); const hi = r === lead; return `<path d="${d}" fill="none" stroke="${hi ? PAL.navy.ac : UI.color(r)}" stroke-width="${hi ? 12 : 6}" stroke-linejoin="round" stroke-linecap="round" class="wr-draw" style="animation-delay:${n * 120}ms"/><circle cx="${x(weeks.length - 1)}" cy="${y(pts[pts.length - 1])}" r="${hi ? 14 : 9}" fill="${hi ? PAL.navy.ac : UI.color(r)}"/><text x="${x(weeks.length - 1) + 22}" y="${y(pts[pts.length - 1]) + 10}" font-size="28" fill="${PAL.navy.fg}" font-weight="${hi ? 800 : 500}" font-family="Barlow Condensed" class="wr-fade" style="animation-delay:1.6s">${T(D, r).slice(0, 16)}</text>`; }).join("");
+      const lines = D.rids.map((r, n) => { const pts = tables.map((t) => (t.find((s) => s.rid === r) || {}).rank); const d = pts.map((k, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(k).toFixed(1)}`).join(""); const hi = r === lead; return `<path d="${d}" fill="none" stroke="${hi ? PAL.navy.ac : UI.color(r)}" stroke-width="${hi ? 12 : 6}" stroke-linejoin="round" stroke-linecap="round" class="wr-draw" style="animation-delay:${n * 120}ms"/><circle cx="${x(weeks.length - 1)}" cy="${y(pts[pts.length - 1])}" r="${hi ? 14 : 9}" fill="${hi ? PAL.navy.ac : UI.color(r)}"/><text x="${x(weeks.length - 1) + 22}" y="${y(pts[pts.length - 1]) + 10}" font-size="28" fill="${PAL.navy.fg}" font-weight="${hi ? 800 : 500}" font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif" class="wr-fade" style="animation-delay:1.6s">${T(D, r).slice(0, 16)}</text>`; }).join("");
       cards.push(card({ pal: "navy", fx: "waves", song: "carrera" }, `${kick("La carrera")}${title("Así se movió la tabla", 110)}<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" class="wr-chart">${lines}</svg>`, D));
     }
     const close = D.records.closest[0], high = D.records.games.slice().sort((a, b) => b.pa + b.pb - (a.pa + a.pb))[0];
