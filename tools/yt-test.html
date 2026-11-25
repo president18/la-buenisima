@@ -1,0 +1,8 @@
+<!doctype html><meta charset="utf-8"><body><div id="p"></div><pre id="o"></pre>
+<script>
+const IDS="9jK-NcRmVcw 4hj8M8XZpis UywKZcH_Wk0 E_NNCNDYEpU mk48xRzuNvA 6k8cpUkKK4c YgSPaXgAdzE hLQl3WQQoQ0 22c3_LoIfZQ -0kcet4aPpQ 2aW7HweAf3o rY0WxgSXdEE 1tLYYSofs3U MfiKk4wxiVM 51rLkzeMbqQ PNbBDrceCy8 LYb_nqU_43w CnQ8N1KacJc zwEyuzaNUTA 04854XqcfCY 62v4y43D-3k 0J2QdDbelmY 8a-HfNE3EIo r78QV5Cwiq0 v2AC41dglnM btPJPFnesV4 zoK_BifM_cA h_D3VFfhvs4 _mMyPJSx8RU fJ9rUzIMcZQ HgzGwKwLmgM a01QQZyl-_I nbwn21TU4ec xFYQQPAOz7Y xnOlUcHwyyg WRc4lH6_bEU AxWejrVYcCg ioE_O7Lm0I4".split(" ");
+window.RES={};let i=0,pl;
+function onYouTubeIframeAPIReady(){pl=new YT.Player("p",{width:320,height:200,playerVars:{autoplay:1,mute:1,playsinline:1},events:{onReady:()=>nx(),onStateChange:e=>{if(e.data===1){done("OK "+pl.getVideoData().title+" | "+Math.round(pl.getDuration()))}},onError:e=>done("ERR "+e.data)}});}
+let t;function nx(){if(i>=IDS.length){window.FIN=1;return}pl.mute();pl.loadVideoById(IDS[i]);clearTimeout(t);t=setTimeout(()=>done("TIMEOUT"),9000)}
+function done(s){if(RES[IDS[i]])return;RES[IDS[i]]=s;document.getElementById("o").textContent+=IDS[i]+" "+s+"\n";i++;setTimeout(nx,300)}
+</script><script src="https://www.youtube.com/iframe_api"></script>
