@@ -123,7 +123,7 @@
     const X = W.teamData(D, r);
     const s = X.st, nick = N(D, r), team = T(D, r);
     const cards = [];
-    cards.push(card(COL.forest, COL.paper, `${kick("Tu temporada")}<div class="wr-title">${nick},</div>${line(`esta fue la temporada ${esc(D.season)} de <b>${team}</b>.`, "lg")}${line("Toca para empezar.", "dim")}`, D));
+    cards.push(card(COL.forest, COL.paper, `${kick("Tu temporada")}<div class="wr-title">${nick},</div>${line(`esta fue la temporada ${esc(D.season)} de <b>${team.replace(/\.+$/, "")}</b>.`, "lg")}${line("Toca para empezar.", "dim")}`, D));
     cards.push(card(COL.paper, COL.ink, `${kick("Tus números")}${big(s.pf || 0)}${line("puntos en la temporada")}<div class="wr-grid"><div><b>${rec(s)}</b><span>récord</span></div><div><b>${s.rank}°</b><span>lugar de ${D.numTeams}</span></div><div><b>${f1(s.ppg)}</b><span>por partido</span></div></div>`, D, team));
     if (X.ranks.length > 1) cards.push(card(COL.blue, COL.paper, `${kick("Tu montaña rusa")}${line(X.low.rank > X.high.rank ? `Llegaste a estar <b>${X.low.rank}°</b> en la semana ${X.low.w}.` : "Estuviste arriba casi toda la temporada.", "lg")}${rankChart(X.ranks, D.numTeams, COL.paper)}${line(X.high.rank === 1 ? `Y en la semana ${X.high.w} estabas en la cima.` : `Tu mejor momento: ${X.high.rank}° en la semana ${X.high.w}.`, "dim")}`, D, team));
     if (X.best) {
