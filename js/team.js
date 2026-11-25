@@ -296,8 +296,24 @@
         <div class="card"><div class="h3" style="margin-top:0;font-size:20px">Tus trades</div>${mt.map((t) => { const me = t.sides.find((s) => s.rid === ME), ot = t.sides.find((s) => s.rid !== ME); return `<div class="list-row small"><span>S${t.week}: recibiste ${esc(me.gets.map((g) => UI.plName(D, g.pid)).join(", "))} de ${esc(UI.tName(D, ot.rid))}</span><span class="sp"></span><b class="${me.startPts >= ot.startPts ? "good" : "bad"}">${sign(me.startPts - ot.startPts)}</b></div>`; }).join("") || '<p class="small muted">No has hecho trades.</p>'}</div></div>`;
   }
 
+  function wrappedPreview() {
+    if (!LB.wrapped) return "";
+    const base = location.href.replace(/napugi-[^/]*$/, "").replace(/[#?].*$/, "");
+    const links = D.standings.map((s) => { const c = LB.wrapped.codeFor(D, s.rid); return `<tr><td>${UI.teamCell(D, s.rid, { sm: true })}</td><td class="small" style="white-space:normal;word-break:break-all">${c ? esc(base + "#wrapped-" + c) : "—"}</td><td><button class="btn" data-wp="${s.rid}" style="padding:5px 10px;font-size:13px">Ver</button></td></tr>`; }).join("");
+    return `<div class="h3">Wrapped · vista previa privada</div>
+      <p class="sub">Solo tú lo ves. Para la liga se abre el ${esc(LB.wrapped.unlockAt().toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" }))}. Usa datos hasta la semana ${D.lastScored}.</p>
+      <div class="row" style="margin-bottom:10px"><button class="btn pri" id="wpLeague">Wrapped de la liga</button><button class="btn pri" id="wpMine">Mi Wrapped</button></div>
+      <div class="tbl-wrap"><table><thead><tr><th>Equipo</th><th>Link privado (mándaselo a cada uno cuando se abra)</th><th></th></tr></thead><tbody>${links}</tbody></table></div>`;
+  }
+  function bindWrapped() {
+    const l = document.getElementById("wpLeague"); if (!l) return;
+    l.onclick = () => LB.wrapped.open(D, LB.wrapped.leagueCards(D), "liga");
+    document.getElementById("wpMine").onclick = () => LB.wrapped.open(D, LB.wrapped.teamCards(D, ME), UI.tName(D, ME));
+    document.querySelectorAll("[data-wp]").forEach((b) => (b.onclick = () => { const r = Number(b.dataset.wp); LB.wrapped.open(D, LB.wrapped.teamCards(D, r), UI.tName(D, r)); }));
+  }
   function render() {
-    $("#main").innerHTML = [resumen(), lineup(), posStrength(), freeAgents(), trades(), myHistory()].map((h) => `<section style="padding-top:8px">${h}</section>`).join("");
+    $("#main").innerHTML = [resumen(), lineup(), posStrength(), freeAgents(), trades(), myHistory(), wrappedPreview()].map((h) => `<section style="padding-top:8px">${h}</section>`).join("");
+    bindWrapped();
     if (STATE.afterRender) STATE.afterRender();
   }
 

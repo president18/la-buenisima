@@ -10,7 +10,7 @@
     { k: "inicio", l: "Inicio", i: "home", subs: [["inicio", "Noticias"]] },
     { k: "liga", l: "Liga", i: "chart", subs: [["tabla", "Tabla"], ["power", "Power"], ["playoffs", "Playoffs"], ["calendarios", "Calendarios"]] },
     { k: "semana", l: "Semana", i: "ball", subs: [["semana", "Partidos"], ["manianera", "La Mañanera"], ["roast", "Roast"]] },
-    { k: "equipos", l: "Equipos", i: "user", subs: [["equipo", "Equipos"], ["h2h", "Cara a cara"]] },
+    { k: "equipos", l: "Equipos", i: "user", subs: [["equipo", "Equipos"], ["h2h", "Cara a cara"], ["wrapped", "Wrapped"]] },
     { k: "historia", l: "Historia", i: "book", subs: [["historia", "Récords"], ["draft", "Draft"], ["movimientos", "Trades y waivers"], ["oscars", "Óscars"]] },
   ];
   const groupOf = (sub) => GROUPS.find((g) => g.subs.some((x) => x[0] === sub)) || GROUPS[0];
@@ -37,6 +37,7 @@
     const h = (location.hash || "#inicio").slice(1);
     const m = h.match(/^equipo-(\d+)$/);
     if (m) return { sub: "equipo", team: Number(m[1]) };
+    if (/^wrapped(-[A-Za-z0-9]+)?$/.test(h)) return { sub: "wrapped" };
     return { sub: GROUPS.some((g) => g.subs.some((x) => x[0] === h)) ? h : "inicio" };
   }
   function show() {
@@ -45,8 +46,9 @@
     lastSub[g.k] = sub;
     document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("on", b.dataset.g === g.k));
     document.querySelectorAll("#bnav button").forEach((b) => b.classList.toggle("on", b.dataset.g === g.k));
-    $("#subtabs").innerHTML = g.subs.length > 1 ? g.subs.map(([k, l]) => `<button class="${k === sub ? "on" : ""}" data-k="${k}">${l}</button>`).join("") : "";
+    $("#subtabs").innerHTML = g.subs.length > 1 ? g.subs.map(([k, l]) => `<button class="${k === sub ? "on" : ""}" data-k="${k === "wrapped" && /^#wrapped-/.test(location.hash) ? location.hash.slice(1) : k}">${l}</button>`).join("") : "";
     $("#subtabs").style.display = g.subs.length > 1 ? "" : "none";
+    if (sub === "wrapped" && D) LB.wrapped.render(D, $("#s-wrapped"));
     if (sub === "equipo" && D) { if (team && team !== sel.team) { sel.team = team; try { localStorage.setItem("lb-team", String(team)); } catch (e) {} renderEquipo(); } }
     document.querySelectorAll(".sec").forEach((s) => s.classList.toggle("on", s.id === "s-" + sub));
     window.scrollTo(0, 0);

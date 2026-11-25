@@ -48,5 +48,20 @@ window.LB_CONFIG = {
 
   // Campeones de temporadas pasadas que NO están en Sleeper (opcional).
   // Ej: [{ season: "2025", champion: "Napugi", runnerUp: "Pony28", note: "" }]
-  pastChampions: []
+  pastChampions: [],
+  // Wrapped de fin de temporada: se abre en esta fecha (2 días después de la final, semana 17).
+  wrappedUnlock: "2027-01-06T00:00:00-06:00",
+  // Link privado de cada manager: sitio/#wrapped-CODIGO  (código -> usuario de Sleeper)
+  wrappedCodes: {
+    "da5472a4": "Napugi",
+    "127dfa99": "marcossaade13",
+    "c92dd989": "Pony28",
+    "5a717f49": "oldaktlamete",
+    "74072373": "MITRALAN",
+    "7f16f90d": "MVPurdy26",
+    "4b42d0e0": "TofiZonana",
+    "8b557813": "EytanSt",
+    "7177ce62": "reylago",
+    "c742c531": "Arizg99"
+  }
 };
