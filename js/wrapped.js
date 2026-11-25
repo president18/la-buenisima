@@ -490,7 +490,7 @@
         <div class="wr-yt"><div class="wr-ytbox"></div></div>
         <div class="wr-dinfo">
           <div class="wr-np"><div class="wr-eq"><i></i><i></i><i></i><i></i></div><div><b>Música</b><span>Toca la tarjeta para empezar</span></div></div>
-          <div class="wr-ythint">Si no suena, dale play al video.</div>
+          <div class="wr-ythint">Si no suena, dale play al video. A veces YouTube pone un anuncio antes.</div>
           <div class="wr-btns"><button data-a="mus">Música: sí</button><button data-a="img">Guardar</button><button data-a="close">Cerrar</button></div>
         </div>
       </div>`;

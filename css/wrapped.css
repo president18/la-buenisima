@@ -238,3 +238,5 @@
 .wr-export .wr-chromo{transform:none}
 .wr-export .wr-shine{display:none}
 @media (prefers-reduced-motion:reduce){.wr-ov *{animation-duration:.01s!important;animation-iteration-count:1!important}}
+/* el modal de imagen y los avisos van encima del visor */
+.modal{z-index:400}.toast{z-index:450}
