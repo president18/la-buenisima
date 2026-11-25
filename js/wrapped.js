@@ -32,29 +32,31 @@
   };
   const POSC = { QB: "#E4572E", RB: "#2BB673", WR: "#3E7CB1", TE: "#F2B33D", K: "#8E8D8A", DEF: "#5B2A86" };
 
-  /* Canciones: se pueden cambiar en config.js con wrappedSongs */
+  /* Música: YouTube solo en los momentos clave (ids), beats originales en el resto (beat).
+     Se puede cambiar en config.js con wrappedSongs */
+  const BEAT_A = "Beat original · La Buenísima";
   const SONGS = Object.assign({
     portada: { t: "Sirius", a: "The Alan Parsons Project", ids: ["UywKZcH_Wk0", "E_NNCNDYEpU"], s: 0 },
-    numeros: { t: "Gonna Fly Now (Rocky)", a: "Bill Conti", ids: ["AxWejrVYcCg", "ioE_O7Lm0I4"], s: 0 },
-    montana: { t: "Under Pressure", a: "Queen & David Bowie", ids: ["a01QQZyl-_I", "nbwn21TU4ec"], s: 0 },
-    adivina: { t: "The Final Countdown", a: "Europe", ids: ["9jK-NcRmVcw", "4hj8M8XZpis"], s: 0 },
-    vsliga: { t: "Eye of the Tiger", a: "Survivor", ids: ["btPJPFnesV4", "zoK_BifM_cA"], s: 0 },
-    mvp: { t: "Hall of Fame", a: "The Script ft. will.i.am", ids: ["mk48xRzuNvA"], s: 0 },
-    fiel: { t: "Count on Me", a: "Bruno Mars", ids: ["6k8cpUkKK4c"], s: 0 },
-    ladrillo: { t: "Payaso de Rodeo", a: "Caballo Dorado", ids: ["xnOlUcHwyyg", "YgSPaXgAdzE"], s: 0 },
-    banca: { t: "Someone Like You", a: "Adele", ids: ["hLQl3WQQoQ0", "22c3_LoIfZQ"], s: 0 },
-    movidas: { t: "Money", a: "Pink Floyd", ids: ["-0kcet4aPpQ", "2aW7HweAf3o"], s: 0 },
-    versus: { t: "Another One Bites the Dust", a: "Queen", ids: ["rY0WxgSXdEE", "1tLYYSofs3U"], s: 0 },
-    suerte: { t: "Luck Be a Lady", a: "Frank Sinatra", ids: ["MfiKk4wxiVM", "51rLkzeMbqQ"], s: 0 },
     personalidad: { t: "Who Are You", a: "The Who", ids: ["PNbBDrceCy8", "LYb_nqU_43w"], s: 0 },
     campeon: { t: "We Are the Champions", a: "Queen", ids: ["04854XqcfCY", "62v4y43D-3k"], s: 0 },
     cierre: { t: "Good Riddance (Time of Your Life)", a: "Green Day", ids: ["CnQ8N1KacJc", "zwEyuzaNUTA"], s: 0 },
-    resumen: { t: "Don't Stop Me Now", a: "Queen", ids: ["HgzGwKwLmgM", "MHi9mKq0slA"], s: 0 },
     liga: { t: "Seven Nation Army", a: "The White Stripes", ids: ["0J2QdDbelmY"], s: 0 },
-    carrera: { t: "Chariots of Fire", a: "Vangelis", ids: ["r78QV5Cwiq0", "8a-HfNE3EIo"], s: 0 },
-    partido: { t: "Thunderstruck", a: "AC/DC", ids: ["v2AC41dglnM"], s: 0 },
-    robo: { t: "Smooth Criminal", a: "Michael Jackson", ids: ["h_D3VFfhvs4", "_mMyPJSx8RU"], s: 0 },
-    personalidades: { t: "Bohemian Rhapsody", a: "Queen", ids: ["fJ9rUzIMcZQ"], s: 0 },
+    numeros: { t: "Modo Bestia", a: BEAT_A, beat: "hype" },
+    montana: { t: "Subidas y Bajadas", a: BEAT_A, beat: "rusa" },
+    adivina: { t: "Cuenta Regresiva", a: BEAT_A, beat: "suspense" },
+    vsliga: { t: "Tú contra Todos", a: BEAT_A, beat: "battle" },
+    mvp: { t: "Salón de la Fama", a: BEAT_A, beat: "epic" },
+    fiel: { t: "Siempre Titular", a: BEAT_A, beat: "chill" },
+    ladrillo: { t: "Ladrillazo", a: BEAT_A, beat: "oompa" },
+    banca: { t: "La Banca Llora", a: BEAT_A, beat: "sad" },
+    movidas: { t: "Wall Street", a: BEAT_A, beat: "funk" },
+    versus: { t: "Némesis", a: BEAT_A, beat: "battle" },
+    suerte: { t: "Casino", a: BEAT_A, beat: "lounge" },
+    resumen: { t: "Otra Temporada", a: BEAT_A, beat: "hype" },
+    carrera: { t: "Sprint Final", a: BEAT_A, beat: "sprint" },
+    partido: { t: "Final de Infarto", a: BEAT_A, beat: "battle" },
+    robo: { t: "Robo a Mano Armada", a: BEAT_A, beat: "funk" },
+    personalidades: { t: "Quién es Quién", a: BEAT_A, beat: "lounge" },
   }, CFG.wrappedSongs || {});
   W.SONGS = SONGS;
 
@@ -409,6 +411,94 @@
     return cards;
   };
 
+
+  /* ---------------- beats originales (Web Audio) ---------------- */
+  // Cada "mood" es un loop de 4 compases. prog: [semitonos desde la raíz, "M" mayor | "m" menor | "7" dominante]
+  const MOODS = {
+    hype: { bpm: 124, root: 45, prog: [[0, "m"], [-4, "M"], [3, "M"], [-2, "M"]], k: "x...x...x...x...", s: "....x.......x...", h: "..x...x...x...x.", hh: "x.x.x.x.x.x.x.x.", b: "..0...0...0...0.", arp: "0.1.2.1.0.1.2.1.", stab: "x.......x.......", cut: 1800 },
+    rusa: { bpm: 116, root: 48, prog: [[0, "M"], [5, "M"], [-3, "m"], [7, "M"]], k: "x.......x.......", s: "....x.......x...", h: "x.x.x.x.x.x.x.x.", b: "0.....0.0.....0.", arp: "0123210123432101", cut: 2400 },
+    suspense: { bpm: 100, root: 43, prog: [[0, "m"], [0, "m"], [1, "M"], [1, "M"]], k: "x..x............", s: "................", h: "x...x...x...x...", b: "0...............", arp: "2.2.2.2.2.2.2.2.", pad: 1, cut: 900, rise: 1 },
+    battle: { bpm: 140, root: 38, prog: [[0, "m"], [0, "m"], [-2, "M"], [1, "M"]], k: "x.x...x.x.x...x.", s: "....x.......x..x", h: "xxxxxxxxxxxxxxxx", b: "0.0.0.0.0.0.0.0.", stab: "x..x..x.........", cut: 1500 },
+    epic: { bpm: 84, root: 48, prog: [[0, "M"], [7, "M"], [9, "m"], [5, "M"]], k: "x.........x.....", s: "........x.......", h: "..x...x...x...x.", b: "0.......0.......", arp: "0.1.2.3.2.1.0.1.", pad: 1, cut: 2200 },
+    chill: { bpm: 92, root: 50, prog: [[0, "M"], [-3, "m"], [5, "M"], [7, "M"]], k: "x......x..x.....", s: "....x.......x...", h: "x.x.x.x.x.x.x.x.", b: "0......0..0.....", pad: 1, cut: 1100, swing: 0.18 },
+    sad: { bpm: 70, root: 45, prog: [[0, "m"], [-4, "M"], [3, "M"], [-2, "M"]], k: "x.........x.....", s: "", h: "", b: "0...............", arp: "0..1..2..1..0...", pad: 1, cut: 800 },
+    funk: { bpm: 108, root: 40, prog: [[0, "7"], [0, "7"], [5, "7"], [7, "7"]], k: "x..x..x...x..x..", s: "....x.......x...", h: "xxxxxxxxxxxxxxxx", b: "0..0.0..0.3.5..7", stab: "..x...x...x...x.", cut: 2000, swing: 0.1 },
+    lounge: { bpm: 118, root: 46, prog: [[0, "M"], [9, "m"], [2, "m"], [7, "7"]], k: "x.......x.......", s: "....x.......x...", h: "x..xx..xx..xx..x", b: "0...4...7...4...", stab: "....x.......x...", cut: 1600, swing: 0.22 },
+    oompa: { bpm: 96, root: 41, prog: [[0, "M"], [7, "7"], [0, "M"], [7, "7"]], k: "x.......x.......", s: "....x.......x...", h: "", b: "0.......7.......", stab: "....x.......x...", cut: 900, tuba: 1 },
+    sprint: { bpm: 150, root: 42, prog: [[0, "m"], [-4, "M"], [-2, "M"], [-5, "M"]], k: "x...x...x...x...", s: "....x.......x...", h: "..x...x...x...x.", hh: "xxxxxxxxxxxxxxxx", b: "0.0.0.0.0.0.0.0.", arp: "0.2.1.2.0.2.1.2.", cut: 2600 },
+  };
+  const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
+  function chordOf(root, [off, q]) { const r = root + off; return q === "m" ? [r, r + 3, r + 7, r + 12] : q === "7" ? [r, r + 4, r + 7, r + 10] : [r, r + 4, r + 7, r + 12]; }
+
+  function Beat() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    const B = { ctx: null, mood: null, next: null, on: false, step: 0, bar: 0, t: 0, timer: null };
+    let master, comp, noise;
+    B.init = () => {
+      if (B.ctx || !AC) return !!B.ctx;
+      B.ctx = new AC();
+      comp = B.ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4;
+      master = B.ctx.createGain(); master.gain.value = 0;
+      master.connect(comp); comp.connect(B.ctx.destination);
+      noise = B.ctx.createBuffer(1, B.ctx.sampleRate, B.ctx.sampleRate); const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      return true;
+    };
+    B.resume = () => { if (B.ctx && B.ctx.state !== "running") B.ctx.resume(); };
+    const env = (g, t, a, peak, dec) => { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + dec); };
+    const osc = (type, f, t, dur, peak, dest, a = 0.005, cut) => {
+      const o = B.ctx.createOscillator(), g = B.ctx.createGain(); o.type = type; o.frequency.setValueAtTime(f, t);
+      let node = o; if (cut) { const fl = B.ctx.createBiquadFilter(); fl.type = "lowpass"; fl.frequency.value = cut; fl.Q.value = 3; o.connect(fl); node = fl; }
+      node.connect(g); g.connect(dest || master); env(g, t, a, peak, dur); o.start(t); o.stop(t + a + dur + 0.05); return o;
+    };
+    const nz = (t, dur, peak, type, f, dest) => {
+      const s = B.ctx.createBufferSource(), fl = B.ctx.createBiquadFilter(), g = B.ctx.createGain(); s.buffer = noise; fl.type = type; fl.frequency.value = f;
+      s.connect(fl); fl.connect(g); g.connect(dest || master); env(g, t, 0.002, peak, dur); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.05); return fl;
+    };
+    const kick = (t) => { const o = B.ctx.createOscillator(), g = B.ctx.createGain(); o.frequency.setValueAtTime(160, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.14); o.connect(g); g.connect(master); env(g, t, 0.003, 0.9, 0.32); o.start(t); o.stop(t + 0.4); };
+    const snare = (t) => { nz(t, 0.16, 0.38, "highpass", 1400); osc("triangle", 190, t, 0.08, 0.2); };
+    const hat = (t, v = 0.1) => nz(t, 0.035, v, "highpass", 7500);
+    function tick(m, t, sd) {
+      const s = B.step % 16, ch = chordOf(m.root, m.prog[B.bar % m.prog.length]);
+      const at = (p) => p && p[s] && p[s] !== ".";
+      if (at(m.k)) kick(t);
+      if (at(m.s)) snare(t);
+      if (at(m.h)) hat(t, 0.12);
+      if (at(m.hh)) hat(t, 0.05);
+      if (at(m.b)) { const n = ch[0] - 12 + (Number(m.b[s]) || 0); if (m.tuba) osc("square", mtof(n), t, sd * 3, 0.32, null, 0.01, m.cut); else osc("sawtooth", mtof(n), t, sd * 1.6, 0.3, null, 0.005, 520); }
+      if (at(m.stab)) ch.slice(0, 3).forEach((n) => osc(m.tuba ? "triangle" : "square", mtof(n + 12), t, sd * (m.tuba ? 1.5 : 0.9), 0.05, null, 0.004, m.cut));
+      if (at(m.arp)) { const idx = Number(m.arp[s]) || 0; osc("triangle", mtof(ch[idx % ch.length] + 24), t, sd * 1.2, 0.07, null, 0.004); }
+      if (m.pad && s === 0) ch.slice(0, 3).forEach((n) => { [0, 7].forEach((det) => { const o = osc("sawtooth", mtof(n + 12), t, sd * 15, 0.022, null, 0.4, m.rise ? 500 + (B.bar % 4) * 350 : m.cut); o.detune.value = det; }); });
+    }
+    function loop() {
+      if (!B.ctx) return;
+      while (B.t < B.ctx.currentTime + 0.12) {
+        if (B.step % 16 === 0 && B.next) { B.mood = B.next; B.next = null; B.bar = 0; }
+        const m = MOODS[B.mood]; if (!m) { B.t += 0.1; continue; }
+        const sd = 60 / m.bpm / 4, sw = m.swing && B.step % 2 ? sd * m.swing : 0;
+        tick(m, B.t + sw, sd);
+        B.t += sd; B.step++; if (B.step % 16 === 0) B.bar++;
+      }
+    }
+    B.setMood = (mood) => {
+      if (!B.ctx) return;
+      if (!B.timer) { B.mood = mood; B.step = 0; B.bar = 0; B.t = B.ctx.currentTime + 0.05; B.timer = setInterval(loop, 25); }
+      else if (mood !== B.mood) { B.next = mood; if (B.step % 16 > 2) { B.step = Math.ceil(B.step / 16) * 16; } }
+    };
+    B.fade = (to, sec = 0.4) => { if (!B.ctx) return; const g = master.gain, n = B.ctx.currentTime; g.cancelScheduledValues(n); g.setValueAtTime(g.value, n); g.linearRampToValueAtTime(to, n + sec); };
+    B.stop = () => { clearInterval(B.timer); B.timer = null; B.fade(0, 0.2); };
+    // efectos
+    B.sfx = (kind) => {
+      if (!B.ctx || !B.sfxOn) return; const t = B.ctx.currentTime + 0.01, d = B.sfxBus || (B.sfxBus = (() => { const g = B.ctx.createGain(); g.gain.value = 0.6; g.connect(comp); return g; })());
+      if (kind === "whoosh") { const f = nz(t, 0.35, 0.25, "bandpass", 500, d); f.frequency.exponentialRampToValueAtTime(4000, t + 0.3); f.Q.value = 1.5; }
+      if (kind === "ding") { osc("sine", 1318, t, 0.5, 0.25, d); osc("sine", 1760, t + 0.12, 0.7, 0.25, d); }
+      if (kind === "buzz") osc("sawtooth", 98, t, 0.35, 0.25, d, 0.01, 700);
+      if (kind === "pop") { nz(t, 0.08, 0.4, "highpass", 900, d); osc("sine", 660, t, 0.15, 0.2, d); osc("sine", 990, t + 0.06, 0.2, 0.15, d); }
+    };
+    B.sfxOn = true;
+    B.close = () => { B.stop(); try { B.ctx && B.ctx.close(); } catch (e) {} B.ctx = null; };
+    return B;
+  }
+
   /* ---------------- música (YouTube, reproductor visible) ---------------- */
   function ytAPI() {
     if (window.YT && window.YT.Player) return Promise.resolve();
@@ -421,46 +511,61 @@
     return W._ytp;
   }
   function Music(ov) {
-    const M = { pl: null, ready: false, on: true, started: false, want: null, cur: null, idx: 0, vt: null };
-    const np = ov.querySelector(".wr-np"), npT = ov.querySelector(".wr-np b"), npA = ov.querySelector(".wr-np span"), hint = ov.querySelector(".wr-ythint");
+    const M = { pl: null, ready: false, on: true, started: false, want: null, cur: null, idx: 0, vt: null, B: Beat() };
+    const npT = ov.querySelector(".wr-np b"), npA = ov.querySelector(".wr-np span"), hint = ov.querySelector(".wr-ythint");
     const label = (key, extra) => { const s = SONGS[key]; npT.textContent = s ? s.t : "—"; npA.textContent = extra || (s ? s.a : ""); };
+    const isYT = (k) => SONGS[k] && SONGS[k].ids;
     const ramp = (to, ms, cb) => { clearInterval(M.vt); if (!M.pl || !M.pl.getVolume) { cb && cb(); return; } let v = M.pl.getVolume() || 0; const st = (to - v) / Math.max(1, ms / 40); M.vt = setInterval(() => { v += st; if ((st >= 0 && v >= to) || (st < 0 && v <= to)) { v = to; clearInterval(M.vt); cb && cb(); } try { M.pl.setVolume(Math.round(v)); } catch (e) {} }, 40); };
+    const ytPause = () => { clearInterval(M.vt); try { M.pl && M.pl.pauseVideo(); } catch (e) {} };
     const load = () => {
       const s = SONGS[M.cur]; if (!s) return;
-      const id = s.ids[M.idx]; if (!id) { label(M.cur, "No disponible aquí"); return; }
+      const id = s.ids[M.idx]; if (!id) { label(M.cur, "No disponible aquí"); M.B.setMood("hype"); M.B.fade(0.55); return; }
       try { M.pl.setVolume(0); M.pl.loadVideoById({ videoId: id, startSeconds: s.s || 0 }); } catch (e) {}
       label(M.cur);
       setTimeout(() => ramp(85, 900), 400);
+      setTimeout(() => { try { if (M.on && M.cur && isYT(M.cur) && M.pl.getPlayerState() !== 1 && M.pl.getPlayerState() !== 3) hint.classList.add("on"); } catch (e) {} }, 3500);
     };
     M.play = (key) => {
       if (key) M.want = key;
       if (!M.want) return;
+      const yt = isYT(M.want);
+      ov.classList.toggle("ytoff", !yt);
       label(M.want);
-      if (!M.on || !M.started || !M.ready) return;
+      if (!M.on || !M.started) return;
+      if (!yt) { // beat propio
+        hint.classList.remove("on");
+        if (M.cur && isYT(M.cur)) ytPause();
+        M.cur = M.want; M.B.resume(); M.B.setMood(SONGS[M.want].beat); M.B.fade(0.55, 0.5); ov.classList.add("playing");
+        return;
+      }
+      M.B.fade(0, 0.4);
+      if (!M.ready) return;
       if (M.cur === M.want) { try { if (M.pl.getPlayerState() !== 1) M.pl.playVideo(); } catch (e) {} return; }
-      const go = () => { M.cur = M.want; M.idx = 0; load(); };
-      if (M.cur) ramp(0, 300, go); else go();
+      M.cur = M.want; M.idx = 0; load();
     };
     M.start = () => {
-      if (M.started) return; M.started = true; M.play();
-      setTimeout(() => { try { if (M.on && M.pl && M.pl.getPlayerState && M.pl.getPlayerState() !== 1 && M.pl.getPlayerState() !== 3) hint.classList.add("on"); } catch (e) {} }, 3000);
+      if (M.started) return false; M.started = true;
+      if (M.B.init()) M.B.resume();
+      M.play(); return true;
     };
+    M.sfx = (k) => { if (M.on && M.started) M.B.sfx(k); };
     M.toggle = () => {
       M.on = !M.on; ov.classList.toggle("nomus", !M.on);
-      try { if (!M.on) M.pl.pauseVideo(); else if (M.started) { if (M.cur === M.want) M.pl.playVideo(); else M.play(); } } catch (e) {}
+      if (!M.on) { ytPause(); M.B.fade(0, 0.2); ov.classList.remove("playing"); }
+      else if (M.started) { const k = M.want; M.cur = isYT(k) ? M.cur : null; if (isYT(k) && M.cur === k) { try { M.pl.playVideo(); } catch (e) {} } else M.play(k); }
       return M.on;
     };
-    M.destroy = () => { clearInterval(M.vt); try { M.pl && M.pl.destroy(); } catch (e) {} };
+    M.destroy = () => { clearInterval(M.vt); M.B.close(); try { M.pl && M.pl.destroy(); } catch (e) {} };
     ytAPI().then(() => {
       M.pl = new YT.Player(ov.querySelector(".wr-ytbox"), {
         width: 200, height: 200, playerVars: { playsinline: 1, rel: 0, modestbranding: 1, controls: 1, fs: 0, iv_load_policy: 3 },
         events: {
-          onReady: () => { M.ready = true; if (M.started) M.play(); },
+          onReady: () => { M.ready = true; if (M.started && isYT(M.want)) M.play(); },
           onError: () => { M.idx++; load(); },
-          onStateChange: (e) => { ov.classList.toggle("playing", e.data === 1); if (e.data === 1) hint.classList.remove("on"); if (e.data === 0 && M.cur) { const s = SONGS[M.cur]; try { M.pl.seekTo(s.s || 0); M.pl.playVideo(); } catch (x) {} } },
+          onStateChange: (e) => { if (isYT(M.cur)) ov.classList.toggle("playing", e.data === 1); if (e.data === 1) hint.classList.remove("on"); if (e.data === 0 && M.cur && isYT(M.cur)) { const s = SONGS[M.cur]; try { M.pl.seekTo(s.s || 0); M.pl.playVideo(); } catch (x) {} } },
         },
       });
-    }).catch(() => label(null, "Sin conexión a YouTube"));
+    }).catch(() => { M.ytDead = true; });
     return M;
   }
 
@@ -489,7 +594,7 @@
       <div class="wr-dock">
         <div class="wr-yt"><div class="wr-ytbox"></div></div>
         <div class="wr-dinfo">
-          <div class="wr-np"><div class="wr-eq"><i></i><i></i><i></i><i></i></div><div><b>Música</b><span>Toca la tarjeta para empezar</span></div></div>
+          <div class="wr-np"><div class="wr-eq"><i></i><i></i><i></i><i></i></div><div><b>Música</b><span>Toca la tarjeta para arrancar</span></div></div>
           <div class="wr-ythint">Si no suena, dale play al video. A veces YouTube pone un anuncio antes.</div>
           <div class="wr-btns"><button data-a="mus">Música: sí</button><button data-a="img">Guardar</button><button data-a="close">Cerrar</button></div>
         </div>
@@ -509,16 +614,16 @@
       const g = scale.querySelector(".wr-guess");
       if (g) {
         const rv = scale.querySelector(".wr-reveal"); rv.classList.add("hid");
-        g.onclick = (e) => { const b = e.target.closest("button"); if (!b || g.dataset.done) return; e.stopPropagation(); g.dataset.done = 1; g.querySelectorAll("button").forEach((x) => x.classList.add(x.dataset.w === g.dataset.ans ? "ok" : x === b ? "no" : "off")); rv.classList.remove("hid"); if (b.dataset.w === g.dataset.ans) boom(); };
+        g.onclick = (e) => { const b = e.target.closest("button"); if (!b || g.dataset.done) return; e.stopPropagation(); g.dataset.done = 1; g.querySelectorAll("button").forEach((x) => x.classList.add(x.dataset.w === g.dataset.ans ? "ok" : x === b ? "no" : "off")); rv.classList.remove("hid"); if (b.dataset.w === g.dataset.ans) { M.sfx("ding"); boom(); } else M.sfx("buzz"); };
       }
-      if (c.conf) setTimeout(boom, 700);
+      if (c.conf) setTimeout(() => { M.sfx("pop"); boom(); }, 700);
       if (c.song) M.play(c.song);
       fit();
     };
     const close = () => { M.destroy(); cancelAnimationFrame(cv._raf); ov.remove(); document.body.style.overflow = ""; window.removeEventListener("resize", fit); document.removeEventListener("keydown", key); };
     const key = (e) => { if (e.key === "ArrowRight") next(); if (e.key === "ArrowLeft") prev(); if (e.key === "Escape") close(); };
-    const next = () => { M.start(); if (i < cards.length - 1) { i++; show(); } };
-    const prev = () => { M.start(); if (i > 0) { i--; show(); } };
+    const next = () => { if (M.start()) return; if (i < cards.length - 1) { i++; M.sfx("whoosh"); show(); } };
+    const prev = () => { if (M.start()) return; if (i > 0) { i--; M.sfx("whoosh"); show(); } };
     stage.onclick = (e) => { const x = e.clientX - stage.getBoundingClientRect().left; if (x < stage.clientWidth / 3) prev(); else next(); };
     ov.querySelector('[data-a="close"]').onclick = close;
     ov.querySelector('[data-a="mus"]').onclick = (e) => { const on = M.toggle(); e.target.textContent = "Música: " + (on ? "sí" : "no"); setTimeout(fit, 50); };

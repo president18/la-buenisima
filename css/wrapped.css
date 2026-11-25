@@ -29,6 +29,11 @@
 .wr-btns button{font:700 14px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.06em;padding:9px 12px;border-radius:999px;border:1.5px solid rgba(244,241,232,.6);background:transparent;color:#F4F1E8;cursor:pointer}
 .wr-btns button[data-a="img"]{background:#F4F1E8;color:#121212;border-color:#F4F1E8}
 .wr-ov.nomus .wr-yt{display:none}
+.wr-ov.ytoff .wr-yt{position:absolute;left:-9999px;top:0}
+.wr-ov.ytoff .wr-dinfo{flex-direction:row;align-items:center;justify-content:space-between}
+.wr-ov.ytoff .wr-dock{padding-top:6px}
+.wr-ov.ytoff .wr-btns,.wr-ov.nomus .wr-btns{flex-wrap:nowrap}
+@media (max-width:420px){.wr-ov.ytoff .wr-btns button,.wr-ov.nomus .wr-btns button{padding:8px 9px;font-size:13px}}
 .wr-ov.nomus .wr-dock{padding-top:6px}
 .wr-ov.nomus .wr-dinfo{flex-direction:row;align-items:center;justify-content:space-between}
 @media (min-width:900px){
@@ -38,7 +43,7 @@
   .wr-dock{grid-column:2;grid-row:2;flex-direction:column;justify-content:flex-end;padding:0 0 0 18px}
   .wr-yt{flex:0 0 auto;width:240px;height:240px}.wr-yt iframe{width:240px;height:240px}
   .wr-dinfo{flex:0 0 auto}
-  .wr-ov.nomus .wr-dinfo{flex-direction:column;align-items:stretch}
+  .wr-ov.nomus .wr-dinfo,.wr-ov.ytoff .wr-dinfo{flex-direction:column;align-items:stretch}
 }
 
 /* --- tarjeta --- */
