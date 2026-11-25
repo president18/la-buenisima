@@ -70,7 +70,7 @@
         <td class="num">${rec(s)}</td><td class="r num">${f1(s.pf)}</td><td class="r num hide-m">${f1(s.pa)}</td>
         <td class="r num hide-m">${f1(s.max)}</td><td class="r num">${pct(s.eff, 1)}</td>
         <td class="num hide-m">${s.apW}-${s.apL}</td><td class="r num ${s.luck > 0.5 ? "good" : s.luck < -0.5 ? "bad" : ""}">${sign(s.luck)}</td>
-        <td class="c">${s.streak}</td><td class="r num">${D.sim.remaining.length ? pct(o.playoff) : s.rank <= D.playoffTeams ? IC("check", 15) : IC("x", 15)}</td></tr>`;
+        <td class="c ${/G$/.test(s.streak) ? "stk-w" : /P$/.test(s.streak) ? "stk-l" : /E$/.test(s.streak) ? "stk-t" : ""}">${s.streak}</td><td class="r num">${D.sim.remaining.length ? pct(o.playoff) : s.rank <= D.playoffTeams ? IC("check", 15) : IC("x", 15)}</td></tr>`;
     }).join("");
     $("#s-inicio").innerHTML = installHTML() + breakingHTML() + miniTabla();
     bindBreaking();
@@ -212,7 +212,7 @@
     const R = D.records;
     const rows = R.weeklyTop.slice().reverse().map((x) => {
       const second = D.rids.filter((r) => r !== x.rid && D.tw[r][x.w]).map((r) => D.tw[r][x.w].pf).sort((a, b) => b - a)[0];
-      return `<tr><td class="num">S${x.w}</td><td>${UI.teamCell(D, x.rid, { sm: true })}</td><td class="r num"><b>${f1(x.pts)}</b></td><td class="r num faint">+${f1(x.pts - (second || 0))}</td><td class="c">${D.tw[x.rid][x.w].res === "W" ? '<span class="good">G</span>' : '<span class="bad">P</span>'}</td></tr>`;
+      return `<tr><td class="num">S${x.w}</td><td>${UI.teamCell(D, x.rid, { sm: true })}</td><td class="r num"><b>${f1(x.pts)}</b></td><td class="r num faint">+${f1(x.pts - (second || 0))}</td><td class="c">${D.tw[x.rid][x.w].res === "W" ? '<span class="good">G</span>' : D.tw[x.rid][x.w].res === "L" ? '<span class="bad">P</span>' : '<span class="tie">E</span>'}</td></tr>`;
     }).join("");
     const counts = D.rids.filter((r) => R.weeklyTopCount[r]).sort((a, b) => R.weeklyTopCount[b] - R.weeklyTopCount[a]).map((r) => `<span class="chip">${esc(D.teams[r].name)} <b>×${R.weeklyTopCount[r]}</b></span>`).join("");
     return `<div class="row" style="margin-top:20px"><div><div class="h3" style="margin:0">El que más metió cada semana</div><p class="sub" style="margin:4px 0 10px">Equipo con más puntos de cada jornada y su ventaja sobre el segundo.</p></div><span class="sp"></span><button class="btn" id="imgTop">${IC("image", 16)} Imagen</button></div>

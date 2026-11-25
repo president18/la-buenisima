@@ -141,7 +141,7 @@
     const rows = D.standings.map((s) => s.rid).map((r) => `<tr class="${UI.isMine(D, r) ? "me" : ""}"><td class="sticky-col">${UI.teamCell(D, r, { sm: true, noOwner: true })}</td>${weeks.map((w) => {
       const x = D.tw[r][w]; if (!x) return "<td></td>";
       const t = (x.pf - mn) / (mx - mn || 1);
-      return `<td style="background:${t >= 0.5 ? `rgba(47,93,80,${((t - 0.5) * 1.1).toFixed(2)})` : `rgba(122,82,54,${((0.5 - t) * 0.6).toFixed(2)})`}">${f1(x.pf)}<div style="font-size:10px" class="${x.res === "W" ? "good" : "bad"}">${x.res === "W" ? "G" : x.res === "L" ? "P" : ""}</div></td>`;
+      return `<td style="background:${t >= 0.5 ? `rgba(47,93,80,${((t - 0.5) * 1.1).toFixed(2)})` : `rgba(122,82,54,${((0.5 - t) * 0.6).toFixed(2)})`}">${f1(x.pf)}<div style="font-size:10px" class="${x.res === "W" ? "good" : x.res === "L" ? "bad" : "tie"}">${x.res === "W" ? "G" : x.res === "L" ? "P" : x.res ? "E" : ""}</div></td>`;
     }).join("")}</tr>`).join("");
     return `<div class="tbl-wrap"><table class="heat"><thead><tr><th class="sticky-col">Equipo</th>${weeks.map((w) => `<th class="c">S${w}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>`;
   }

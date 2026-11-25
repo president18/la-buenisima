@@ -297,7 +297,10 @@ tr.me td.sticky-col{background:var(--tint)}
 .tp-form{display:flex;gap:4px;margin-top:8px}
 .tp-f{width:22px;height:22px;display:grid;place-items:center;font-family:var(--fh);font-weight:700;font-size:13px;border-radius:2px}
 .tp-f.w{background:var(--forest);color:#fff}
-.tp-f.l{background:var(--card2);color:var(--tx2)}
+.tp-f.l{background:var(--bad);color:#fff}
+.tp-f.t{background:#E0B23A;color:#22201C}
+.tie{color:#C9971C}
+.stk-w{color:var(--good);font-weight:700}.stk-l{color:var(--bad);font-weight:700}.stk-t{color:#C9971C;font-weight:700}
 .tp-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--tx2);margin-top:6px}
 .tp-legend i{display:inline-block;width:16px;height:3px;vertical-align:middle;margin-right:5px}
 .tp-legend i.dash{border-top:2px dashed #8A857C;height:0}

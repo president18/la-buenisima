@@ -286,7 +286,7 @@
 
   function myHistory() {
     const ws = Object.values(D.tw[ME]);
-    const rows = ws.map((x) => `<tr><td>S${x.w}</td><td>${x.opp ? UI.teamCell(D, x.opp, { sm: true, noOwner: true }) : "—"}</td><td class="c"><b class="${x.res === "W" ? "good" : "bad"}">${x.res === "W" ? "G" : x.res === "L" ? "P" : x.res || ""}</b></td><td class="r num">${f1(x.pf)}</td><td class="r num">${f1(x.pa)}</td><td class="r num">${f1(x.max)}</td><td class="r num ${x.max - x.pf > 20 ? "bad" : ""}">${f1(x.max - x.pf)}</td><td class="r num">${x.apW}-${x.apL}</td></tr>`).join("");
+    const rows = ws.map((x) => `<tr><td>S${x.w}</td><td>${x.opp ? UI.teamCell(D, x.opp, { sm: true, noOwner: true }) : "—"}</td><td class="c"><b class="${x.res === "W" ? "good" : x.res === "L" ? "bad" : "tie"}">${x.res === "W" ? "G" : x.res === "L" ? "P" : x.res ? "E" : ""}</b></td><td class="r num">${f1(x.pf)}</td><td class="r num">${f1(x.pa)}</td><td class="r num">${f1(x.max)}</td><td class="r num ${x.max - x.pf > 20 ? "bad" : ""}">${f1(x.max - x.pf)}</td><td class="r num">${x.apW}-${x.apL}</td></tr>`).join("");
     const mp = D.pickups.filter((p) => p.rid === ME).sort((a, b) => b.start - a.start).slice(0, 8);
     const mt = D.trades.filter((t) => t.rids.includes(ME));
     return `<div class="h3">Semana por semana</div>

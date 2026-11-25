@@ -72,7 +72,7 @@
     const S = strength(D);
     const ppgRank = D.standings.slice().sort((a, b) => b.ppg - a.ppg).findIndex((x) => x.rid === rid) + 1;
     const effRank = D.standings.slice().sort((a, b) => b.eff - a.eff).findIndex((x) => x.rid === rid) + 1;
-    const form = Object.values(D.tw[rid]).filter((x) => x.reg && x.res).slice(-5).map((x) => `<span class="tp-f ${x.res === "W" ? "w" : "l"}">${x.res === "W" ? "G" : "P"}</span>`).join("");
+    const form = Object.values(D.tw[rid]).filter((x) => x.reg && x.res).slice(-5).map((x) => `<span class="tp-f ${x.res === "W" ? "w" : x.res === "L" ? "l" : "t"}">${x.res === "W" ? "G" : x.res === "L" ? "P" : "E"}</span>`).join("");
 
     // Diagnóstico
     const diag = [];
