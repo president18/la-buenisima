@@ -52,7 +52,7 @@ window.LB_CONFIG = {
 
   // Registro de accesos (Google Sheets + Apps Script, ver tools/registro-accesos.gs).
   // accessLogUrl: el link de la "Aplicación web" que termina en /exec. Vacío = las visitas esperan en cada aparato.
-  accessLogUrl: "",
+  accessLogUrl: "https://script.google.com/macros/s/AKfycbz5CnWkx8p1aXnimhnpsdSdGFKcWS9euRS5RVVjfNOwKl1zUIx7wogMSoj30SWBVBBMIQ/exec",
   accessLogKey: "6e9f37aa77693efca5619ea9",
   // Personas extra en la lista de "¿Quién eres?" (co-dueños sin apodo). Los de "nicknames" ya salen solos.
   accessExtra: [{ user: "joshsnaider1", name: "Josh" }],
